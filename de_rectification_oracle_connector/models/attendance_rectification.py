@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-
+import cx_Oracle
 
 class AttendanceRectification(models.Model):
     _inherit = 'hr.attendance.rectification'
@@ -11,7 +11,7 @@ class AttendanceRectification(models.Model):
     def action_send_rectification_data(self):
         for rectify in self:
             APPLICANT_ID = rectify.employee_id.barcode.lstrip("0")
-            APPROVER_ID = rectify.employee_id.manager_id.barcode.lstrip("0")
+            APPROVER_ID = rectify.employee_id.parent_id.barcode.lstrip("0")
             APP_DATE = rectify.app_date
             APP_REMARKS = 'Test'
             CMTMT_DATE = rectify.check_in
@@ -30,7 +30,7 @@ class AttendanceRectification(models.Model):
                 CMTMT_TYPE =  'S' 
             else:
                 CMTMT_TYPE =  'M' 
-                
+            IO_TIME = False    
             if rectify.partial == 'Check In Time Missing':                
                 IO_TIME =  rectify.check_in.strftime('%H:%M:%S')
             elif rectify.partial == 'Out Time Missing':
@@ -59,7 +59,7 @@ class AttendanceRectification(models.Model):
             REQ_DATE = rectify.create_date  
             REQ_ID = rectify.id
             
-            conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.153:1524/test3')
+            conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
             cur = conn.cursor()
             statement = 'insert into ODOO_HR_COMMITMENT_SLIP_HEADER(APPLICANT_ID,APPROVER_ID, APP_DATE, APP_REMARKS,CMTMT_DATE,CMTMT_DATE_TO,CMTMT_STATUS,CMTMT_TIME_FROM,CMTMT_TIME_TO, CMTMT_TYPE, IO_TIME, POST, PREVIOUS_DAY_NIGHT_SHIFT, REASON_CODE, REMARKS, REQ_DATE, REQ_ID) values(: 2,:3,: 4,:5,: 6,:7,: 8,:9,: 10,:11,: 12,:13,: 14,:15,: 16,:17,: 18)'
             cur.execute(statement, (
@@ -75,7 +75,7 @@ class AttendanceRectification(models.Model):
         for linerectify in rectification:
             CMTMT_DATE = linerectify.date
             REQ_ID = rectify          
-            conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.153:1524/test3')
+            conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
             cur = conn.cursor()
             statement = 'insert into ODOO_HR_COMMITMENT_SLIP_DETAIL(CMTMT_DATE,REQ_ID) values(: 2,:3)'
             cur.execute(statement, (CMTMT_DATE,REQ_ID))
