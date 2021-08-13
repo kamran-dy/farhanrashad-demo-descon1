@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="menu_contract_expiry_report_parent"
+                  name="Contract Expiry Reports"
+                  parent="hr.hr_menu_hr_reports"
+                  action="de_hr_employee_report.action_contract_expiry_wizard" sequence="2"
+        />
+        <menuitem id="menu_cost_center_wise"
+                  name="Cost Center Wise Report"
+                  parent="hr.hr_menu_hr_reports"
+                  action="de_hr_employee_report.action_cost_center_wise_wizard" sequence="3"
+        />
+        <menuitem id="menu_cost_center_distribution"
+                  name="Cost Center Distribution Report"
+                  parent="hr.hr_menu_hr_reports"
+                  action="de_hr_employee_report.action_cost_center_distribution_wizard" sequence="4"
+        />
+        <menuitem id="menu_employee_type"
+                  name="Employee Type"
+                  parent="hr.hr_menu_hr_reports"
+                  action="de_hr_employee_report.action_employee_type" sequence="5"
+        />
+        <menuitem id="menu_contract_expiry_report_parent"
+                  name="Age Report"
+                  parent="hr.hr_menu_hr_reports"
+                  action="de_hr_employee_report.action_employee_age_wizard" sequence="7"
+        />
+    </data>
+</odoo>
+

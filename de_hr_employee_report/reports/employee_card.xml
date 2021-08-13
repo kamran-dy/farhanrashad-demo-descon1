@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+                id="view_employee_card"
+                model="hr.employee"
+                string="Print Employee Card"
+                report_type="qweb-pdf"
+                name="de_hr_employee_report.employee_card"
+                file="Employee Card"/>
+        
+        <template id="employee_card">
+            <t t-call="web.basic_layout">
+                <div class="page">
+                    <t t-foreach="docs" t-as="employee">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-sm-6" style="float:left;width:50%;">
+                                    <table style="width:250pt; height:20pt; border: 1pt solid black; border-collapse:separate; border-radius:8pt; margin:5pt;background-color:blue;">
+                                      <tr style="color:white;">
+                                          <td style="width:33%;" align="center" valign="center">
+                                              <img t-if="employee.company_id.logo" t-att-src="image_data_uri(employee.company_id.logo)" style="max-height:45pt;max-width:90%" alt="Company Logo"/>
+                                          </td>
+                                          <td style="width:67%;">
+                                              <t t-esc="employee.company_id.name"/>
+                                          </td>
+                                      </tr>
+                                    </table>
+                                    <table style="width:250pt; height:150pt;border-bottom: 3px solid #8B4513">
+                                        <td style="width:67%;">
+                                            <strong>Employee #</strong>
+                                            <span style="font-weight: bold;"><t t-esc="employee.emp_number"/></span>
+                                            <br/>
+                                            <span style="font-weight: bold;"><t t-esc="employee.name"/></span>
+                                            <br/>
+                                            <br/>
+                                            <strong>Blood Group: </strong>
+                                            <span style="font-weight: bold;"><t t-esc="employee.blood_group"/></span>
+                                            <br/>
+                                            <strong>CNIC: </strong>
+                                            <span style="font-weight: bold;"><t t-esc="employee.cnic"/></span>
+                                        </td>
+                                        <td style="width:33%;">
+                                            <img t-if="employee.image_1920" t-att-src="image_data_uri(employee.image_1920)" style="max-height:90pt;max-width:90%" alt="Employee Image"/>
+                                        </td>
+                                    </table>
+<!--                                     <h2 style="text-decoration: underline;color:brown;"></h2> -->
+                                </div>
+                                <div class="col-sm-6" style="float:left;width:50%;">
+                                    <br/>
+                                    <br/>
+                                    <br/>
+                                    
+                                    <p style="text-align: center;"><span>
+                                        if found please return to following address:        
+                                        </span></p>
+                                    <p style="text-align: center;font-weight: bold;"><span>Human Resource Department</span></p>
+                                    <p style="font-weight: bold;text-align: center;"><span><t t-esc="employee.company_id.name"/></span></p>
+                                    <h2 style="font-weight: bold;text-align: center;"><span><t t-esc="employee.emp_number"/></span></h2>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+                id="view_employee_age_report_xlsx"
+                model="employee.age"
+                string="Print to XLSX"
+                report_type="xlsx"
+                name="de_hr_employee_report.employee_age_report_xlsx"
+                file="Employee Age XLSX Report"/>
+    </data>
+</odoo>

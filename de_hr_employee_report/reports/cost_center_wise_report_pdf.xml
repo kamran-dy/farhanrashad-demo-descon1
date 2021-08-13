@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="cost_center_wise_pdf_report">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="text-left">
+                            <h3 class="text-center">Cost Center Wise Report</h3>
+                            <div class="row">
+                                <div class="col-5">
+                                    <b>
+                                       Cost Center:
+                                   </b>
+                                   <span t-esc="cost_center"/>
+                                </div>
+                                <div class="col-2">
+                                </div>
+                                <div class="col-5">
+                                    <b>
+                                       Location:
+                                   </b>
+                                   <span t-esc="location"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <b>
+                                       Grade Type:
+                                   </b>
+                                   <span t-esc="grade_type"/>
+                                </div>
+                                <div class="col-2">
+                                </div>
+                                <div class="col-5">
+                                    <b>
+                                       Employee Type:
+                                   </b>
+                                   <span t-esc="employee_type"/>
+                                </div>
+                            </div>
+                        </div>
+                       <div>
+                           <table class="table table-condensed" style="border: 1px solid black;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Cost Cente</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Grade Type</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Employee Type</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Emp Code</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Name</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Designation</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Grade</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">DOJ</b>
+                                        </th>
+                                    </tr>
+                                </thead>
+                               <t t-foreach="active_contract" t-as="o">
+                                   <tbody class="invoice_tbody">
+                                       <tr style="border: 1px solid black">
+                                           <td style="border: 1px solid black">
+                                               <strong t-esc="o.cost_center_information_line[0].cost_center.name"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.grade_type.name"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.emp_type"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.emp_number"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.name"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.job_id.name"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.grade_designation.name"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.date"/>
+                                           </td>
+                                       </tr>
+                                   </tbody>
+                               </t>
+                           </table>
+                       </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

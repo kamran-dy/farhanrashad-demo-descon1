@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+                id="view_cost_center_distribution_report_xlsx"
+                model="cost.center.distribution"
+                string="Print to XLSX"
+                report_type="xlsx"
+                name="de_hr_employee_report.cost_center_distribution_xlsx"
+                file="Cost Center Distribution XLSX Report"/>
+    </data>
+</odoo>

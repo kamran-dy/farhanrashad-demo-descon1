@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="employee_age_pdf">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="text-left">
+                            <h3 class="text-center">Employee Age Report</h3>
+                            <div class="row">
+                                <div class="col-5">
+                                    <b>
+                                       Age From:
+                                   </b>
+                                   <span t-esc="age_from"/>
+                                </div>
+                                <div class="col-2">
+                                    <b>
+                                       Emp Type:
+                                   </b>
+                                    <span t-esc="employee_type"/>
+                                </div>
+                                <div class="col-5">
+                                    <b>
+                                       Department:
+                                   </b>
+                                   <span t-esc="department"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <b>
+                                       Age To:
+                                   </b>
+                                   <span t-esc="age_to"/>
+                                </div>
+                                <div class="col-2">
+                                    <b>
+                                       Grade Type:
+                                   </b>
+                                    <span t-esc="grade_type"/>
+                                </div>
+                                <div class="col-5">
+                                    <b>
+                                       Location:
+                                   </b>
+                                   <span t-esc="location"/>
+                                </div>
+                            </div>
+                        </div>
+                       <div>
+                           <table class="table table-condensed" style="border: 1px solid black;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Sr #</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Emp Code</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Name</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Department</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Employee Type</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Staff Type</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">DOB</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Age</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Years</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Months</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Days</b>
+                                        </th>
+                                    </tr>
+                                </thead>
+                               <t t-foreach="employees" t-as="employee">
+                                   
+                                   <tbody class="invoice_tbody">
+                                       <tr style="border: 1px solid black">
+                                           <td style="border: 1px solid black">
+                                               <strong t-esc="employee['sr_no']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['emp_code']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['name']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['dep_name']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['emp_type']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['g_type']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['dob']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['age']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['year']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['month']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['date']"/>
+                                           </td>
+                                       </tr>
+                                   </tbody>
+                               </t>
+                           </table>
+                       </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

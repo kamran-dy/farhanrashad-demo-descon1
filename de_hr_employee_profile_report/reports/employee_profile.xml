@@ -1,0 +1,1000 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_contract_expiry" model="ir.actions.report">
+            <field name="name">Employee Profile</field>
+            <field name="model">hr.employee</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">de_hr_employee_profile_report.employee_profile_report</field>
+            <field name="report_file">de_hr_employee_profile_report.employee_profile_report</field>
+            <field name="binding_model_id" ref="hr.model_hr_employee"/>
+            <field name="binding_type">report</field>
+        </record>
+        <template id="employee_profile_report">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="row" style="margin-top:0 !important;">
+                            <div class="col-3">
+                                <img style="text-align:left;" src='/web/binary/company_logo'/>
+                            </div>
+                            <div class="col-6">
+                                <h1 style="font-size:20px;">Descon Corporation (Pvt) Limited</h1>
+                                <br></br>
+                                <a style="border-bottom: 1px solid;font-weight:bold;font-size:20px;">Employee Profile Report</a>
+                                <br></br>
+                                <span style="font-weight:bold;"> Location: All</span>
+                                <span style="font-weight:bold;"> Department: All</span>
+                                <span style="font-weight:bold;"> Section: All</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <table class="table table-condensed" style="border:2px solid black;">
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b> Company.</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.address_id.name"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Location</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.work_location"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Emp #/Status</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.emp_number"/>/<span t-field="employee.emp_type"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b> Name</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.name"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Department</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.department_id.name"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Section</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.section"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b> Cost Center</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="cost_center.name"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Emp Type</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.emp_type"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Grade Type</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.grade_type.name"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b> Grade Designation</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.grade_designation.name"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Position</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.job_id.name"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Date of Joining</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.date"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b> Prob Period</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.probation_period"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Confirmation Date</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.confirm_date"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Contract Expiry</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.contract_expiry"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b> Father Name</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.father_name"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Dob/Age</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.birthday"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Nic No.</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.cnic"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b> Bank Name</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+<!--                                         <span t-field="employee.father_name"/> -->
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Bank Branch</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+<!--                                         <span t-field="********"/> -->
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Account #</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.bank_account_id"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b> Blood Group</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.blood_group"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Marital Status</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.marital"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>FAC Deduction</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.fac_deduction"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>FAC Ded. %</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.fac_deduction_percentage"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Is Consultant</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.is_consultant"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Consultant Tax Rate</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.tax_rate"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Resigned Date</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.resigned_date"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Resign Type</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.resign_type"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Resigned Remarks</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.resigned_remarks"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Resign Reason</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.resign_reason"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Religion</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.religion"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Nationality</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.country_id.name"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Gender</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.gender"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>NTN</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.ntn"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>PF Member</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.pf_member"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>PF Trust</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.pf_trust"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>PF Effective Date</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.pf_effec_date"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>SS Entitled</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.ss_entitled"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>SS Number</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.ss_number"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Union Fund Entitled</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.union_fund"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Union Fund Amount</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.union_fund_amount"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>OT Allowed</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.ot_allowed"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>EOBI Number</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.eobi_number"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>EOBI Reg. Date</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.eobi_registration_date"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>WPS</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.wps"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>IPL Variable Cost</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.ipl_variable"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Email</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.work_email"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>City</b>
+                                        
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.place_of_birth"/>
+                                        
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Address</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.temporary_address"/>
+                                    </td>
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Permanent Address</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.address_home_id.street"/> 
+                                    </td>
+                                </tr>
+                                <tr style="line-height:12px;">
+                                    <td colspan="1" style="border:2px solid black;color:blue;">
+                                        <b>Contact #</b>
+                                    </td>
+                                    <td colspan="3" style="border:2px solid black;">
+                                        <span t-field="employee.phone"/>
+                                        
+                                    </td>
+                                </tr>
+                                <tr>
+                                </tr>
+                                <tr>
+                                    <td colspan="6" style="border:2px solid black;color:red;">
+                                        <b>Reporting To.</b>
+                                    </td>
+                                    <td colspan="6" style="border:2px solid black;color:red;">
+                                        <b>Leaves Balances</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="6" style="border:2px solid black;">
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Code</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 40%; float:left">
+                                            <b>
+                                                <strong>Name</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 40%; float:left">
+                                            <b>
+                                                <strong>Level</strong>
+                                            </b>
+                                        </div>
+                                        
+                                    </td>
+                                    <td colspan="6" style="border:2px solid black;">
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Casual</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 40%; float:left">
+                                            <b>
+                                                <strong>Sick</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 40%; float:left">
+                                            <b>
+                                                <strong>Annual</strong>
+                                            </b>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="6" style="border:2px solid black;">
+                                        <div style="width: 20%; float:left">
+                                            <b>
+                                                <span t-field="employee.emp_number"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 40%; float:left">
+                                            <b>
+                                                <span t-field="employee.parent_id.name"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 40%; float:left">
+                                            <b>
+                                                <span t-field="employee.department_id.name"/>
+                                            </b>
+                                        </div>
+                                        
+                                    </td>
+                                    <td colspan="6" style="border:2px solid black;">
+                                        <div style="width: 20%; float:left">
+                                            <b>
+                                                <span t-esc="casual_leave_count"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 40%; float:left">
+                                            <b>
+                                                <span t-esc="sick_leave_count"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 40%; float:left">
+                                            <b>
+                                                <span t-esc="annual_leave_count"/>
+                                            </b>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr style="page-break-before: always">
+                                    <td colspan="6" style="border:2px solid black;color:red;">
+                                        <b>Depandants</b>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="6" style="border:2px solid black;">
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Name</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 40%; float:left">
+                                            <b>
+                                                <strong>Relation</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 40%; float:left">
+                                            <b>
+                                                <strong>Dob</strong>
+                                            </b>
+                                        </div>
+                                        
+                                    </td>
+
+                                </tr>
+                                <tr t-foreach="employee.employee_family_ids" t-as="family">
+                                    <td colspan="6" style="border:2px solid black;">
+
+                                        <div style="width: 20%; float:left">
+                                            <b>
+                                                <span t-field="family.name"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 40%; float:left">
+                                            <b>
+                                                <span t-field="family.relation_ship"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 40%; float:left">
+                                            <b>
+                                                <span t-field="family.date_of_birth"/>
+                                            </b>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;color:red;">
+                                        <b>Qualification</b>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;">
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Degree Name</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Degree Level</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Institute</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Date From</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Date To</strong>
+                                            </b>
+                                        </div>
+                                        
+                                    </td>
+
+                                </tr>
+                                <tr t-foreach="employee.resume_line_ids" t-as="resume">
+                                    <t t-if="resume.line_type_id.name == 'Education'">
+                                        <td colspan="12" style="border:2px solid black;">
+
+                                            <div style="width: 20%; float:left">
+                                                <b>
+                                                    <span t-field="resume.name"/>
+                                                </b>
+                                            </div>
+                                            <div style="width: 20%; float:left">
+                                                <b>
+                                                    <span t-field="resume.description"/>
+                                                </b>
+                                            </div>
+                                            <div style="width: 20%; float:left">
+                                                <b>
+                                                    <span t-field="resume.institute"/>
+                                                </b>
+                                            </div>
+                                            <div style="width: 20%; float:left">
+                                                <b>
+                                                    <span t-field="resume.date_start"/>
+                                                </b>
+                                            </div>
+                                            <div style="width: 20%; float:left">
+                                                <b>
+                                                    <span t-field="resume.date_end"/>
+                                                </b>
+                                            </div>
+                                        </td>
+                                    </t>
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;color:red;">
+                                        <b>Experience</b>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;">
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Employer</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Designation</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 15%; float:left">
+                                            <b>
+                                                <strong>Date From</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 15%; float:left">
+                                            <b>
+                                                <strong>Date To</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 15%; float:left">
+                                            <b>
+                                                <strong>Salary</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 15%; float:left">
+                                            <b>
+                                                <strong>Reason To Leave</strong>
+                                            </b>
+                                        </div>
+                                        
+                                    </td>
+
+                                </tr>
+                                <tr t-foreach="employee.resume_line_ids" t-as="resume">
+                                    <t t-if="resume.line_type_id.name == 'Experience'">
+                                        <td colspan="12" style="border:2px solid black;">
+
+                                            <div style="width: 20%; float:left">
+                                                <b>
+                                                    <span t-field="resume.name"/>
+                                                </b>
+                                            </div>
+                                            <div style="width: 20%; float:left">
+                                                <b>
+                                                    <span t-field="employee.grade_designation"/>
+                                                </b>
+                                            </div>
+                                            <div style="width: 15%; float:left">
+                                                <b>
+                                                    <span t-field="resume.date_start"/>
+                                                </b>
+                                            </div>
+                                            <div style="width: 15%; float:left">
+                                                <b>
+                                                    <span t-field="resume.date_end"/>
+                                                </b>
+                                            </div>
+                                            <div style="width: 15%; float:left">
+                                                <b>
+                                                    <span t-field="resume.salary"/>
+                                                </b>
+                                            </div>
+                                            <div style="width: 15%; float:left">
+                                                <b>
+                                                    <span t-field="resume.reason_to_leave"/>
+                                                </b>
+                                            </div>
+                                        </td>
+                                    </t>
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;color:red;">
+                                        <b>Appraisal History</b>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;">
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Year</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 40%; float:left">
+                                            <b>
+                                                <strong>Ranking</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 40%; float:left">
+                                            <b>
+                                                <strong>Score</strong>
+                                            </b>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;">
+
+                                        <div style="width: 20%; float:left">
+                                            <b>
+                                                <span t-field="employee_appraisal.appraisal_year"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 40%; float:left">
+                                            <b>
+<!--                                                 <span t-field="employee.grade_designation"/> -->
+                                            </b>
+                                        </div>
+                                        <div style="width: 40%; float:left">
+                                            <b>
+<!--                                                 <span t-field="resume.date_start"/> -->
+                                            </b>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;color:red;">
+                                        <b>Training</b>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;">
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Training Name</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 15%; float:left">
+                                            <b>
+                                                <strong>Type</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 15%; float:left">
+                                            <b>
+                                                <strong>Institute</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 10%; float:left">
+                                            <b>
+                                                <strong>Trainser</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 10%; float:left">
+                                            <b>
+                                                <strong>Start Date</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 10%; float:left">
+                                            <b>
+                                                <strong>End Date</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 10%; float:left">
+                                            <b>
+                                                <strong>Hours</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 10%; float:left">
+                                            <b>
+                                                <strong>Venue</strong>
+                                            </b>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;">
+
+                                        <div style="width: 20%; float:left">
+                                            <b>
+                                                <span t-field="employee_training.name"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 15%; float:left">
+                                            <b>
+<!--                                                 <span t-field="employee.grade_designation"/> -->
+                                            </b>
+                                        </div>
+                                        <div style="width: 15%; float:left">
+                                            <b>
+                                                <span t-field="employee_training.institute"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 10%; float:left">
+                                            <b>
+<!--                                                 <span t-field="employee.grade_designation"/> -->
+                                            </b>
+                                        </div>
+                                        <div style="width: 10%; float:left">
+                                            <b>
+<!--                                                 <span t-field="resume.date_start"/> -->
+                                            </b>
+                                        </div>
+                                        <div style="width: 10%; float:left">
+                                            <b>
+<!--                                                 <span t-field="employee.grade_designation"/> -->
+                                            </b>
+                                        </div>
+                                        <div style="width: 10%; float:left">
+                                            <b>
+<!--                                                 <span t-field="resume.date_start"/> -->
+                                            </b>
+                                        </div>
+                                        <div style="width: 10%; float:left">
+                                            <b>
+<!--                                                 <span t-field="resume.date_start"/> -->
+                                            </b>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;color:red;">
+                                        <b>Emp Benefits</b>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;">
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Benefit</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Model</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Registration #</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Cost</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Fleet Card #</strong>
+                                            </b>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                                <tr t-foreach="employee.benefit_lines" t-as="benefit">
+                                    <td colspan="12" style="border:2px solid black;">
+
+                                        <div style="width: 20%; float:left">
+                                            <b>
+                                                <span t-field="benefit.benefit_description"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 20%; float:left">
+                                            <b>
+<!--                                                 <span t-field="employee.grade_designation"/> -->
+                                            </b>
+                                        </div>
+                                        <div style="width: 20%; float:left">
+                                            <b>
+<!--                                                 <span t-field="employee_training.institute"/> -->
+                                            </b>
+                                        </div>
+                                        <div style="width: 20%; float:left">
+                                            <b>
+<!--                                                 <span t-field="employee.grade_designation"/> -->
+                                            </b>
+                                        </div>
+                                        <div style="width: 20%; float:left">
+                                            <b>
+<!--                                                 <span t-field="resume.date_start"/> -->
+                                            </b>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;color:red;">
+                                        <b>Cost Allocation</b>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;">
+                                        <div style="color:blue;width: 25%; float:left">
+                                            <b>
+                                                <strong>Company</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 25%; float:left">
+                                            <b>
+                                                <strong>Cost Center</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 25%; float:left">
+                                            <b>
+                                                <strong>Percentage</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 25%; float:left">
+                                            <b>
+                                                <strong>Start Date</strong>
+                                            </b>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;">
+
+                                        <div style="width: 25%; float:left">
+                                            <b>
+                                                <span t-field="employee.address_id.name"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 25%; float:left">
+                                            <b>
+                                                <span t-field="cost_center.name"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 25%; float:left">
+                                            <b>
+                                                <span t-esc="cost_center_percentage"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 25%; float:left">
+                                            <b>
+                                                <span t-esc="cost_center_start_date"/>
+                                            </b>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;color:red;">
+                                        <b>Projects</b>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="12" style="border:2px solid black;">
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Project Name</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Start Date</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>End Date</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Period</strong>
+                                            </b>
+                                        </div>
+                                        <div style="color:blue;width: 20%; float:left">
+                                            <b>
+                                                <strong>Location</strong>
+                                            </b>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                                <tr t-foreach="employee.project_lines" t-as="project">
+                                    <td colspan="12" style="border:2px solid black;">
+
+                                        <div style="width: 20%; float:left">
+                                            <b>
+                                                <span t-field="project.name"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 20%; float:left">
+                                            <b>
+                                                <span t-field="project.start_date"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 20%; float:left">
+                                            <b>
+                                                <span t-field="project.end_date"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 20%; float:left">
+                                            <b>
+                                                <span t-field="project.period"/>
+                                            </b>
+                                        </div>
+                                        <div style="width: 20%; float:left">
+                                            <b>
+                                                <span t-field="project.location"/>
+                                            </b>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+    </template>
+    </data>
+</odoo>
