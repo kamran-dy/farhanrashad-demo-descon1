@@ -48,9 +48,9 @@
                         </thead>
                         <tbody>
                             <t t-foreach="all_approvals" t-as="_approval_">  
-                               <t t-foreach="_approval_.approver_ids" t-as="lines">
+                               <!-- <t t-foreach="_approval_.approver_ids" t-as="lines">
                                <t t-if="lines.user_id.id == uid">
-                                <t t-if="lines.status == 'pending'"> 
+                                <t t-if="lines.status == 'pending'">  -->
                                 <tr>
                                     <td class="text-left">
                                           <a t-attf-href="/my/approval/#{_approval_.id}?{{ keep_query() }}">#<span t-field="_approval_.id"/></a>
@@ -102,9 +102,9 @@
                                         </t> 
                                     </td>
                                 </tr>
+                                    <!--</t>
                                     </t>
-                                    </t>
-                                </t>
+                                </t> -->
                             </t>
                             <tr>
                                 
