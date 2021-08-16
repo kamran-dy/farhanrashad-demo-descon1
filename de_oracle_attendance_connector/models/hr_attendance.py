@@ -2,6 +2,11 @@
 from odoo import models, fields, api, _
 from odoo import models, fields, api, exceptions, _
 from odoo.tools import format_datetime
+from odoo import models, fields, api, _
+from datetime import date, datetime, timedelta
+from odoo import exceptions
+from dateutil.relativedelta import relativedelta
+from odoo.exceptions import UserError, ValidationError
 
 
 class HrAttendance(models.Model):
@@ -11,42 +16,37 @@ class HrAttendance(models.Model):
     oralce_employee_no = fields.Char(related='employee_id.emp_number')
 
 
-    def action_process_attendance(self):
-        attt_date = fields.date.today() - timedelta(90)
-        total_employee = self.env['hr.employee'].search([])
-        for employee in total_employee:
-            hr_attendances = self.env['hr.attendance'].search([('employee_id','=',employee.id),('check_out','=', False),('att_date','>=', attt_date)])
-            for attendance in hr_attendances:
-                if not attendance.check_out and attendance.check_in:
-                    if attendance.shift_id:
-                        hour_from = 4
-                        attendance_date1 = attendance.check_in.strftime("%Y-%m-%d")
-                        hour_to =  12
-                        attendance_date = datetime.strptime(str(attendance_date1), '%Y-%m-%d')
-                        for  shift_line in attendance.shift_id.attendance_ids:
+    def action_process_attendance(self, attendance_id):
+        hr_attendances = self.env['hr.attendance'].search([('id','=', attendance_id)])
+        for attendance in hr_attendances:
+            if not attendance.check_out and attendance.check_in:
+                if attendance.shift_id:
+                    hour_from = 4
+                    attendance_date1 = attendance.check_in.strftime("%Y-%m-%d")
+                    hour_to =  12
+                    attendance_date = datetime.strptime(str(attendance_date1), '%Y-%m-%d')
+                    for  shift_line in attendance.shift_id.attendance_ids:
+                        hour_from = shift_line.hour_from
+                        hour_to = shift_line.hour_to
+                        if attendance_date.weekday() == shift_line.dayofweek:
                             hour_from = shift_line.hour_from
-                            hour_to = shift_line.hour_to
-                            if attendance_date.weekday() == shift_line.dayofweek:
-                                hour_from = shift_line.hour_from
-                                hour_to = shift_line.hour_to    
-
-
-                        date_hour_from = attendance_date + relativedelta(hours =+ hour_from)
-                        date_hour_to =  attendance_date + relativedelta(hours =+ hour_to) 
-                        check_in = attendance.check_in + relativedelta(hours =+ 5) 
-                        if check_in >= date_hour_from and check_in <= date_hour_to:
-                            delta = date_hour_to - check_in
-                            deltain = delta.total_seconds()
-                            if deltain <= 7200:
-                                attendance.update( {
-                                    'check_in': False,
-                                    'check_out': attendance.check_in
-                                })
-                        elif check_in >= date_hour_to:
+                            hour_to = shift_line.hour_to    
+                    date_hour_from = attendance_date + relativedelta(hours =+ hour_from)
+                    date_hour_to =  attendance_date + relativedelta(hours =+ hour_to) 
+                    check_in = attendance.check_in + relativedelta(hours =+ 5) 
+                    if check_in >= date_hour_from and check_in <= date_hour_to:
+                        delta = date_hour_to - check_in
+                        deltain = delta.total_seconds()
+                        if deltain <= 7200:
                             attendance.update( {
                                     'check_in': False,
                                     'check_out': attendance.check_in
                                 })
+                    elif check_in >= date_hour_to:
+                        attendance.update( {
+                                  'check_in': False,
+                                  'check_out': attendance.check_in
+                        })
                         
     
     
