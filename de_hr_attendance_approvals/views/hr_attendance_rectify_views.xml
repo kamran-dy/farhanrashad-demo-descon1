@@ -52,12 +52,14 @@
                             <field name="check_in"  attrs="{'readonly': [('state','!=', 'draft')]}"/>
                             <field name="check_out" attrs="{'readonly': [('state','!=', 'draft')]}"/>
 							<field name="date" attrs="{'readonly': [('state','!=', 'draft')]}" />
+                             <field name="number_of_Days" attrs="{'readonly': [('state','!=', 'draft')]}" />
+
 						</group>
 
                         <group>
                             <field name="partial"/>
                             <field name="app_date" invisible='0'/> 
-                            <field name="create_date" /> 
+                            <field name="create_date" invisible='1'/> 
 							<field name="approval_request_id" invisible="1" />
 							<field name="category_id" attrs="{'readonly': [('state','!=', 'draft')]}"/>
 							<field name="attendance_id"  invisible="1"/>

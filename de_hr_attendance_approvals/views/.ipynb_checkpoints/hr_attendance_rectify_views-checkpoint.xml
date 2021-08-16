@@ -56,8 +56,6 @@
 
                         <group>
                             <field name="partial"/>
-                            <field name="app_date" invisible='0'/> 
-                            <field name="create_date" /> 
 							<field name="approval_request_id" invisible="1" />
 							<field name="category_id" attrs="{'readonly': [('state','!=', 'draft')]}"/>
 							<field name="attendance_id"  invisible="1"/>
