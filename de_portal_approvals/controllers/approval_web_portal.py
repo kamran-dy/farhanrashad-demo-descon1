@@ -180,7 +180,7 @@ class CustomerPortal(CustomerPortal):
             domain += search_domain
  
         approval_count = request.env['approval.request'].search_count(domain)
-
+        
         pager = portal_pager(
             url="/my/Approvals",
             url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'filterby': filterby,
@@ -190,7 +190,7 @@ class CustomerPortal(CustomerPortal):
             step=self._items_per_page
         )
 
-        _approvals = request.env['approval.request'].search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
+        _approvals = request.env['approval.request'].sudo().search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
         request.session['my_approvals_history'] = _approvals.ids[:100]
 
         grouped_approvals = [_approvals]

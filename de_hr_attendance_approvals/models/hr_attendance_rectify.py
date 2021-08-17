@@ -87,7 +87,7 @@ class HrAttendanceRectification(models.Model):
             
     def action_approve(self):
         for line in self:
-            if line.state in ('submitted','approved'):
+            if line.state =='submitted':
                 line.app_date = fields.date.today()
                 if line.attendance_id:
                     attendance_rectify = self.env['hr.attendance'].search([('id','=',line.attendance_id.id)])
@@ -275,13 +275,18 @@ class HrAttendanceRectification(models.Model):
     def action_validate_comitment_period(self):
         restrict_date = '2021-07-16'
         for line in self:
-            if str(line.date)  <= restrict_date:
+            if str(line.date)  < restrict_date:
                 raise UserError('Not Allow to Enter Rectification Request before 16 JULY 2021!') 
     
     def action_create_approval_request_attendance(self):
         approver_ids  = []
         
-        
+        check_in = False
+        check_out = False
+        if line.check_in:
+            check_in = line.check_in + relativedelta(hours =+ 5)
+        if line.check_out:
+            check_out = line.check_out + relativedelta(hours =+ 5)
         request_list = []
         for line in self:
             if line.category_id:
@@ -290,7 +295,7 @@ class HrAttendanceRectification(models.Model):
                         'request_owner_id': line.employee_id.user_id.id,
                         'category_id': line.category_id.id,
                         'rectification_id': line.id,
-                        'reason': ' Check In: ' + str(line.check_in + relativedelta(hours =+ 5))+"\n"+' Check Out: '+str(line.check_out+ relativedelta(hours =+ 5))+"\n" +"\n" +"\n" + ' Remarks:   ' +str(line.reason)+"\n",
+                        'reason': ' Check In: ' + str(check_in)+"\n"+' Check Out: '+str(check_out)+"\n" +"\n" +"\n" + ' Remarks:   ' +str(line.reason)+"\n",
                         'request_status': 'new',
                 })
                 approval_request_id = self.env['approval.request'].create(request_list)
