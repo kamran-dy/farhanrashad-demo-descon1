@@ -178,19 +178,19 @@ class CustomerPortal(CustomerPortal):
             if search_in in ('request_status', 'all'):
                 search_domain = OR([search_domain, [('request_status', 'ilike', search)]])
             domain += search_domain
-        #domain += [('approver_ids.user_id', '=', http.request.env.context.get('uid'))]
-        approval_count = request.env['approval.request'].sudo().search_count(domain)
+ 
+        approval_count = request.env['approval.request'].search_count(domain)
 
         pager = portal_pager(
             url="/my/Approvals",
             url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'filterby': filterby,
-                      'search_in': search_in, 'search': search},
+                      'seissuesarch_in': search_in, 'search': search},
             total=approval_count,
             page=page,
             step=self._items_per_page
         )
 
-        _approvals = request.env['approval.request'].sudo().search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
+        _approvals = request.env['approval.request'].search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
         request.session['my_approvals_history'] = _approvals.ids[:100]
 
         grouped_approvals = [_approvals]

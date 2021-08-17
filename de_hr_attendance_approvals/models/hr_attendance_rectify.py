@@ -19,12 +19,12 @@ class HrAttendanceRectification(models.Model):
     employee_id = fields.Many2one('hr.employee', string="Employee", required=True)
     user_id = fields.Many2one('res.users', string="User")
     category_id = fields.Many2one(related='employee_id.category_id')
+    app_date = fields.Date(string='Approve Date')
     check_in = fields.Datetime(string="Check In", required=False)
     check_out = fields.Datetime(string="Check Out", required=False)
     approval_request_id = fields.Many2one('approval.request', string="Approval")
     date = fields.Date(string="Date")
     reason =  fields.Text(string="Reason")
-    app_date = fields.Date(string='Approve Date')
     partial = fields.Char(string='Type')
     attendance_id = fields.Many2one('hr.attendance', string="Attendance")
     state = fields.Selection([
@@ -34,6 +34,22 @@ class HrAttendanceRectification(models.Model):
         ('refused', 'Refused')
          ],
         readonly=True, string='State', default='draft')
+    number_of_Days = fields.Integer(string='Number Of Days', compute='_compute_number_of_days')
+    
+    
+    @api.constrains('check_in', 'check_out')
+    def _compute_number_of_days(self):
+        for line in self:
+            if line.check_out and line.check_in:
+                delta_diff = line.check_out - line.check_in
+                delta_days = delta_diff.days
+                line.update({
+                    'number_of_Days': delta_days
+                })    
+            else:
+                line.update({
+                    'number_of_Days': 0
+                })
     
     @api.constrains('check_in', 'check_out')
     def _check_attendance_date(self):
@@ -78,6 +94,7 @@ class HrAttendanceRectification(models.Model):
 
                     attendance_rectify.update({
                         'check_in': line.check_in,
+                        'att_date':  line.check_in,
                         'check_out': line.check_out,
                     })
                     line.update({
@@ -89,12 +106,13 @@ class HrAttendanceRectification(models.Model):
                         for rectify_attendance in attendance_rectify:
                             if rectify_attendance.check_in and rectify_attendance.check_out:
                                 if line.check_out and line.check_in:
-                                    if rectify_attendance.check_in >= line.check_in and  rectify_attendance.check_in <= line.check_out:
+                                    if rectify_attendance.check_in >= line.check_in and  rectify_attendance.check_in >= line.check_out:
                                         pass
                                     else:
                                         vals = {
                                             'employee_id': line.employee_id.id,
                                             'check_in': line.check_in,
+                                            'att_date':  line.check_in,
                                             'check_out': line.check_out,
                                             'remarks': 'Comitment Slip',
                                         }
@@ -108,12 +126,14 @@ class HrAttendanceRectification(models.Model):
                                     if rectify_attendance.check_in > line.check_out:                           
                                         rectify_attendance.update({
                                             'check_in': line.check_out,
+                                            'att_date':  line.check_out,
                                             'check_out': rectify_attendance.check_in,
                                             'remarks': 'In Time Is Missing',
                                         })
                                     elif rectify_attendance.check_in < line.check_out: 
                                         rectify_attendance.update({
                                             'check_in': rectify_attendance.check_in,
+                                            'att_date':  line.check_out,
                                             'check_out': line.check_out,
                                             'remarks': 'Out Time Is Missing',
                                         })
@@ -121,42 +141,115 @@ class HrAttendanceRectification(models.Model):
                                     if rectify_attendance.check_in > line.check_in:                           
                                         rectify_attendance.update({
                                             'check_in': line.check_in,
+                                            'att_date':  line.check_out,
                                             'check_out': rectify_attendance.check_in,
                                             'remarks': 'In Time Is Missing',
                                         })
                                     elif rectify_attendance.check_in < line.check_in: 
                                         rectify_attendance.update({
                                             'check_in': rectify_attendance.check_in,
+                                            'att_date':  line.check_out,
                                             'check_out': line.check_in,   
                                             'remarks': 'Out Time Is Missing',
                                         }) 
                                         
                     else:
+                        if line.number_of_Days == 0:
+                            vals = {
+                                'employee_id': line.employee_id.id,
+                                'check_in': line.check_in,
+                                'att_date':  line.check_out,
+                                'check_out': line.check_out,
+                                'remarks': 'Comitment Slip',
+                            }
+                            attendance = self.env['hr.attendance'].create(vals)
+                            line.update({
+                                'state': 'approved'
+                            }) 
+                        else:
+                            if line.check_in and line.check_out:
+                                delta_days_count = line.number_of_Days + 1
+                                for day in range(delta_days_count):
+                                    check_ina = line.check_in.strftime("%y-%m-%d")
+                                    check_inaa = datetime.strptime(str(check_ina),'%y-%m-%d')
+                                    check_in = check_inaa + timedelta(day)
+                                    hour_from = 4
+                                    hour_to = 8
+
+                                    shift_time = self.env['resource.calendar'].search([('company_id','=',line.employee_id.company_id.id),('shift_type','=','general')], limit=1)
+                                    if line.employee_id.shift_id:
+                                        shift_time =  line.employee_id.shift_id   
+                                    shift_line = self.env['hr.shift.schedule.line'].search([('employee_id','=',line.employee_id.id),('date','=',check_in)], limit=1)
+                                    
+                                    if shift_line.first_shift_id:
+                                        shift_time = shift_line.first_shift_id
+                                        
+                                    for  shift_line in shift_time.attendance_ids:
+                                        hour_from = shift_line.hour_from
+                                        hour_to = shift_line.hour_to
+                                    final_check_in= check_in + relativedelta(hours =+ hour_from)
+                                    check_out = final_check_in + relativedelta(hours =+ hour_to)
+                                    
+                                    vals = {
+                                        'employee_id': line.employee_id.id,
+                                        'check_in':final_check_in ,
+                                        'att_date':  final_check_in,
+                                        'check_out': check_out ,
+                                        'remarks': 'Comitment Slip',
+                                        }
+                                    attendance = self.env['hr.attendance'].create(vals)
+                                    line.update({
+                                        'state': 'approved'
+                                    })          
+                               
+                else:
+                    if line.number_of_Days == 0:
                         vals = {
-                            'employee_id': line.employee_id.id,
-                            'check_in': line.check_in,
-                            'check_out': line.check_out,
-                            'remarks': 'Comitment Slip',
+                                'employee_id': line.employee_id.id,
+                                'check_in': line.check_in,
+                                'att_date':  line.check_out,
+                                'check_out': line.check_out,
+                                'remarks': 'Comitment Slip',
                         }
                         attendance = self.env['hr.attendance'].create(vals)
                         line.update({
                             'state': 'approved'
-                        })                     
-                    line.update({
-                        'state': 'approved'
-                    })
-                else:
-                    vals = {
-                        'employee_id': line.employee_id.id,
-                        'check_in': line.check_in,
-                        'check_out': line.check_out,
-                        'remarks': 'Comitment Slip',
-                        
-                    }
-                    attendance = self.env['hr.attendance'].create(vals)
-                    line.update({
-                        'state': 'approved'
-                    }) 
+                        }) 
+                    else:
+                        if line.check_in and line.check_out:
+                            delta_days_count = line.number_of_Days + 1
+                            for day in range(delta_days_count):
+                                check_ina = line.check_in.strftime("%y-%m-%d")
+                                check_inaa = datetime.strptime(str(check_ina),'%y-%m-%d')
+                                check_in = check_inaa + timedelta(day)
+                                hour_from = 4
+                                hour_to = 8
+
+                                shift_time = self.env['resource.calendar'].search([('company_id','=',line.employee_id.company_id.id),('shift_type','=','general')], limit=1)
+                                if line.employee_id.shift_id:
+                                    shift_time =  line.employee_id.shift_id   
+                                shift_line = self.env['hr.shift.schedule.line'].search([('employee_id','=',line.employee_id.id),('date','=',check_in)], limit=1)
+                                
+                                if shift_line.first_shift_id:
+                                    shift_time = shift_line.first_shift_id
+                                        
+                                for  shift_line in shift_time.attendance_ids:
+                                    hour_from = shift_line.hour_from
+                                    hour_to = shift_line.hour_to
+                                final_check_in= check_in + relativedelta(hours =+ hour_from)
+                                check_out = final_check_in + relativedelta(hours =+ hour_to)
+                                
+                                vals = {
+                                    'employee_id': line.employee_id.id,
+                                    'check_in': final_check_in,
+                                    'att_date':  final_check_in,
+                                    'check_out': check_out ,
+                                    'remarks': 'Comitment Slip',
+                                    }
+                                attendance = self.env['hr.attendance'].create(vals)
+                                line.update({
+                                    'state': 'approved'
+                                })    
                 
             
     def action_refuse(self):
@@ -182,7 +275,7 @@ class HrAttendanceRectification(models.Model):
     def action_validate_comitment_period(self):
         restrict_date = '2021-07-16'
         for line in self:
-            if str(line.date)  < restrict_date:
+            if str(line.date)  <= restrict_date:
                 raise UserError('Not Allow to Enter Rectification Request before 16 JULY 2021!') 
     
     def action_create_approval_request_attendance(self):

@@ -216,7 +216,8 @@ class HolidaysRequest(models.Model):
     def action_validate_leave_period(self):
         restrict_date = '2021-07-16'
         for line in self:
-            if str(line.request_date_from)  < restrict_date: 
+            if str(line.request_date_from)  < restrict_date:
+                
                 raise UserError('Not Allow to Enter Leave Request before 16 JULY 2021!')
     
     def _get_duration_update_approval(self):

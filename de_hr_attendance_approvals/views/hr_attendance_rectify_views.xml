@@ -52,6 +52,8 @@
                             <field name="check_in"  attrs="{'readonly': [('state','!=', 'draft')]}"/>
                             <field name="check_out" attrs="{'readonly': [('state','!=', 'draft')]}"/>
 							<field name="date" attrs="{'readonly': [('state','!=', 'draft')]}" />
+                             <field name="number_of_Days" attrs="{'readonly': [('state','!=', 'draft')]}" />
+
 						</group>
 
                         <group>

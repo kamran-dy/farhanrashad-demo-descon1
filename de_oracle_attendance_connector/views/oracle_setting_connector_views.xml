@@ -12,7 +12,7 @@
                     <header>
                         <button name="try_connection" states="draft" class="oe_highlight" string="Connect" type="object"/>
                         <button name="action_get_attendance_data" states="active" class="oe_highlight" string="Download Attendance" type="object"/>
-                        <button name="action_process" states="active" class="oe_highlight" string="Recompute Attendance" type="object"/> 
+                         
                         <field name="state" widget="statusbar" statusbar_visible="draft,active,close" clickable="1" />
                     </header>
                     <sheet>

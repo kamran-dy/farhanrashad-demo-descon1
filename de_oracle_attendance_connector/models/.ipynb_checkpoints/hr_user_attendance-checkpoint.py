@@ -28,19 +28,14 @@ class HrUserAttendance(models.Model):
       
 
    
-    def unlink(self):
-        for ovtime in self:
-            if ovtime:
-                raise UserError(_('You cannot delete a Attendance Record!'))
-            
-        return super(HrOverTime, self).unlink()  
+
 
 
 
     def action_attendace_validated(self):
         
-        month_datetime = fields.date.today() - timedelta(2)
-        for month_date in range(2):
+        month_datetime = fields.date.today() - timedelta(100)
+        for month_date in range(100):
             datetime =  month_datetime + timedelta(month_date)
             date_start = datetime + relativedelta(hours =+ 0)
             date_end = datetime + relativedelta(hours =+ 23.99)
@@ -50,42 +45,151 @@ class HrUserAttendance(models.Model):
                 count = oracle_attendance.search_count([('employee_id','=',employee.id)])
                 
 
-                attendance_list = oracle_attendance.search([('employee_id','=',employee.id),('timestamp','>=',date_start),('timestamp','<=',date_end),('is_attedance_created','=',False)], order="timestamp asc",)
-                if attendance_list:
+                attendance_list = oracle_attendance.search([('employee_id','=',employee.id),('timestamp','>=',date_start),('timestamp','<=',date_end),('is_attedance_created','=',False)], order="timestamp asc")
+                if attendance_list: 
                     check_in = fields.date.today()
                     for attendace in attendance_list:
-                            
-                        previous_attendance = attendace.attendance_date - timedelta(1)  
+                        previous_attendance = attendace.attendance_date - timedelta(1)    
                         previos_existing_attendance = self.env['hr.attendance'].search([('employee_id','=',attendace.employee_id.id),('att_date','=', previous_attendance), ('check_out','=', False)], order="check_in asc", limit=1)
                         if previos_existing_attendance:
-
-                            previos_existing_attendance.update({
-                                          'check_out': attendace.timestamp,
-                                          'att_date': attendace.attendance_date,
-                                         })
-                            attendace.update({
-                                'is_attedance_created' : True
-                                    })
-                        if not previos_existing_attendance:    
+                            delta_in_yesterday = attendace.timestamp - previos_existing_attendance.check_in  
+                            deltain = delta_in_yesterday.total_seconds()
+                            if deltain <= 50400:
+                                previos_existing_attendance.update({
+                                     'check_out': attendace.timestamp,
+                                      'att_date': attendace.attendance_date,
+                                                     })
+                                attendace.update({
+                                       'is_attedance_created' : True
+                                                })
+                            
+                                
+                        if not previos_existing_attendance:
                             existing_attendance = self.env['hr.attendance'].search([('employee_id','=',attendace.employee_id.id),('att_date','=', attendace.attendance_date), ('check_out','=', False)], order="check_in asc", limit=1)
                             if existing_attendance:
+                      
+                                delta_yesterday1 = attendace.timestamp - existing_attendance.check_in  
+                                delta1a = delta_yesterday1.total_seconds()
+                                if delta1a < 600 :
+                                    existing_attendance.update({
+                                                        'check_in': attendace.timestamp,
+                                                        'att_date': attendace.attendance_date,
+                                                    })
+                                    attendace.update({
+                                                    'is_attedance_created' : True
+                                                        })
+                                else:
+                                    edelta_in_yesterday = attendace.timestamp - existing_attendance.check_in  
+                                    edeltain = edelta_in_yesterday.total_seconds()
+                                    if edeltain <= 50400:
+                                        existing_attendance.update({
+                                                            'check_out': attendace.timestamp,
+                                                            'att_date': attendace.attendance_date,
+                                                        })
+                                        attendace.update({
+                                                    'is_attedance_created' : True
+                                                        }) 
+                                    else:
+                                        vals = {
+                                                'employee_id': attendace.employee_id.id,
+                                                'check_in': attendace.timestamp,
+                                                'att_date': attendace.attendance_date,
+                                                    }
+                                        hr_attendance = self.env['hr.attendance'].create(vals)
+                                        hr_attendance.action_process_attendance()
+                                        check_in = attendace.timestamp
+                                        attendace.update({
+                                                   'is_attedance_created' : True
+                                                        })  
 
-                                existing_attendance.update({
-                                              'check_out': attendace.timestamp,
-                                              'att_date': attendace.attendance_date,
-                                             })
-                                attendace.update({
-                                    'is_attedance_created' : True
-                                        })    
-                           
                             if not existing_attendance:
-                                vals = {
-                                    'employee_id': attendace.employee_id.id,
-                                    'check_in': attendace.timestamp,
-                                    'att_date': attendace.attendance_date,
-                                        }
-                                hr_attendance = self.env['hr.attendance'].create(vals)
-                                check_in = attendace.timestamp
-                                attendace.update({
-                                        'is_attedance_created' : True
-                                    })
+                                previous_attendance2 = attendace.attendance_date - timedelta(1)    
+                                previos_existing_attendance2 = self.env['hr.attendance'].search([('employee_id','=',attendace.employee_id.id),('att_date','=', previous_attendance2)], order="check_in asc", limit=1)
+                                if previos_existing_attendance2:
+                                    delta_pre_yesterday = attendace.timestamp - previos_existing_attendance2.check_out  
+                                    delta1a = delta_pre_yesterday.total_seconds()
+                                    if delta1a < 600 :
+                                        previos_existing_attendance2.update({
+                                                            'check_out': attendace.timestamp,
+                                                            'att_date': attendace.attendance_date,
+                                                        })
+                                        attendace.update({
+                                                        'is_attedance_created' : True
+                                                            })    
+                                    else:
+                                        existing_attendance2 = self.env['hr.attendance'].search([('employee_id','=',attendace.employee_id.id),('att_date','=', attendace.attendance_date)], order="check_in asc", limit=1)
+                                        if existing_attendance2:
+                                            delta_today = attendace.timestamp - existing_attendance2.check_out  
+                                            delta1a = delta_today.total_seconds()
+                                            if delta1a < 600 :
+                                                existing_attendance2.update({
+                                                                    'check_out': attendace.timestamp,
+                                                                    'att_date': attendace.attendance_date,
+                                                                })
+                                                attendace.update({
+                                                                'is_attedance_created' : True
+                                                                    })
+                                            else:    
+                                        
+                                                vals = {
+                                                            'employee_id': attendace.employee_id.id,
+                                                            'check_in': attendace.timestamp,
+                                                            'att_date': attendace.attendance_date,
+                                                            }
+                                                hr_attendance = self.env['hr.attendance'].create(vals)
+                                                hr_attendance.action_process_attendance()
+                                                check_in = attendace.timestamp
+                                                attendace.update({
+                                                                'is_attedance_created' : True
+                                                            })
+                                        else:
+                                            vals = {
+                                                    'employee_id': attendace.employee_id.id,
+                                                    'check_in': attendace.timestamp,
+                                                    'att_date': attendace.attendance_date,
+                                                    }
+                                            hr_attendance = self.env['hr.attendance'].create(vals)
+                                            hr_attendance.action_process_attendance()
+                                            check_in = attendace.timestamp
+                                            attendace.update({
+                                                        'is_attedance_created' : True
+                                                            })
+                                else:
+                                    existing_attendance12 = self.env['hr.attendance'].search([('employee_id','=',attendace.employee_id.id),('att_date','=', attendace.attendance_date)], order="check_in asc", limit=1)
+                                    if existing_attendance12:
+                                        delta_today1 = attendace.timestamp - existing_attendance12.check_out  
+                                        delta1a = delta_today1.total_seconds()
+                                        if delta1a < 600 :
+                                            existing_attendance12.update({
+                                                                'check_out': attendace.timestamp,
+                                                                'att_date': attendace.attendance_date,
+                                                                })
+                                            attendace.update({
+                                                                'is_attedance_created' : True
+                                                                    })
+                                        else:    
+                                            vals = {
+                                                  'employee_id': attendace.employee_id.id,
+                                                  'check_in': attendace.timestamp,
+                                                  'att_date': attendace.attendance_date,
+                                                   }
+                                            hr_attendance = self.env['hr.attendance'].create(vals)
+                                            hr_attendance.action_process_attendance()
+                                            check_in = attendace.timestamp
+                                            attendace.update({
+                                                                'is_attedance_created' : True
+                                                            })
+                                    else:
+                                        vals = {
+                                                'employee_id': attendace.employee_id.id,
+                                                 'check_in': attendace.timestamp,
+                                                 'att_date': attendace.attendance_date,
+                                                    }
+                                        hr_attendance = self.env['hr.attendance'].create(vals)
+                                        hr_attendance.action_process_attendance()
+                                        check_in = attendace.timestamp
+                                        attendace.update({
+                                                     'is_attedance_created' : True
+                                                         })
+                                    
+                                                

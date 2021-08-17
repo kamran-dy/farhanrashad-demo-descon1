@@ -26,10 +26,10 @@ import json
 
 def timeoff_page_content(flag = 0):
     leave_type = request.env['hr.leave.type'].search([('is_publish','=', True)])
-    employees = request.env['hr.employee'].search([('user_id','=',http.request.env.context.get('uid'))])
-    leave_allocation = request.env['hr.leave.allocation'].search([('employee_id.user_id', '=', http.request.env.context.get('uid') )])
+    employees = request.env['hr.employee'].sudo().search([('user_id','=',http.request.env.context.get('uid'))])
+    leave_allocation = request.env['hr.leave.allocation'].sudo().search([('employee_id.user_id', '=', http.request.env.context.get('uid') )])
     
-    company_info = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])
+    company_info = request.env['res.users'].sudo().search([('id','=',http.request.env.context.get('uid'))])
     managers = employees.line_manager
     employee_name = employees
     return {
@@ -318,19 +318,20 @@ class CustomerPortal(CustomerPortal):
             if search_in in ('id', 'all'):
                 search_domain = OR([search_domain, [('id', 'ilike', search)]])
             domain += search_domain
+        domain += [('employee_id.user_id', '=', http.request.env.context.get('uid'))] 
         timeoff_count = request.env['hr.leave'].search_count(domain)
 
         # pager
         pager = portal_pager(
             url="/my/timeoffs",
             url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'filterby': filterby,
-                      'seissuesarch_in': search_in, 'search': search},
-            total=555,
+                      'search_in': search_in, 'search': search},
+            total=timeoff_count,
             page=page,
             step=self._items_per_page
         )
 
-        _timeoff = request.env['hr.leave'].search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
+        _timeoff = request.env['hr.leave'].sudo().search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
         request.session['my_timeoff_history'] = _timeoff.ids[:100]
 
         grouped_timeoffs = [_timeoff]

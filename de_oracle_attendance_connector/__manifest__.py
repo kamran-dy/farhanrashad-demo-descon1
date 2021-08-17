@@ -27,7 +27,6 @@
     'data': [
          'data/scheduler_data.xml',
          'security/security.xml',
-         'wizard/process_attendance_wizard.xml', 
          'views/hr_user_attendance_views.xml',
          'views/hr_employee_views.xml',
          'wizard/hr_attendance_wizard.xml',      

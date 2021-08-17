@@ -30,13 +30,9 @@ def timeoff_page_content(flag = 0):
     leave_allocation = request.env['hr.leave.allocation'].search([('employee_id.user_id', '=', http.request.env.context.get('uid') )])
     
     company_info = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])
-    managers = employees.line_manager
-    employee_name = employees
     return {
         'leave_type' : leave_type,
         'employees' : employees,
-        'employee_name': employee_name,
-        'managers': managers,
         'leave_allocation': leave_allocation,
         'success_flag' : flag,
         'company_info' : company_info

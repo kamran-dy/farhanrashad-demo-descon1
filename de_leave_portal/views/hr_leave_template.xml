@@ -663,7 +663,7 @@
                         </thead>
                         <tbody>
                             <t t-set="allocation_type" t-value="0"/>  
-                             <t t-foreach="leave_allocation" t-as="allocation">
+                            <t t-foreach="leave_allocation" t-as="allocation">
                                <t t-set="balance" t-value="0"/> 
                                <t t-set="employeeid" t-value="0"/> 
                                <t t-if="allocation.holiday_status_id.id != allocation_type" >
