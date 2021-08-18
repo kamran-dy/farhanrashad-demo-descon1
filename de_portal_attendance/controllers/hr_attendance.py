@@ -137,43 +137,58 @@ class CreateAttendance(http.Controller):
                 return request.render("de_portal_attendance.rectification_submited", {})
                 
         else:
-            checkin_date_in = kw.get('check_in')
-            attendance_data_in =  fields.datetime.now()
-            if checkin_date_in:
-                date_processing_in = checkin_date_in.replace('T', '-').replace(':', '-').split('-')
-                date_processing_in = [int(v) for v in date_processing_in]
-                checkin_date_out = datetime(*date_processing_in)
-                attendance_data_in = datetime(*date_processing_in) - relativedelta(hours =+ 5)  
-            
-            if attendance_data_in.date() > date.today():
-                return request.render("de_portal_attendance.cannot_submit_future_days_commitment_msg", attendance_page_content())
-            
-            attendance_data_out =  fields.datetime.now()
-            checkout_date_in = kw.get('check_out') 
-            if checkout_date_in:
-                date_processing_out = checkout_date_in.replace('T', '-').replace(':', '-').split('-')
-                date_processing_out = [int(v) for v in date_processing_out]
-                checkout_date_out = datetime(*date_processing_out)
-                attendance_data_out = datetime(*date_processing_out) - relativedelta(hours =+ 5)
-
-#             raise UserError(str(checkin_date_in)+' '+str(checkout_date_in))
-            
-            rectify_val = {
-                'reason': kw.get('description'),
-                'employee_id': int(kw.get('employee_id')),
-                'check_in':  attendance_data_in,
-                'check_out': attendance_data_out,
-                'partial': 'Full',
-                'date':  checkin_date_in,
-            }
-            record = request.env['hr.attendance.rectification'].sudo().create(rectify_val)
             if kw.get('partial'):
-                record.update({
-                        'partial': 'Partial',
-                })
-            record.action_submit()
-            return request.render("de_portal_attendance.rectification_submited", {})
-    
+                check_in_datetime = datetime.datetime(kw.get('date_partial')) + relativedelta(hours =+ float(kw.get('check_in_time')))
+                check_out_datetime = datetime.datetime(kw.get('date_partial')) + relativedelta(hours =+ float(kw.get('check_out_time')))
+                rectify_val = {
+                    'reason': kw.get('description'),
+                    'employee_id': int(kw.get('employee_id')),
+                    'check_in':  check_in_datetime,
+                    'check_out': check_out_datetime,
+                    'partial': 'Partial',
+                    'date':  check_in_datetime,
+                }
+                record = request.env['hr.attendance.rectification'].sudo().create(rectify_val)
+                record.action_submit()
+                return request.render("de_portal_attendance.rectification_submited", {})
+        
+            else:    
+                checkin_date_in = kw.get('check_in')
+                attendance_data_in =  fields.datetime.now()
+                if checkin_date_in:
+                    date_processing_in = checkin_date_in.replace('T', '-').replace(':', '-').split('-')
+                    date_processing_in = [int(v) for v in date_processing_in]
+                    checkin_date_out = datetime(*date_processing_in)
+                    attendance_data_in = datetime(*date_processing_in) - relativedelta(hours =+ 5)  
+
+                if attendance_data_in.date() > date.today():
+                    return request.render("de_portal_attendance.cannot_submit_future_days_commitment_msg", attendance_page_content())
+
+                attendance_data_out =  fields.datetime.now()
+                checkout_date_in = kw.get('check_out') 
+                if checkout_date_in:
+                    date_processing_out = checkout_date_in.replace('T', '-').replace(':', '-').split('-')
+                    date_processing_out = [int(v) for v in date_processing_out]
+                    checkout_date_out = datetime(*date_processing_out)
+                    attendance_data_out = datetime(*date_processing_out) - relativedelta(hours =+ 5)
+
+
+                rectify_val = {
+                    'reason': kw.get('description'),
+                    'employee_id': int(kw.get('employee_id')),
+                    'check_in':  attendance_data_in,
+                    'check_out': attendance_data_out,
+                    'partial': 'Full',
+                    'date':  checkin_date_in,
+                }
+                record = request.env['hr.attendance.rectification'].sudo().create(rectify_val)
+                if kw.get('partial'):
+                    record.update({
+                            'partial': 'Partial',
+                    })
+                record.action_submit()
+                return request.render("de_portal_attendance.rectification_submited", {})
+
     
     
    
