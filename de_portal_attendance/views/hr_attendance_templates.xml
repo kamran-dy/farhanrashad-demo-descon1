@@ -4,8 +4,8 @@
     
         <template id="portal_rectify_layout" name="Portal layout: Rectify menu entry" inherit_id="portal.portal_breadcrumbs" priority="25">
         <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
-            <li t-if="page_name == 'attendance' or attendance" class="col-lg-2" t-attf-class="breadcrumb-item #{'active ' if not attendance else ''}">
-                <a t-if="attendance" t-attf-href="/hr/rectify/attendances?{{ keep_query() }}">Attendance Rectification</a>
+            <li t-if="page_name == 'rectify' or rectify" class="col-lg-2" t-attf-class="breadcrumb-item #{'active ' if not attendance else ''}">
+                <a t-if="rectify" t-attf-href="/hr/rectify/attendances?{{ keep_query() }}">Attendance Rectification</a>
                 <t t-else="">Attendance Rectification</t>
             </li>
 
@@ -40,10 +40,12 @@
                         <thead>
                             <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
                                 <th class="text-left">Employee</th>
+                                <th class="text-left">Approver</th>
                                 <th class="text-left">Check In</th>
                                 <th class="text-left">Check Out</th>
                                 <th class="text-left">Type</th>
                                 <th class="text-left">Reason</th>
+                                <th class="text-left">State</th>
                                 
                             </tr>
                         </thead>
@@ -54,6 +56,9 @@
                                     
                                      <td>
                                       <span t-field="rectify.employee_id.name"/>
+                                    </td>
+                                    <td>
+                                      <span t-field="rectify.employee_id.parent_id.name"/>
                                     </td>
                                      <td class="text-left">
                                         <t t-if="rectify.check_in"> 
@@ -68,6 +73,21 @@
                                     </td>
                                     <td class="text-left">
                                         <span t-esc="rectify.reason" />
+                                    </td>
+                                    <td class="text-left">
+                                        <t t-if="rectify.state == 'draft'">
+                                            <i class="badge badge-pill badge-info" >Draft</i>
+                                        </t>
+                                        <t t-if="rectify.state == 'submitted'">
+                                            <i class="badge badge-pill badge-info" >To Approve</i>
+                                        </t>
+                                        <t t-if="rectify.state == 'approved'">
+                                            <i class="badge badge-pill badge-info" >Approved</i>
+                                        </t>
+                                         <t t-if="rectify.state == 'refused'">
+                                            <i class="badge badge-pill badge-info" >Refused</i>
+                                        </t>
+                                        
                                     </td>
                                     <td class="text-left">
                                           <t t-if = "rectify.state == 'submitted'">

@@ -212,7 +212,7 @@ class CustomerPortal(CustomerPortal):
     def _rectify_attendance_get_page_view_values(self,rectify, next_id = 0,pre_id= 0, attendance_user_flag = 0, access_token = None, **kwargs):
         values = {
             'page_name' : 'rectify',
-            'attendance' : rectify,
+            'rectify' : rectify,
             'attendance_user_flag': attendance_user_flag,
             'next_id' : next_id,
             'pre_id' : pre_id,
@@ -370,8 +370,8 @@ class CustomerPortal(CustomerPortal):
             if search_in in ('employee_id.name', 'Employee'):
                 search_domain = OR([search_domain, [('employee_id.name', 'ilike', search)]])
             domain += search_domain
- 
-        attendance_count = request.env['hr.attendance'].search_count(domain)
+        domain += [('employee_id.user_id', '=', http.request.env.context.get('uid'))] 
+        attendance_count = request.env['hr.attendance'].sudo().search_count(domain)
 
         pager = portal_pager(
             url="/hr/attendances",
@@ -382,7 +382,7 @@ class CustomerPortal(CustomerPortal):
             step=self._items_per_page
         )
 
-        _attendances = request.env['hr.attendance'].search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
+        _attendances = request.env['hr.attendance'].sudo().search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
         request.session['my_attendance_history'] = _attendances.ids[:100]
 
         grouped_attendances = [project_groups]
