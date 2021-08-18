@@ -22,7 +22,7 @@ from odoo.osv.expression import OR
 
 def attendance_page_content(flag = 0):
     emps = request.env['hr.employee'].sudo().search([('user_id','=',http.request.env.context.get('uid'))])
-    managers = request.env['hr.employee'].sudo().search([('parent_id.user_id','=',http.request.env.context.get('uid'))]).name
+    managers = emps.line_manager
     employee_name = emps
     return {
         'emps': emps,
@@ -267,7 +267,7 @@ class CustomerPortal(CustomerPortal):
             if search_in in ('employee_id.name', 'Employee'):
                 search_domain = OR([search_domain, [('employee_id.name', 'ilike', search)]])
             domain += search_domain
- 
+        domain += [('employee_id.user_id', '=', http.request.env.context.get('uid'))] 
         rectify_count = request.env['hr.attendance.rectification'].search_count(domain)
 
         pager = portal_pager(
@@ -279,7 +279,7 @@ class CustomerPortal(CustomerPortal):
             step=self._items_per_page
         )
 
-        _rectification = request.env['hr.attendance.rectification'].search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
+        _rectification = request.env['hr.attendance.rectification'].sudo().search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
         request.session['my_rectify_attendance_history'] = _rectification.ids[:100]
 
         grouped_rectify_attendances = [project_groups]
