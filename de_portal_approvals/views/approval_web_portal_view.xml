@@ -35,7 +35,7 @@
             </t>
             <t t-if="grouped_approvals">
                 <t t-call="portal.portal_table">
-                    <t t-foreach="grouped_approvals" t-as="all_approvals">
+                    
                         <thead>
                             <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
                                 <th class="text-left">Ref</th>
@@ -46,7 +46,9 @@
                                 <th class="text-center">Action</th>
                             </tr>
                         </thead>
+                        <t t-foreach="grouped_approvals" t-as="all_approvals">
                         <tbody>
+                            
                             <t t-foreach="all_approvals" t-as="_approval_">  
                                <t t-foreach="_approval_.approver_ids" t-as="lines">
                                <t t-if="lines.user_id.id == uid">
