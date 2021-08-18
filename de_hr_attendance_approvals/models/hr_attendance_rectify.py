@@ -281,14 +281,15 @@ class HrAttendanceRectification(models.Model):
     def action_create_approval_request_attendance(self):
         approver_ids  = []
         
-        check_in = False
-        check_out = False
-        if line.check_in:
-            check_in = line.check_in + relativedelta(hours =+ 5)
-        if line.check_out:
-            check_out = line.check_out + relativedelta(hours =+ 5)
+        
         request_list = []
         for line in self:
+            check_in = False
+            check_out = False
+            if line.check_in:
+                check_in = line.check_in + relativedelta(hours =+ 5)
+            if line.check_out:
+                check_out = line.check_out + relativedelta(hours =+ 5)
             if line.category_id:
                 request_list.append({
                         'name':  str(line.employee_id.name ),
@@ -301,6 +302,7 @@ class HrAttendanceRectification(models.Model):
                 approval_request_id = self.env['approval.request'].create(request_list)
                 approval_request_id._onchange_category_id()
                 approval_request_id.action_confirm()
+                approval_request_id.action_date_confirm_update()
                 line.approval_request_id = approval_request_id.id
 
 

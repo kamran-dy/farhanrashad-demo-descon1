@@ -48,6 +48,7 @@
                     <field name="category_id" readonly="1" invisible="0"/> 
                     <field name="request_status" string="Approval Status"/> 
                     <field name="approval_request_id" invisible="1"/> 
+                    <field name="approve_date" invisible="1"/> 
                 </xpath>
               
            </field>

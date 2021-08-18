@@ -46,6 +46,16 @@ class HolidaysRequest(models.Model):
                                             column1="doc_id",
                                             column2="attachment_id",
                                             string="Attachment")
+    approve_date = fields.Date(string='Approve Date')
+    
+    
+    def action_validate(self):
+       
+        res = super(HolidaysRequest, self).action_validate()
+        self.update({
+            'approve_date': fields.date.today()
+        })
+        return res
     
     
     def action_cancel(self):
@@ -200,7 +210,15 @@ class HolidaysRequest(models.Model):
                     holiday_sudo.activity_update()
             holiday._get_date_from_to()  
             holiday._get_duration_update_approval()  
+            holiday.action_validate_leave_period()  
         return holidays
+
+    def action_validate_leave_period(self):
+        restrict_date = '2021-07-16'
+        for line in self:
+            if str(line.request_date_from)  < restrict_date:
+                
+                raise UserError('Not Allow to Enter Leave Request before 16 JULY 2021!')
     
     def _get_duration_update_approval(self):
         for line in self:
@@ -264,7 +282,7 @@ class HolidaysRequest(models.Model):
                 duration_type = 'Short leave'     
                 
             request_list.append({
-                'name': ' Leave Request From '+ str(line.employee_id.name) ,
+                'name':  str(line.employee_id.name) ,
                 'request_owner_id': line.employee_id.user_id.id or line.user_id.id,
                 'category_id': line.category_id.id,
                 'leave_id': line.id,
@@ -274,4 +292,5 @@ class HolidaysRequest(models.Model):
             approval_request_id = self.env['approval.request'].create(request_list)
             approval_request_id._onchange_category_id()
             approval_request_id.action_confirm()
+            approval_request_id.action_date_confirm_update()
             line.approval_request_id = approval_request_id.id
