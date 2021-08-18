@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
-
+from datetime import date, timedelta
 
 
 class ResPartner(models.Model):
@@ -23,7 +23,7 @@ class ApprovalRequest(models.Model):
             line.update({
                'date_confirmed': date_confirm
             })
-            mail = self.env['mail.activity'].search([('res_id','=',rec.id)])
+            mail = self.env['mail.activity'].search([('res_id','=',line.id)])
             date_dead = fields.date.today() + timedelta(60)
             mail.update ({
                'date_deadline': date_dead
