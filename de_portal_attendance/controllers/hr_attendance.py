@@ -32,6 +32,18 @@ def attendance_page_content(flag = 0):
     }
 
 
+def print_page_content(flag = 0):
+    emps = request.env['hr.employee'].sudo().search([('user_id','=',http.request.env.context.get('uid'))])
+    managers = emps.line_manager
+    employee_name = emps
+    return {
+        'emps': emps,
+        'managers': managers,
+        'employee_name': employee_name,
+        'success_flag' : flag,
+    }
+
+
 
 def paging(data, flag1 = 0, flag2 = 0):        
     if flag1 == 1:
@@ -48,9 +60,17 @@ def paging(data, flag1 = 0, flag2 = 0):
 class CreateAttendance(http.Controller):
     @http.route('/hr/attendance/rectify/',type="http", website=True, auth='user')
     def approvals_create_template(self, **kw):
-       return request.render("de_portal_attendance.attendance_create_rectify", attendance_page_content())
+        return request.render("de_portal_attendance.attendance_create_rectify", attendance_page_content())
+
+
+    @http.route('/hr/attendance/print/',type="http", website=True, auth='user')
+    def action_print_attendance(self, **kw):
+        return request.render("de_portal_attendance.print_attendance_report", print_page_content())
     
-    
+    @http.route('/hr/attendance/print/report',type="http", website=True, auth='user')
+    def action_print_attendance_report(self, **kw):
+        
+        return request.redirect('/hr/attendances')
     
     @http.route('/hr/attendance/rectify/save', type="http", auth="public", website=True)
     def create_rectify_attendance(self, **kw):
