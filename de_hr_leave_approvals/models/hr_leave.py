@@ -292,4 +292,5 @@ class HolidaysRequest(models.Model):
             approval_request_id = self.env['approval.request'].create(request_list)
             approval_request_id._onchange_category_id()
             approval_request_id.action_confirm()
+            approval_request_id.action_date_confirm_update()
             line.approval_request_id = approval_request_id.id

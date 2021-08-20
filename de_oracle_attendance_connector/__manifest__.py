@@ -29,7 +29,7 @@
          'security/security.xml',
          'views/hr_user_attendance_views.xml',
          'views/hr_employee_views.xml',
-         #'wizard/hr_attendance_wizard.xml',      
+         'wizard/hr_attendance_wizard.xml',      
         'security/ir.model.access.csv',
         'views/hr_attendance_views.xml',
         'views/oracle_setting_connector_views.xml',
