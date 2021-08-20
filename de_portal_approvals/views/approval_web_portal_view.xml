@@ -35,7 +35,7 @@
             </t>
             <t t-if="grouped_approvals">
                 <t t-call="portal.portal_table">
-                    <t t-foreach="grouped_approvals" t-as="all_approvals">
+                    
                         <thead>
                             <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
                                 <th class="text-left">Ref</th>
@@ -46,7 +46,9 @@
                                 <th class="text-center">Action</th>
                             </tr>
                         </thead>
+                        <t t-foreach="grouped_approvals" t-as="all_approvals">
                         <tbody>
+                            
                             <t t-foreach="all_approvals" t-as="_approval_">  
                                <t t-foreach="_approval_.approver_ids" t-as="lines">
                                <t t-if="lines.user_id.id == uid">
@@ -60,7 +62,29 @@
                                     </td>
                                      
                                        <td class="text-left">
+                                        <t t-if="_approval_.leave_id">   
+                                          <t t-if="_approval_.leave_id.leave_category == 'day'">
+                                             <i class="badge badge-pill badge-info" >Day</i>
+                                           </t>
+                                           <t t-if="_approval_.leave_id.leave_category == 'half_day'">
+                                             <i class="badge badge-pill badge-info" >Half Day</i>
+                                           </t>
+                                           <t t-if="_approval_.leave_id.leave_category == 'hours'">
+                                             <i class="badge badge-pill badge-info" >Short leave</i>
+                                           </t>
+                                         </t> 
+                                           
+                                           <t t-if="not _approval_.leave_id">
+                                           <t t-if="not _approval_.rectification_id">
+                                              <span t-esc="_approval_.reason"/>
+                                         
+                                          </t> 
+                                          </t>   
+                                           <t t-if="_approval_.rectification_id">
                                        
+                                              <span t-esc="_approval_.rectification_id.partial"/>
+                                                                             
+                                          </t>   
                                        </td>
                                         
                                    
