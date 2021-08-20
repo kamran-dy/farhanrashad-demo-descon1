@@ -223,40 +223,7 @@
        <template id="attendance_create_rectify" name="Create Attendance">
         <t t-call="portal.portal_layout">
                <div id="wrap">
-                   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-                         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-                        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-                        <script>
-                              $(function () {
-                                
-                                var partial = $( "#partial" ).val();
-                               
-                                    $("#check_in_time").hide();
-                                    $("#check_out_time").hide();
-                                    $("#check_in").show();
-                                    $("#check_out").show(); 
-                              
-                            });
-                              $(document).ready(function(){
-                              $("#partial").change(function(){
-                                var partial = $( "#partial" ).val();
-                                if($(this).is(":checked")){
-                                    $("#check_in").hide();
-                                    $("#check_out").hide();
-                                    $("#check_in_time").show();
-                                    $("#check_out_time").show();
-                                }
-                                else if($(this).is(":not(:checked)")){
-                                    $("#check_in_time").hide();
-                                    $("#check_out_time").hide();
-                                    $("#check_in").show();
-                                    $("#check_out").show(); 
-                                }
-                                
-                              });
-                              
-                            }); 
-                        </script>
+                  
                    
                    
                             <div class="oe_structure" data-oe-model="ir.ui.view" data-oe-id="2052" data-oe-field="arch" data-oe-xpath="/t[1]/t[1]/div[1]/div[1]">
@@ -288,12 +255,52 @@
                                                 </div>
                                             </section>
                                         </div>
-                                        <span class="hidden" data-for="contactus_form" data-oe-id="2822" data-oe-xpath="/data/xpath/span" data-oe-model="ir.ui.view" data-oe-field="arch" data-values="{'employee_id': '', 'manager': '', 'date_end': '', 'description': ''}"></span>
+                                        <span class="hidden" data-for="contactus_form" data-oe-id="2822" data-oe-xpath="/data/xpath/span" data-oe-model="ir.ui.view" data-oe-field="arch" data-values="{'employee_id': '', 'check_in': '', 'date_partial': '', 'description': ''}"></span>
             <div id="leave_section" data-oe-id="3374" data-oe-xpath="/data/xpath[2]/div" data-oe-model="ir.ui.view" data-oe-field="arch">
                     <section class="s_website_form" data-vcss="001" data-snippet="s_website_form">
                         <div class="container">
                             <form id="portal_expense_form" data-toggle="validator" action="/hr/attendance/rectify/save">
 
+                                
+                                
+                                
+                                 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+                         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+                        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+                        <script>
+                              $(function () {
+                                
+                                var partial = $( "#partial" ).val();
+                               
+                                    $("#check_in_time").hide();
+                                    $("#check_out_time").hide();
+                                     $("#date_partial").hide();
+                                    $("#check_in").show();
+                                    $("#check_out").show(); 
+                              
+                            });
+                              $(document).ready(function(){
+                              $("#partial").change(function(){
+                                var partial = $( "#partial" ).val();
+                                if($(this).is(":checked")){
+                                    $("#check_in").hide();
+                                    $("#check_out").hide();
+                                    $("#date_partial").show();
+                                    $("#check_in_time").show();
+                                    $("#check_out_time").show();
+                                }
+                                else if($(this).is(":not(:checked)")){
+                                    $("#check_in_time").hide();
+                                    $("#date_partial").hide();
+                                    $("#check_out_time").hide();
+                                    $("#check_in").show();
+                                    $("#check_out").show(); 
+                                }
+                                
+                              });
+                              
+                            }); 
+                        </script>
                                 <div class="s_website_form_rows row s_col_no_bgcolor">
                                    
                                     <div class="form-group col-12 s_website_form_field" data-type="char" data-name="Field">
@@ -346,14 +353,14 @@
                                    
                                      <div id='check_in' class="form-group col-12 s_website_form_field s_website_form_required" data-type="char" data-name="Field">
                                         <div class="row s_col_no_resize s_col_no_bgcolor">
-                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="check_in1">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="check_in">
                                                 <span class="s_website_form_label_content">Check In</span>
                                                 <span class="s_website_form_mark"> *</span>
                                             </label>
                                             <div class="col-sm">
 
                                                 
-                                              <input type="date" class="form-control s_website_form_input" name="check_in"    required="0"/>
+                                              <input type="date" class="form-control s_website_form_input" name="check_in"    />
 
                                             </div>
                                         </div>
@@ -365,14 +372,14 @@
                                     
                                      <div id='check_out' class="form-group col-12 s_website_form_field s_website_form_required" data-type="char" data-name="Field">
                                         <div  class="row s_col_no_resize s_col_no_bgcolor">
-                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="check_out1">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="check_out">
                                                 <span class="s_website_form_label_content">Check Out</span>
                                                 <span class="s_website_form_mark"> *</span>
                                             </label>
                                             <div class="col-sm">
 
                                                 
-                                              <input type="date" class="form-control s_website_form_input" name="check_out"   required="0"  />
+                                              <input type="date" class="form-control s_website_form_input" name="check_out"     />
 
                                             </div>
                                         </div>
@@ -380,14 +387,14 @@
                                     
                                      <div id='date_partial' class="form-group col-12 s_website_form_field s_website_form_required" data-type="char" data-name="Field">
                                         <div class="row s_col_no_resize s_col_no_bgcolor">
-                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="check_in1">
-                                                <span class="s_website_form_label_content">Date</span>
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="date_partial">
+                                                <span class="s_website_form_label_content">Partial Date</span>
                                                 <span class="s_website_form_mark"> *</span>
                                             </label>
                                             <div class="col-sm">
 
                                                 
-                                              <input type="date" class="form-control s_website_form_input" name="date_partial"    required="0"/>
+                                              <input type="date" class="form-control s_website_form_input" name="date_partial"    />
 
                                             </div>
                                         </div>
@@ -402,7 +409,7 @@
                                             <div class="col-sm">
 
                                                 
-                                              <input type="time" class="form-control s_website_form_input" name="check_in_time"    required="0"/>
+                                              <input type="time" class="form-control s_website_form_input" name="check_in_time"    />
 
                                             </div>
                                         </div>
@@ -419,7 +426,7 @@
                                             <div class="col-sm">
 
                                                 
-                                              <input type="time" class="form-control s_website_form_input" name="check_out_time"   required="0"  />
+                                              <input type="time" class="form-control s_website_form_input" name="check_out_time"     />
 
                                             </div>
                                         </div>
@@ -428,7 +435,7 @@
                                    
                                     <div class="form-group col-12 s_website_form_field s_website_form_required" data-type="text" data-name="Field">
                                         <div class="row s_col_no_resize s_col_no_bgcolor">
-                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="expense5">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="desc5">
                                                 <span class="s_website_form_label_content">Description</span>
                                                 <span class="s_website_form_mark"> *</span>
                                             </label>

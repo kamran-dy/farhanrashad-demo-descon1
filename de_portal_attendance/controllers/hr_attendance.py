@@ -138,13 +138,13 @@ class CreateAttendance(http.Controller):
                 
         else:
             if kw.get('partial'):
-                check_in_datetime = datetime.datetime(kw.get('date_partial')) + relativedelta(hours =+ float(kw.get('check_in_time')))
-                check_out_datetime = datetime.datetime(kw.get('date_partial')) + relativedelta(hours =+ float(kw.get('check_out_time')))
+                check_in_datetime = datetime.strptime(kw.get('date_partial'), '%Y-%m-%d') + relativedelta(hours =+ float(kw.get('check_in_time').replace(":", ".")))
+                check_out_datetime = datetime.strptime(kw.get('date_partial'),'%Y-%m-%d') + relativedelta(hours =+ float(kw.get('check_out_time').replace(":", ".")))
                 rectify_val = {
                     'reason': kw.get('description'),
                     'employee_id': int(kw.get('employee_id')),
-                    'check_in':  check_in_datetime,
-                    'check_out': check_out_datetime,
+                    'check_in':  check_in_datetime - relativedelta(hours =+ 5),
+                    'check_out': check_out_datetime - relativedelta(hours =+ 5),
                     'partial': 'Partial',
                     'date':  check_in_datetime,
                 }
@@ -152,36 +152,40 @@ class CreateAttendance(http.Controller):
                 record.action_submit()
                 return request.render("de_portal_attendance.rectification_submited", {})
         
-            else:    
-                checkin_date_in = kw.get('check_in')
-                attendance_data_in =  fields.datetime.now()
-                if checkin_date_in:
-                    date_processing_in = checkin_date_in.replace('T', '-').replace(':', '-').split('-')
-                    date_processing_in = [int(v) for v in date_processing_in]
-                    checkin_date_out = datetime(*date_processing_in)
-                    attendance_data_in = datetime(*date_processing_in) - relativedelta(hours =+ 5)  
-
-                if attendance_data_in.date() > date.today():
-                    return request.render("de_portal_attendance.cannot_submit_future_days_commitment_msg", attendance_page_content())
-
-                attendance_data_out =  fields.datetime.now()
-                checkout_date_in = kw.get('check_out') 
-                if checkout_date_in:
-                    date_processing_out = checkout_date_in.replace('T', '-').replace(':', '-').split('-')
-                    date_processing_out = [int(v) for v in date_processing_out]
-                    checkout_date_out = datetime(*date_processing_out)
-                    attendance_data_out = datetime(*date_processing_out) - relativedelta(hours =+ 5)
-
+            else:
+                employee_data = request.env['hr.employee'].sudo().search([('id','=',int(kw.get('employee_id')))], limit=1)
+                shift = request.env['resource.calendar'].sudo().search([('shift_type','=', 'general'),('company_id','=',employee_data.company_id.id)], limit=1)
+                generate_shift_line = request.env['hr.shift.schedule.line'].sudo().search([('employee_id','=',int(kw.get('employee_id'))),('date','=', kw.get('check_in'))], limit=1)
+                if generate_shift_line.first_shift_id:
+                    shift =   generate_shift_line.first_shift_id  
+                    
+                if not shift:
+                    employee_data = request.env['hr.employee'].sudo().search([('id','=',int(kw.get('employee_id')))], limit=1)
+                    shift = request.env['resource.calendar'].sudo().search([('shift_type','=', 'general'),('company_id','=',employee_data.company_id.id)], limit=1)
+                if not shift:    
+                    shift = request.env['resource.calendar'].sudo().search([('company_id','=',employee_data.company_id.id)], limit=1)
+                hours_from = 8
+                hours_to =  16
+                
+                for shift_line in shift.attendance_ids:
+                    hours_from =   shift_line.hour_from     
+                    hours_to = shift_line.hour_to 
+                attendance_data_in = datetime.strptime(kw.get('check_in'), '%Y-%m-%d') + relativedelta(hours =+ hours_from)
+                att_date_out = datetime.strptime(kw.get('check_out'), '%Y-%m-%d') + relativedelta(hours =+ hours_to)
+                attendance_data_out =  datetime.strptime(kw.get('check_out'), '%Y-%m-%d') + relativedelta(hours =+ hours_to)
+                if shift.shift_type == 'night':
+                    attendance_data_out =  att_date_out  + timedelta(1)  
 
                 rectify_val = {
                     'reason': kw.get('description'),
                     'employee_id': int(kw.get('employee_id')),
-                    'check_in':  attendance_data_in,
-                    'check_out': attendance_data_out,
+                    'check_in':  attendance_data_in - relativedelta(hours =+ 5),
+                    'check_out': attendance_data_out - relativedelta(hours =+ 5),
                     'partial': 'Full',
-                    'date':  checkin_date_in,
+                    'date':  kw.get('check_in'),
                 }
                 record = request.env['hr.attendance.rectification'].sudo().create(rectify_val)
+
                 if kw.get('partial'):
                     record.update({
                             'partial': 'Partial',
