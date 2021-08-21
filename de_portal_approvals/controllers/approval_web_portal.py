@@ -60,16 +60,20 @@ class CustomerPortal(CustomerPortal):
         id=approval_id
         recrd = request.env['approval.request'].sudo().browse(id)
         recrd.action_approve()
+        recrd.action_date_confirm_update_reverse()
         approvals_page = CustomerPortal()
-        return request.render("de_portal_approvals.approval_submited", {})
+        return request.redirect('/my/approvals')
+        #return request.render("de_portal_approvals.approval_submited", {})
         
     @http.route(['/request/refuse/<int:approval_id>'], type='http', auth="public", website=True)
     def action_approval_reject(self,approval_id ,**kw):
         id=approval_id
         recrd = request.env['approval.request'].sudo().browse(id)
         recrd.action_refuse()
+        recrd.action_date_confirm_update_reverse()
         approvals_page = CustomerPortal()
-        return request.render("de_portal_approvals.approval_refused", {})
+        return request.redirect('/my/approvals')
+        #return request.render("de_portal_approvals.approval_refused", {})
         
     @http.route(['/app/approval/approve/<int:approval_id>'], type='http', auth="public", website=True)
     def approval(self,approval_id , access_token=None, **kw):
@@ -77,12 +81,14 @@ class CustomerPortal(CustomerPortal):
         record = request.env['approval.request'].sudo().browse(id)
 
         record.action_approve()
+        record.action_date_confirm_update_reverse()
         try:
             approval_sudo = self._document_check_access('approval.request', id, access_token)
         except (AccessError, MissingError):
             return request.redirect('/my')
-        values = self._approval_get_page_view_values(approval_sudo, **kw) 
-        return request.render("de_portal_approvals.approval_submited", {})
+        values = self._approval_get_page_view_values(approval_sudo, **kw)
+        return request.redirect('/my/approvals') 
+        #return request.render("de_portal_approvals.approval_submited", {})
         
         
     @http.route(['/app/approval/refuse/<int:approval_id>'], type='http', auth="public", website=True)
@@ -91,13 +97,15 @@ class CustomerPortal(CustomerPortal):
         recrd = request.env['approval.request'].sudo().browse(id)
 
         recrd.action_refuse()
+        recrd.action_date_confirm_update_reverse()
         try:
             approval_sudo = self._document_check_access('approval.request', id, access_token)
         except (AccessError, MissingError):
             return request.redirect('/my')
         
         values = self._approval_get_page_view_values(approval_sudo, **kw) 
-        return request.render("de_portal_approvals.approval_refused", {})
+        return request.redirect('/my/approvals')
+        #return request.render("de_portal_approvals.approval_refused", {})
     
     
     
