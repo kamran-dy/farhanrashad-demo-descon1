@@ -26,10 +26,10 @@ import json
 
 def timeoff_page_content(flag = 0):
     leave_type = request.env['hr.leave.type'].search([('is_publish','=', True)])
-    employees = request.env['hr.employee'].search([('user_id','=',http.request.env.context.get('uid'))])
-    leave_allocation = request.env['hr.leave.allocation'].search([('employee_id.user_id', '=', http.request.env.context.get('uid') )])
+    employees = request.env['hr.employee'].sudo().search([('user_id','=',http.request.env.context.get('uid'))])
+    leave_allocation = request.env['hr.leave.allocation'].sudo().search([('employee_id.user_id', '=', http.request.env.context.get('uid') )])
     
-    company_info = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])
+    company_info = request.env['res.users'].sudo().search([('id','=',http.request.env.context.get('uid'))])
     managers = employees.line_manager
     employee_name = employees
     return {
@@ -152,12 +152,16 @@ class CreateTimeOff(http.Controller):
             date_start1 = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
             date_start2 = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
             date_start =  date_start1 + relativedelta(hours =+ float((employee11.shift_id.hours_per_day/2)))       
-            date_end =  date_start2 + relativedelta(hours =+ float((employee11.shift_id.hours_per_day/2)) + 4) 
+            date_end =  date_start2 + relativedelta(hours =+ float((employee11.shift_id.hours_per_day/2)) + 4)
+            leave_period_half = 'first_half'  
+            if kw.get('leave_half_day') == 'pm':
+                leave_period_half = 'second_half'     
             timeoff_val = {
                 'holiday_status_id': int(kw.get('leave_type_id')),
                 'employee_id': int(kw.get('employee_id')),            
                 'date_from':date_start,
                 'date_to': date_end,
+                'leave_period_half': leave_period_half,  
                 'leave_category': kw.get('leave_category_id'),
                 'request_date_from':kw.get('half_day_date'),
                 'request_date_to': kw.get('half_day_date'),
@@ -196,6 +200,7 @@ class CreateTimeOff(http.Controller):
                 'holiday_status_id': int(kw.get('leave_type_id')),
                 'employee_id': int(kw.get('employee_id')),            
                 'date_from':date_start,
+                'short_start_time': kw.get('time_from').replace(":","."),
                 'date_to': date_end,
                 'leave_category': kw.get('leave_category_id'),
                 'request_date_from':kw.get('hours_date'),
@@ -318,19 +323,20 @@ class CustomerPortal(CustomerPortal):
             if search_in in ('id', 'all'):
                 search_domain = OR([search_domain, [('id', 'ilike', search)]])
             domain += search_domain
+        domain += [('employee_id.user_id', '=', http.request.env.context.get('uid'))] 
         timeoff_count = request.env['hr.leave'].search_count(domain)
 
         # pager
         pager = portal_pager(
             url="/my/timeoffs",
             url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'filterby': filterby,
-                      'seissuesarch_in': search_in, 'search': search},
-            total=555,
+                      'search_in': search_in, 'search': search},
+            total=timeoff_count,
             page=page,
             step=self._items_per_page
         )
 
-        _timeoff = request.env['hr.leave'].search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
+        _timeoff = request.env['hr.leave'].sudo().search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
         request.session['my_timeoff_history'] = _timeoff.ids[:100]
 
         grouped_timeoffs = [_timeoff]
