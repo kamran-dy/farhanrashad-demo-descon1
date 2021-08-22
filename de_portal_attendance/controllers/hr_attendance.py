@@ -174,7 +174,9 @@ class CreateAttendance(http.Controller):
                 att_date_out = datetime.strptime(kw.get('check_out'), '%Y-%m-%d') + relativedelta(hours =+ hours_to)
                 attendance_data_out =  datetime.strptime(kw.get('check_out'), '%Y-%m-%d') + relativedelta(hours =+ hours_to)
                 if shift.shift_type == 'night':
-                    attendance_data_out =  att_date_out  + timedelta(1)  
+                    delta_diff = datetime.strptime(kw.get('check_out'), '%Y-%m-%d') - datetime.strptime(kw.get('check_in'), '%Y-%m-%d')
+                    if delta_diff.days == 0:
+                        attendance_data_out =  att_date_out  + timedelta(1)  
 
                 rectify_val = {
                     'reason': kw.get('description'),

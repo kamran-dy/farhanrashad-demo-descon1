@@ -90,7 +90,7 @@ class HrAttendanceRectification(models.Model):
             
     def action_approve(self):
         for line in self:
-            if line.state =='submitted':
+            if line.state == 'submitted':
                 line.app_date = fields.date.today()
                 if line.attendance_id:
                     attendance_rectify = self.env['hr.attendance'].search([('id','=',line.attendance_id.id)])
@@ -191,13 +191,14 @@ class HrAttendanceRectification(models.Model):
                                         hour_from = shift_line.hour_from
                                         hour_to = shift_line.hour_to
                                     final_check_in= check_in + relativedelta(hours =+ hour_from)
-                                    check_out = final_check_in + relativedelta(hours =+ hour_to)
-                                    
+                                    check_out = check_in + relativedelta(hours =+ hour_to)
+                                    if shift_time.shift_type == 'night':
+                                        check_out = check_out +  timedelta(1) 
                                     vals = {
                                         'employee_id': line.employee_id.id,
-                                        'check_in':final_check_in ,
+                                        'check_in':final_check_in - relativedelta(hours =+ 5),
                                         'att_date':  final_check_in,
-                                        'check_out': check_out ,
+                                        'check_out': check_out - relativedelta(hours =+ 5),
                                         'remarks': 'Comitment Slip',
                                         }
                                     attendance = self.env['hr.attendance'].create(vals)
@@ -240,13 +241,14 @@ class HrAttendanceRectification(models.Model):
                                     hour_from = shift_line.hour_from
                                     hour_to = shift_line.hour_to
                                 final_check_in= check_in + relativedelta(hours =+ hour_from)
-                                check_out = final_check_in + relativedelta(hours =+ hour_to)
-                                
+                                check_out = check_in + relativedelta(hours =+ hour_to)
+                                if shift_time.shift_type == 'night':
+                                    check_out = check_out +  timedelta(1)
                                 vals = {
                                     'employee_id': line.employee_id.id,
-                                    'check_in': final_check_in,
+                                    'check_in': final_check_in - relativedelta(hours =+ 5),
                                     'att_date':  final_check_in,
-                                    'check_out': check_out ,
+                                    'check_out': check_out - relativedelta(hours =+ 5),
                                     'remarks': 'Comitment Slip',
                                     }
                                 attendance = self.env['hr.attendance'].create(vals)
