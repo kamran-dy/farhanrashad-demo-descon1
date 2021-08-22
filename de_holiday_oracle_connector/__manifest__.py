@@ -29,6 +29,7 @@
         # 'security/ir.model.access.csv',
         'data/oracle_server_action.xml',
         'views/hr_leave_views.xml',
+        'views/hr_leave_type_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
