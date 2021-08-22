@@ -76,7 +76,10 @@ class HrAttendanceRectification(models.Model):
                                     
                 if attendance.check_out < attendance.check_in:
                     raise exceptions.UserError(_('"Check Out" time cannot be earlier than "Check In" time.'+ str(attendance.check_out) ))
-                     
+            if attendance.date:
+                rectification = self.env['hr.attendance.rectification'].search([('date','=',attendance.date),('state','in',('submitted','approved'))])
+                if rectification:
+                    raise exceptions.UserError(_('Attendance Rectification Already Exist between selected range!'))         
                
     
     def action_submit(self):
