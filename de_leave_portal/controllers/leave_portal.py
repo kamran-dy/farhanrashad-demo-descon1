@@ -42,7 +42,10 @@ def timeoff_page_content(flag = 0):
         'company_info' : company_info
     }
    
-   
+def timeoff_page_exception( e):  
+    return {
+        'e': e
+    }
 
 
 def paging(data, flag1 = 0, flag2 = 0):        
@@ -105,6 +108,7 @@ class CreateTimeOff(http.Controller):
                 'name':kw.get('description'),
             }
             record = request.env['hr.leave'].sudo().create(timeoff_val)
+
             if kw.get('attachment'):
                 Attachments = request.env['ir.attachment']
 
@@ -122,8 +126,7 @@ class CreateTimeOff(http.Controller):
                 record.update({
                    'attachment_id': [(4, attachment_id.id)],
                  })
-             
-            
+
             
         if kw.get('leave_category_id') == 'half_day':
             day_half = kw.get('leave_half_day')
@@ -191,11 +194,11 @@ class CreateTimeOff(http.Controller):
              
             hour_from = kw.get('time_from') 
             employee11 = request.env['hr.employee'].search([('id','=', int(kw.get('employee_id')))], limit=1)
-            hour_to =  str(float(kw.get('time_from')) + (employee11.shift_id.hours_per_day/4))
+            hour_to =  str(float(kw.get('time_from').replace(":",".")) + (employee11.shift_id.hours_per_day/4))
             date_start1 = datetime.strptime(kw.get('hours_date') , '%Y-%m-%d')
             date_start2 = datetime.strptime(kw.get('hours_date') , '%Y-%m-%d')
-            date_start =  date_start1 + relativedelta(hours =+ float(kw.get('time_from')))       
-            date_end =  date_start2 + relativedelta(hours =+ float(kw.get('time_from')) + 2) 
+            date_start =  date_start1 + relativedelta(hours =+ float(kw.get('time_from').replace(":",".")))       
+            date_end =  date_start2 + relativedelta(hours =+ float(kw.get('time_from').replace(":",".")) + 2) 
             timeoff_val = {
                 'holiday_status_id': int(kw.get('leave_type_id')),
                 'employee_id': int(kw.get('employee_id')),            
