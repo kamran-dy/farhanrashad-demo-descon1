@@ -4,7 +4,7 @@ from . import config
 from . import update
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
-from odoo import api, fields, models, _
+from odoo import api, fields, models, _, SUPERUSER_ID
 from odoo.osv import expression
 from odoo.exceptions import UserError
 from collections import OrderedDict
@@ -67,10 +67,9 @@ class CreateAttendance(http.Controller):
     def action_print_attendance(self, **kw):
         return request.render("de_portal_attendance.print_attendance_report", print_page_content())
     
-    @http.route('/hr/attendance/print/report',type="http", website=True, auth='user')
-    def action_print_attendance_report(self, **kw):
-        
-        return request.redirect('/hr/attendances')
+   
+    
+    
     
     @http.route('/hr/attendance/rectify/save', type="http", auth="public", website=True)
     def create_rectify_attendance(self, **kw):
@@ -201,6 +200,41 @@ class CreateAttendance(http.Controller):
 
 
 class CustomerPortal(CustomerPortal):
+    
+    def _show_report_portal(self, model, report_type, employee, start_date, end_date, report_ref, download=False):
+        if report_type not in ('html', 'pdf', 'text'):
+            raise UserError(_("Invalid report type: %s", report_type))
+
+        report_sudo = request.env.ref(report_ref).with_user(SUPERUSER_ID)
+
+        if not isinstance(report_sudo, type(request.env['ir.actions.report'])):
+            raise UserError(_("%s is not the reference of a report", report_ref))
+
+        if hasattr(model, 'company_id'):
+            report_sudo = report_sudo.with_company(model.company_id)
+
+        method_name = '_render_qweb_%s' % (report_type)
+        report = getattr(report_sudo, method_name)([model], data={'report_type': report_type,'employee':employee,'start_date':start_date,'end_date':end_date})[0]
+        reporthttpheaders = [
+            ('Content-Type', 'application/pdf' if report_type == 'pdf' else 'text/html'),
+            ('Content-Length', len(report)),
+        ]
+        if report_type == 'pdf' and download:
+            filename = "%s.pdf" % (re.sub('\W+', '-', model._get_report_base_filename()))
+            reporthttpheaders.append(('Content-Disposition', content_disposition(filename)))
+        return request.make_response(report, headers=reporthttpheaders)
+
+
+    
+    @http.route('/hr/attendance/print/report',type="http", website=True,download=False, auth='user')
+    def action_print_attendance_report(self, **kw):
+        report_type='pdf'
+        order_sudo = 'hr.attendance'
+        download = False
+        employee = request.env['hr.employee'].search([('id','=',int(kw.get('employee_id')))]).id
+        start_date = kw.get('check_in')
+        end_date = kw.get('check_out')
+        return self._show_report_portal(model=order_sudo, report_type=report_type,employee=employee, start_date=start_date, end_date=end_date, report_ref='de_hr_attendance_report.open_hr_report_wizard_action_portal', download=download)
     
     
     @http.route(['/hr/attendance/cancel/<int:attendance_id>'], type='http', auth="public", website=True)
