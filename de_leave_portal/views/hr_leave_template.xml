@@ -196,6 +196,39 @@
                         </div>       
                     
                         <br/><br/>
+
+                      
+                      <div class="row">
+                              <t t-if="timeoff.leave_category">  
+                                <div class="col-md-6"> <strong>Leave Category : </strong>
+                                    <t t-if="timeoff.leave_category == 'day'">
+                                            <i class="badge badge-pill badge-info" >Day</i>
+                                        </t>
+                                    <t t-if="timeoff.leave_category == 'half_day'">
+                                            <i class="badge badge-pill badge-info" >Half Day</i>
+                                        </t>
+                                    <t t-if="timeoff.leave_category == 'hours'">
+                                            <i class="badge badge-pill badge-info" >Short Leave</i>
+                                        </t>
+                                    
+                                </div>
+                               </t>   
+                                 <div class="col-md-6"> 
+                                   <t t-if="timeoff.leave_period_half">  
+                                    <strong>Half : </strong>
+                                    
+                                        <span t-esc="timeoff.leave_period_half"/>
+                                    </t>
+                                   <t t-if="timeoff.short_start_time">  
+                                    <strong>Start Time : </strong>
+                                    
+                                        <span t-esc="timeoff.short_start_time"/>
+                                    </t>  
+                                </div>  
+                        </div>    
+                       
+                    
+                        <br/><br/>
                    <div class="row"> 
                                   
                              <div class="col-md-6"> <strong>Start Date : </strong>
