@@ -86,7 +86,7 @@ class CustomerPortal(CustomerPortal):
             approval_sudo = self._document_check_access('approval.request', id, access_token)
         except (AccessError, MissingError):
             return request.redirect('/my')
-        values = self._approval_get_page_view_values(approval_sudo, **kw)
+        values = self._approval_get_page_view_values(approval_sudo, access_token,**kw)
         return request.redirect('/my/approvals') 
         #return request.render("de_portal_approvals.approval_submited", {})
         
@@ -103,7 +103,7 @@ class CustomerPortal(CustomerPortal):
         except (AccessError, MissingError):
             return request.redirect('/my')
         
-        values = self._approval_get_page_view_values(approval_sudo, **kw) 
+        values = self._approval_get_page_view_values(approval_sudo, access_token,**kw) 
         return request.redirect('/my/approvals')
         #return request.render("de_portal_approvals.approval_refused", {})
     
