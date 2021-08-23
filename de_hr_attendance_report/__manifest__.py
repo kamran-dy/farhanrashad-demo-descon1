@@ -26,6 +26,7 @@
     'data': [
         'wizard/hr_attendance_report_wizard.xml',
         'report/hr_attendance_report.xml',
+        'views/hr_leave_type_views.xml',   
         'report/hr_attendance_report_template.xml',
         'security/ir.model.access.csv',
         'views/hr_attendance_report_menu.xml',
