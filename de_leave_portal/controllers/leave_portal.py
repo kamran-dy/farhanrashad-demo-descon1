@@ -108,7 +108,12 @@ class CreateTimeOff(http.Controller):
                 'name':kw.get('description'),
             }
             record = request.env['hr.leave'].sudo().create(timeoff_val)
-
+            dddate_from = datetime.strptime(str(kw.get('date_start')), '%Y-%m-%d')
+            dddate_to = datetime.strptime(str(kw.get('date_end')), '%Y-%m-%d')
+            dddelta = dddate_to - dddate_from
+            record.update({
+                'number_of_days': dddelta.days
+            })
             if kw.get('attachment'):
                 Attachments = request.env['ir.attachment']
 
