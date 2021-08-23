@@ -471,6 +471,8 @@ class PurchaseAttendanceReport(models.AbstractModel):
 
                         if  attendance.check_out:
                             check_out_time = attendance.check_out + relativedelta(hours =+ 5)
+                        datecheck_in_time = check_in_time
+                        datecheck_out_time = check_out_time
                         if check_in_time :
                             datecheck_in_time = datetime.strptime(str(check_in_time), "%Y-%m-%d %H:%M:%S").strftime('%d/%b/%Y %H:%M:%S')
                         if check_out_time :
@@ -528,7 +530,16 @@ class PurchaseAttendanceReport(models.AbstractModel):
                                 status = 'To Approve'     
                             if daily_leave.state == 'validate':
                                 status = 'Approved'         
-                            remarks =  str(daily_leave.holiday_status_id.name) +' ('+str(status) +')'  
+                            remarks =  str(daily_leave.holiday_status_id.name) +' ('+str(status) +')' 
+                    daily_leave = self.env['hr.leave'].search([('employee_id','=', employee.id),('request_date_to','=', date_after_month.strftime('%Y-%m-%d')),('state','in',('validate','confirm'))]) 
+                    if daily_leave:
+                        if daily_leave.holiday_status_id.is_rest_day != True: 
+                            status = ' '
+                            if daily_leave.state == 'confirm':
+                                status = 'To Approve'     
+                            if daily_leave.state == 'validate':
+                                status = 'Approved'         
+                            remarks =  str(daily_leave.holiday_status_id.name) +' ('+str(status) +')'        
                     attendances.append({
                         'date': date_after_month.strftime('%d/%b/%Y'),
                         'day':  day1,
