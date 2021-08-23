@@ -26,5 +26,15 @@
             paperformat="paperformat_attendance_report_landscape"    
         />
       
+      <report 
+            id="open_hr_report_wizard_action_portal"
+            string="Attendance Report"
+            model="report.de_hr_attendance_report.attendance_report_portal"
+            report_type="qweb-pdf"
+            file="de_hr_attendance_report.attendance_report_portal"
+            name="de_hr_attendance_report.attendance_report_portal"
+            paperformat="paperformat_attendance_report_landscape"    
+        />
+      
   </data>
 </odoo>

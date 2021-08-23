@@ -4,7 +4,7 @@ from . import config
 from . import update
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
-from odoo import api, fields, models, _
+from odoo import api, fields, models, _, SUPERUSER_ID
 from odoo.osv import expression
 from odoo.exceptions import UserError
 from collections import OrderedDict
@@ -32,6 +32,18 @@ def attendance_page_content(flag = 0):
     }
 
 
+def print_page_content(flag = 0):
+    emps = request.env['hr.employee'].sudo().search([('user_id','=',http.request.env.context.get('uid'))])
+    managers = emps.line_manager
+    employee_name = emps
+    return {
+        'emps': emps,
+        'managers': managers,
+        'employee_name': employee_name,
+        'success_flag' : flag,
+    }
+
+
 
 def paging(data, flag1 = 0, flag2 = 0):        
     if flag1 == 1:
@@ -48,7 +60,14 @@ def paging(data, flag1 = 0, flag2 = 0):
 class CreateAttendance(http.Controller):
     @http.route('/hr/attendance/rectify/',type="http", website=True, auth='user')
     def approvals_create_template(self, **kw):
-       return request.render("de_portal_attendance.attendance_create_rectify", attendance_page_content())
+        return request.render("de_portal_attendance.attendance_create_rectify", attendance_page_content())
+
+
+    @http.route('/hr/attendance/print/',type="http", website=True, auth='user')
+    def action_print_attendance(self, **kw):
+        return request.render("de_portal_attendance.print_attendance_report", print_page_content())
+    
+   
     
     
     
@@ -117,49 +136,105 @@ class CreateAttendance(http.Controller):
                 return request.render("de_portal_attendance.rectification_submited", {})
                 
         else:
-            checkin_date_in = kw.get('check_in')
-            attendance_data_in =  fields.datetime.now()
-            if checkin_date_in:
-                date_processing_in = checkin_date_in.replace('T', '-').replace(':', '-').split('-')
-                date_processing_in = [int(v) for v in date_processing_in]
-                checkin_date_out = datetime(*date_processing_in)
-                attendance_data_in = datetime(*date_processing_in) - relativedelta(hours =+ 5)  
-            
-            if attendance_data_in.date() > date.today():
-                return request.render("de_portal_attendance.cannot_submit_future_days_commitment_msg", attendance_page_content())
-            
-            attendance_data_out =  fields.datetime.now()
-            checkout_date_in = kw.get('check_out') 
-            if checkout_date_in:
-                date_processing_out = checkout_date_in.replace('T', '-').replace(':', '-').split('-')
-                date_processing_out = [int(v) for v in date_processing_out]
-                checkout_date_out = datetime(*date_processing_out)
-                attendance_data_out = datetime(*date_processing_out) - relativedelta(hours =+ 5)
-
-#             raise UserError(str(checkin_date_in)+' '+str(checkout_date_in))
-            
-            rectify_val = {
-                'reason': kw.get('description'),
-                'employee_id': int(kw.get('employee_id')),
-                'check_in':  attendance_data_in,
-                'check_out': attendance_data_out,
-                'partial': 'Full',
-                'date':  checkin_date_in,
-            }
-            record = request.env['hr.attendance.rectification'].sudo().create(rectify_val)
             if kw.get('partial'):
-                record.update({
-                        'partial': 'Partial',
-                })
-            record.action_submit()
-            return request.render("de_portal_attendance.rectification_submited", {})
-    
+                check_in_datetime = datetime.strptime(kw.get('date_partial'), '%Y-%m-%d') + relativedelta(hours =+ float(kw.get('check_in_time').replace(":", ".")))
+                check_out_datetime = datetime.strptime(kw.get('date_partial'),'%Y-%m-%d') + relativedelta(hours =+ float(kw.get('check_out_time').replace(":", ".")))
+                rectify_val = {
+                    'reason': kw.get('description'),
+                    'employee_id': int(kw.get('employee_id')),
+                    'check_in':  check_in_datetime - relativedelta(hours =+ 5),
+                    'check_out': check_out_datetime - relativedelta(hours =+ 5),
+                    'partial': 'Partial',
+                    'date':  check_in_datetime,
+                }
+                record = request.env['hr.attendance.rectification'].sudo().create(rectify_val)
+                record.action_submit()
+                return request.render("de_portal_attendance.rectification_submited", {})
+        
+            else:
+                employee_data = request.env['hr.employee'].sudo().search([('id','=',int(kw.get('employee_id')))], limit=1)
+                shift = request.env['resource.calendar'].sudo().search([('shift_type','=', 'general'),('company_id','=',employee_data.company_id.id)], limit=1)
+                generate_shift_line = request.env['hr.shift.schedule.line'].sudo().search([('employee_id','=',int(kw.get('employee_id'))),('date','=', kw.get('check_in'))], limit=1)
+                if generate_shift_line.first_shift_id:
+                    shift =   generate_shift_line.first_shift_id  
+                    
+                if not shift:
+                    employee_data = request.env['hr.employee'].sudo().search([('id','=',int(kw.get('employee_id')))], limit=1)
+                    shift = request.env['resource.calendar'].sudo().search([('shift_type','=', 'general'),('company_id','=',employee_data.company_id.id)], limit=1)
+                if not shift:    
+                    shift = request.env['resource.calendar'].sudo().search([('company_id','=',employee_data.company_id.id)], limit=1)
+                hours_from = 8
+                hours_to =  16
+                
+                for shift_line in shift.attendance_ids:
+                    hours_from =   shift_line.hour_from     
+                    hours_to = shift_line.hour_to 
+                attendance_data_in = datetime.strptime(kw.get('check_in'), '%Y-%m-%d') + relativedelta(hours =+ hours_from)
+                att_date_out = datetime.strptime(kw.get('check_out'), '%Y-%m-%d') + relativedelta(hours =+ hours_to)
+                attendance_data_out =  datetime.strptime(kw.get('check_out'), '%Y-%m-%d') + relativedelta(hours =+ hours_to)
+                if shift.shift_type == 'night':
+                    delta_diff = datetime.strptime(kw.get('check_out'), '%Y-%m-%d') - datetime.strptime(kw.get('check_in'), '%Y-%m-%d')
+                    if delta_diff.days == 0:
+                        attendance_data_out =  att_date_out  + timedelta(1)  
+
+                rectify_val = {
+                    'reason': kw.get('description'),
+                    'employee_id': int(kw.get('employee_id')),
+                    'check_in':  attendance_data_in - relativedelta(hours =+ 5),
+                    'check_out': attendance_data_out - relativedelta(hours =+ 5),
+                    'partial': 'Full',
+                    'date':  kw.get('check_in'),
+                }
+                record = request.env['hr.attendance.rectification'].sudo().create(rectify_val)
+
+                if kw.get('partial'):
+                    record.update({
+                            'partial': 'Partial',
+                    })
+                record.action_submit()
+                return request.render("de_portal_attendance.rectification_submited", {})
+
     
     
    
 
 
 class CustomerPortal(CustomerPortal):
+    
+    def _show_report_portal(self, model, report_type, employee, start_date, end_date, report_ref, download=False):
+        if report_type not in ('html', 'pdf', 'text'):
+            raise UserError(_("Invalid report type: %s", report_type))
+
+        report_sudo = request.env.ref(report_ref).with_user(SUPERUSER_ID)
+
+        if not isinstance(report_sudo, type(request.env['ir.actions.report'])):
+            raise UserError(_("%s is not the reference of a report", report_ref))
+
+        if hasattr(model, 'company_id'):
+            report_sudo = report_sudo.with_company(model.company_id)
+
+        method_name = '_render_qweb_%s' % (report_type)
+        report = getattr(report_sudo, method_name)([model], data={'report_type': report_type,'employee':employee,'start_date':start_date,'end_date':end_date})[0]
+        reporthttpheaders = [
+            ('Content-Type', 'application/pdf' if report_type == 'pdf' else 'text/html'),
+            ('Content-Length', len(report)),
+        ]
+        if report_type == 'pdf' and download:
+            filename = "%s.pdf" % (re.sub('\W+', '-', model._get_report_base_filename()))
+            reporthttpheaders.append(('Content-Disposition', content_disposition(filename)))
+        return request.make_response(report, headers=reporthttpheaders)
+
+
+    
+    @http.route('/hr/attendance/print/report',type="http", website=True,download=False, auth='user')
+    def action_print_attendance_report(self, **kw):
+        report_type='pdf'
+        order_sudo = 'hr.attendance'
+        download = False
+        employee = request.env['hr.employee'].search([('id','=',int(kw.get('employee_id')))]).id
+        start_date = kw.get('check_in')
+        end_date = kw.get('check_out')
+        return self._show_report_portal(model=order_sudo, report_type=report_type,employee=employee, start_date=start_date, end_date=end_date, report_ref='de_hr_attendance_report.open_hr_report_wizard_action_portal', download=download)
     
     
     @http.route(['/hr/attendance/cancel/<int:attendance_id>'], type='http', auth="public", website=True)
@@ -212,7 +287,7 @@ class CustomerPortal(CustomerPortal):
     def _rectify_attendance_get_page_view_values(self,rectify, next_id = 0,pre_id= 0, attendance_user_flag = 0, access_token = None, **kwargs):
         values = {
             'page_name' : 'rectify',
-            'attendance' : rectify,
+            'rectify' : rectify,
             'attendance_user_flag': attendance_user_flag,
             'next_id' : next_id,
             'pre_id' : pre_id,
@@ -370,8 +445,8 @@ class CustomerPortal(CustomerPortal):
             if search_in in ('employee_id.name', 'Employee'):
                 search_domain = OR([search_domain, [('employee_id.name', 'ilike', search)]])
             domain += search_domain
- 
-        attendance_count = request.env['hr.attendance'].search_count(domain)
+        domain += [('employee_id.user_id', '=', http.request.env.context.get('uid'))] 
+        attendance_count = request.env['hr.attendance'].sudo().search_count(domain)
 
         pager = portal_pager(
             url="/hr/attendances",
@@ -382,7 +457,7 @@ class CustomerPortal(CustomerPortal):
             step=self._items_per_page
         )
 
-        _attendances = request.env['hr.attendance'].search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
+        _attendances = request.env['hr.attendance'].sudo().search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
         request.session['my_attendance_history'] = _attendances.ids[:100]
 
         grouped_attendances = [project_groups]

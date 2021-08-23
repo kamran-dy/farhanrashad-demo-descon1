@@ -2,10 +2,10 @@
 
 <odoo>
     
-        <template id="portal_rectify_layout" name="Portal layout: Rectify menu entry" inherit_id="portal.portal_breadcrumbs" priority="25">
+      <template id="portal_rectify_layout" name="Portal layout: Rectify menu entry" inherit_id="portal.portal_breadcrumbs" priority="25">
         <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
-            <li t-if="page_name == 'attendance' or attendance" class="col-lg-2" t-attf-class="breadcrumb-item #{'active ' if not attendance else ''}">
-                <a t-if="attendance" t-attf-href="/hr/rectify/attendances?{{ keep_query() }}">Attendance Rectification</a>
+            <li t-if="page_name == 'rectify' or rectify" class="col-lg-2" t-attf-class="breadcrumb-item #{'active ' if not rectify else ''}">
+                <a t-if="rectify" t-attf-href="/hr/rectify/attendances?{{ keep_query() }}">Attendance Rectification</a>
                 <t t-else="">Attendance Rectification</t>
             </li>
 
@@ -40,10 +40,12 @@
                         <thead>
                             <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
                                 <th class="text-left">Employee</th>
+                                <th class="text-left">Approver</th>
                                 <th class="text-left">Check In</th>
                                 <th class="text-left">Check Out</th>
                                 <th class="text-left">Type</th>
                                 <th class="text-left">Reason</th>
+                                <th class="text-left">Status</th>
                                 
                             </tr>
                         </thead>
@@ -55,19 +57,38 @@
                                      <td>
                                       <span t-field="rectify.employee_id.name"/>
                                     </td>
+                                    <td>
+                                      <span t-field="rectify.employee_id.parent_id.name"/>
+                                    </td>
                                      <td class="text-left">
                                         <t t-if="rectify.check_in"> 
-                                        <span t-esc="rectify.check_in"  t-options='{"widget": "datetime"}'/>                             </t>
+                                          <span t-esc="rectify.check_in"  t-options='{"widget": "datetime"}'/>                                                 </t>
                                     </td>
                                     <td class="text-left">
                                         <t t-if="rectify.check_out"> 
-                                        <span t-esc="rectify.check_out"  t-options='{"widget": "datetime"}'/>     </t>
+                                          <span t-esc="rectify.check_out"  t-options='{"widget": "datetime"}'/>     
+                                        </t>
                                     </td>
                                     <td class="text-left">
                                         <span t-esc="rectify.partial" />
                                     </td>
                                     <td class="text-left">
                                         <span t-esc="rectify.reason" />
+                                    </td>
+                                    <td class="text-left">
+                                        <t t-if="rectify.state == 'draft'">
+                                            <i class="badge badge-pill badge-info" >Draft</i>
+                                        </t>
+                                        <t t-if="rectify.state == 'submitted'">
+                                            <i class="badge badge-pill badge-info" >To Approve</i>
+                                        </t>
+                                        <t t-if="rectify.state == 'approved'">
+                                            <i class="badge badge-pill badge-info" >Approved</i>
+                                        </t>
+                                         <t t-if="rectify.state == 'refused'">
+                                            <i class="badge badge-pill badge-info" >Refused</i>
+                                        </t>
+                                        
                                     </td>
                                     <td class="text-left">
                                           <t t-if = "rectify.state == 'submitted'">
@@ -85,7 +106,8 @@
                                     <t class="col-lg-7 col-md-8" >
                                         <a href="/hr/attendance/rectify/" > <div class="btn btn-primary pull-left" style="height:30px; line-height:100%; ">Create</div> </a> 
                                     </t>
-                                </div>
+                                 </div>
+                                 
                             </tr> 
                            
                         </tbody>
@@ -180,6 +202,11 @@
                                         <a href="/hr/attendance/rectify/" > <div class="btn btn-primary pull-left" style="height:30px; line-height:100%; ">Create</div> </a> 
                                     </t>
                                 </div>
+                                 <div>
+                                    <t class="col-lg-7 col-md-8" >
+                                        <a href="/hr/attendance/print/" > <div class="btn btn-primary pull-right" style="height:30px; line-height:100%; ">print</div> </a> 
+                                    </t>
+                                </div>
                             </tr> 
                            
                         </tbody>
@@ -196,6 +223,9 @@
        <template id="attendance_create_rectify" name="Create Attendance">
         <t t-call="portal.portal_layout">
                <div id="wrap">
+                  
+                   
+                   
                             <div class="oe_structure" data-oe-model="ir.ui.view" data-oe-id="2052" data-oe-field="arch" data-oe-xpath="/t[1]/t[1]/div[1]/div[1]">
                                 <section class="s_title parallax s_parallax_is_fixed bg-white-100 pt24 pb24" data-vcss="001" data-snippet="s_title" data-scroll-background-ratio="1">
                                     <span class="s_parallax_bg oe_img_bg" style="background-image: url('/web/image/website.s_banner_default_image'); background-position: 50% 0;"></span>
@@ -225,12 +255,52 @@
                                                 </div>
                                             </section>
                                         </div>
-                                        <span class="hidden" data-for="contactus_form" data-oe-id="2822" data-oe-xpath="/data/xpath/span" data-oe-model="ir.ui.view" data-oe-field="arch" data-values="{'employee_id': '', 'manager': '', 'date_end': '', 'description': ''}"></span>
+                                        <span class="hidden" data-for="contactus_form" data-oe-id="2822" data-oe-xpath="/data/xpath/span" data-oe-model="ir.ui.view" data-oe-field="arch" data-values="{'employee_id': '', 'check_in': '', 'date_partial': '', 'description': ''}"></span>
             <div id="leave_section" data-oe-id="3374" data-oe-xpath="/data/xpath[2]/div" data-oe-model="ir.ui.view" data-oe-field="arch">
                     <section class="s_website_form" data-vcss="001" data-snippet="s_website_form">
                         <div class="container">
                             <form id="portal_expense_form" data-toggle="validator" action="/hr/attendance/rectify/save">
 
+                                
+                                
+                                
+                                 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+                         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+                        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+                        <script>
+                              $(function () {
+                                
+                                var partial = $( "#partial" ).val();
+                               
+                                    $("#check_in_time").hide();
+                                    $("#check_out_time").hide();
+                                     $("#date_partial").hide();
+                                    $("#check_in").show();
+                                    $("#check_out").show(); 
+                              
+                            });
+                              $(document).ready(function(){
+                              $("#partial").change(function(){
+                                var partial = $( "#partial" ).val();
+                                if($(this).is(":checked")){
+                                    $("#check_in").hide();
+                                    $("#check_out").hide();
+                                    $("#date_partial").show();
+                                    $("#check_in_time").show();
+                                    $("#check_out_time").show();
+                                }
+                                else if($(this).is(":not(:checked)")){
+                                    $("#check_in_time").hide();
+                                    $("#date_partial").hide();
+                                    $("#check_out_time").hide();
+                                    $("#check_in").show();
+                                    $("#check_out").show(); 
+                                }
+                                
+                              });
+                              
+                            }); 
+                        </script>
                                 <div class="s_website_form_rows row s_col_no_bgcolor">
                                    
                                     <div class="form-group col-12 s_website_form_field" data-type="char" data-name="Field">
@@ -273,23 +343,73 @@
                                             <div class="col-sm">
 
                                                 
-                                              <input type="checkbox" class="form-control s_website_form_input" name="partial"   />
+                                              <input type="checkbox" class="form-control s_website_form_input" name="partial"  id='partial'  />
 
                                             </div>
                                         </div>
-                                    </div>
+                                     </div>
+                                    
                                     
                                    
-                                     <div class="form-group col-12 s_website_form_field s_website_form_required" data-type="char" data-name="Field">
+                                     <div id='check_in' class="form-group col-12 s_website_form_field s_website_form_required" data-type="char" data-name="Field">
                                         <div class="row s_col_no_resize s_col_no_bgcolor">
-                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="attendance2">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="check_in">
                                                 <span class="s_website_form_label_content">Check In</span>
                                                 <span class="s_website_form_mark"> *</span>
                                             </label>
                                             <div class="col-sm">
 
                                                 
-                                              <input type="datetime-local" class="form-control s_website_form_input" name="check_in"   required="1"/>
+                                              <input type="date" class="form-control s_website_form_input" name="check_in"    />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    
+                                   
+                                    
+                                     <div id='check_out' class="form-group col-12 s_website_form_field s_website_form_required" data-type="char" data-name="Field">
+                                        <div  class="row s_col_no_resize s_col_no_bgcolor">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="check_out">
+                                                <span class="s_website_form_label_content">Check Out</span>
+                                                <span class="s_website_form_mark"> *</span>
+                                            </label>
+                                            <div class="col-sm">
+
+                                                
+                                              <input type="date" class="form-control s_website_form_input" name="check_out"     />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                     <div id='date_partial' class="form-group col-12 s_website_form_field s_website_form_required" data-type="char" data-name="Field">
+                                        <div class="row s_col_no_resize s_col_no_bgcolor">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="date_partial">
+                                                <span class="s_website_form_label_content">Partial Date</span>
+                                                <span class="s_website_form_mark"> *</span>
+                                            </label>
+                                            <div class="col-sm">
+
+                                                
+                                              <input type="date" class="form-control s_website_form_input" name="date_partial"    />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                      <div id='check_in_time' class="form-group col-12 s_website_form_field s_website_form_required" data-type="char" data-name="Field">
+                                        <div class="row s_col_no_resize s_col_no_bgcolor">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="attendance2">
+                                                <span class="s_website_form_label_content">Time In</span>
+                                                <span class="s_website_form_mark"> *</span>
+                                            </label>
+                                            <div class="col-sm">
+
+                                                
+                                              <input type="time" class="form-control s_website_form_input" name="check_in_time"    />
 
                                             </div>
                                         </div>
@@ -297,16 +417,16 @@
                                     
                                    
                                     
-                                     <div class="form-group col-12 s_website_form_field s_website_form_required" data-type="char" data-name="Field">
+                                     <div id='check_out_time' class="form-group col-12 s_website_form_field s_website_form_required" data-type="char" data-name="Field">
                                         <div class="row s_col_no_resize s_col_no_bgcolor">
-                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="attendance2">
-                                                <span class="s_website_form_label_content">Check Out</span>
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="rectify_timeout">
+                                                <span class="s_website_form_label_content">Time Out</span>
                                                 <span class="s_website_form_mark"> *</span>
                                             </label>
                                             <div class="col-sm">
 
                                                 
-                                              <input type="datetime-local" class="form-control s_website_form_input" name="check_out"  required="1"  />
+                                              <input type="time" class="form-control s_website_form_input" name="check_out_time"     />
 
                                             </div>
                                         </div>
@@ -315,7 +435,7 @@
                                    
                                     <div class="form-group col-12 s_website_form_field s_website_form_required" data-type="text" data-name="Field">
                                         <div class="row s_col_no_resize s_col_no_bgcolor">
-                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="expense5">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="desc5">
                                                 <span class="s_website_form_label_content">Description</span>
                                                 <span class="s_website_form_mark"> *</span>
                                             </label>
@@ -333,6 +453,179 @@
                                     <div class="form-group col-12 s_website_form_submit" data-name="Submit Button">
                                         <div style="width: 200px;" class="s_website_form_label"></div>
                                         <button type="submit" class="btn btn-primary pull-left">Submit</button>
+                                        <span id="s_website_form_result"></span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+			</div>
+                                    <div class="col-lg-4 mt-4 mt-lg-0">
+                                   <div class='section-custom col-md-12'>
+                                                   <a class="mb-5" id="submit-leave" t-attf-href="/hr/attendances">
+                                                        <button t-attf-class="btn btn-primary #{'col-md-10' if multi_type else 'col-md-12'} mb-2">View  Attendance</button>
+                                                    </a>
+                                                </div>      
+                                        
+                                        
+                                        
+    <address itemscope="itemscope" itemtype="http://schema.org/Organization">
+        <div data-oe-model="res.company" data-oe-id="1" data-oe-field="partner_id" data-oe-type="contact" data-oe-expression="res_company.partner_id" data-oe-many2one-id="1" data-oe-many2one-model="res.partner" data-oe-contact-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;name&quot;, &quot;address&quot;, &quot;phone&quot;, &quot;mobile&quot;, &quot;email&quot;], &quot;tagName&quot;: &quot;div&quot;, &quot;expression&quot;: &quot;res_company.partner_id&quot;, &quot;type&quot;: &quot;contact&quot;, &quot;inherit_branding&quot;: true, &quot;translate&quot;: false}" data-oe-field-xpath="/t[1]/address[1]/div[1]">
+    <address class="mb-0" itemscope="itemscope" itemtype="http://schema.org/Organization">
+        
+        
+            
+    <div>
+        
+        
+        
+        
+    </div>
+
+        
+        <div itemprop="address" itemscope="itemscope" itemtype="http://schema.org/PostalAddress">
+           
+            
+          
+            
+           
+        </div>
+        <div>
+             
+            
+
+        </div>
+    
+        
+        
+    </address>
+</div>
+        
+          
+    </address>
+        
+            
+        
+    
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="oe_structure mt-2" data-oe-model="ir.ui.view" data-oe-id="2052" data-oe-field="arch" data-oe-xpath="/t[1]/t[1]/div[1]/div[3]"></div>
+                        </div>
+                            
+                            
+                            
+            
+            
+         
+        </t>
+    </template>
+    
+    
+    
+      <template id="print_attendance_report" name="print Attendance report">
+        <t t-call="portal.portal_layout">
+               <div id="wrap">
+                            <div class="oe_structure" data-oe-model="ir.ui.view" data-oe-id="2052" data-oe-field="arch" data-oe-xpath="/t[1]/t[1]/div[1]/div[1]">
+                                <section class="s_title parallax s_parallax_is_fixed bg-white-100 pt24 pb24" data-vcss="001" data-snippet="s_title" data-scroll-background-ratio="1">
+                                    <span class="s_parallax_bg oe_img_bg" style="background-image: url('/web/image/website.s_banner_default_image'); background-position: 50% 0;"></span>
+                                    <div class="o_we_bg_filter bg-white-50"></div>
+                                    <div class="container">
+                                        <h1 style="margin-left:10px">Attendance Report</h1>
+                                    </div>
+                                </section>
+                            </div>
+                                            
+                            <div class="container mt-4 mb-5">
+                                <div class="row">
+                                    <div class="col-lg-7 col-xl-6 mr-lg-auto">
+                                        <div class="oe_structure" data-oe-model="ir.ui.view" data-oe-id="2052" data-oe-field="arch" data-oe-xpath="/t[1]/t[1]/div[1]/div[2]/div[1]/div[1]/div[1]">
+                                            <section class="s_text_block" data-snippet="s_text_block">
+                                                <div class="container">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <p>
+                                                               
+                                                            </p>
+                                                                   
+                                                            
+                                                          
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                        </div>
+                                        <span class="hidden" data-for="contactus_form" data-oe-id="2822" data-oe-xpath="/data/xpath/span" data-oe-model="ir.ui.view" data-oe-field="arch" data-values="{'employee_id': '', 'manager': '', 'date_end': '', 'description': ''}"></span>
+            <div id="report_section" data-oe-id="3374" data-oe-xpath="/data/xpath[2]/div" data-oe-model="ir.ui.view" data-oe-field="arch">
+                    <section class="s_website_form" data-vcss="001" data-snippet="s_website_form">
+                        <div class="container">
+                            <form id="portal_expense_form" data-toggle="validator" action="/hr/attendance/print/report">
+
+                                <div class="s_website_form_rows row s_col_no_bgcolor">
+                                   
+                                    <div class="form-group col-12 s_website_form_field" data-type="char" data-name="Field">
+                                        <div class="row s_col_no_resize s_col_no_bgcolor">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="attendance1">
+                                                <span class="s_website_form_label_content">Employee</span>
+                                                <span class="s_website_form_mark"> *</span>
+
+                                            </label>
+                                            <div class="col-sm">
+                                            
+                                             <t t-esc="employee_name.name"    />
+                                               <input type="hidden" class="form-control s_website_form_input" name="employee_id"   t-att-value='employee_name.id' />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                     
+                                    
+                                   
+                                     <div class="form-group col-12 s_website_form_field s_website_form_required" data-type="char" data-name="Field">
+                                        <div class="row s_col_no_resize s_col_no_bgcolor">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="attendance2">
+                                                <span class="s_website_form_label_content">Date From</span>
+                                                <span class="s_website_form_mark"> *</span>
+                                            </label>
+                                            <div class="col-sm">
+
+                                                
+                                              <input type="date" class="form-control s_website_form_input" name="check_in"   required="1"/>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                   
+                                    
+                                     <div class="form-group col-12 s_website_form_field s_website_form_required" data-type="char" data-name="Field">
+                                        <div class="row s_col_no_resize s_col_no_bgcolor">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="attendance2">
+                                                <span class="s_website_form_label_content">Date To</span>
+                                                <span class="s_website_form_mark"> *</span>
+                                            </label>
+                                            <div class="col-sm">
+
+                                                
+                                              <input type="date" class="form-control s_website_form_input" name="check_out"  required="1"  />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                                                         
+                                   
+                                   
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    <div class="form-group col-12 s_website_form_submit" data-name="Submit Button">
+                                        <div style="width: 200px;" class="s_website_form_label"></div>
+                                        <button type="submit" class="btn btn-primary pull-left">Print</button>
                                         <span id="s_website_form_result"></span>
                                     </div>
                                 </div>
