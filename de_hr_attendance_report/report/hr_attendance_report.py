@@ -539,6 +539,15 @@ class PurchaseAttendanceReport(models.AbstractModel):
                                 status = 'To Approve'     
                             if daily_leave.state == 'validate':
                                 status = 'Approved'         
+                            remarks =  str(daily_leave.holiday_status_id.name) +' ('+str(status) +')' 
+                    daily_leave = self.env['hr.leave'].search([('employee_id','=', employee.id),('request_date_from','>=', date_after_month.strftime('%Y-%m-%d')),('request_date_to','<=', date_after_month.strftime('%Y-%m-%d')),('state','in',('validate','confirm'))]) 
+                    if daily_leave:
+                        if daily_leave.holiday_status_id.is_rest_day != True: 
+                            status = ' '
+                            if daily_leave.state == 'confirm':
+                                status = 'To Approve'     
+                            if daily_leave.state == 'validate':
+                                status = 'Approved'         
                             remarks =  str(daily_leave.holiday_status_id.name) +' ('+str(status) +')'        
                     attendances.append({
                         'date': date_after_month.strftime('%d/%b/%Y'),
