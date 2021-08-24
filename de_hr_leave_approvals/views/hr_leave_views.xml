@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='department_id']" position="after">
                     <field name="category_id" readonly="1" invisible="0"/> 
-                    <field name="leave_category" readonly="1" invisible="0"/> 
+                    <field name="leave_category" readonly="0" invisible="0"/> 
                     <field name="request_status" string="Approval Status"/> 
                     <field name="approval_request_id" invisible="1"/>
 

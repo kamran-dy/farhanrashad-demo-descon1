@@ -39,7 +39,7 @@ class HolidaysRequest(models.Model):
         ('day', 'Day'),
         ('half_day', 'Half Day'),
         ('hours', 'Short leave'),
-        ], string='Status', tracking=True)
+        ], string='Leave Category', tracking=True)
     approval_request_id = fields.Many2one('approval.request', string='Approval Request', copy=False, readonly=True)
     request_status = fields.Selection(related='approval_request_id.request_status')
     attachment_id = fields.Many2many('ir.attachment', relation="files_rel_leave",
@@ -217,8 +217,8 @@ class HolidaysRequest(models.Model):
         restrict_date = '2021-07-16'
         for line in self:
             if str(line.request_date_from)  < restrict_date:
-                
-                raise UserError('Not Allow to Enter Leave Request before 16 JULY 2021!')
+                pass
+                #raise UserError('Not Allow to Enter Leave Request before 16 JULY 2021!')
     
     def _get_duration_update_approval(self):
         for line in self:

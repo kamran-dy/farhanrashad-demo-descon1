@@ -76,7 +76,10 @@ class HrAttendanceRectification(models.Model):
                                     
                 if attendance.check_out < attendance.check_in:
                     raise exceptions.UserError(_('"Check Out" time cannot be earlier than "Check In" time.'+ str(attendance.check_out) ))
-                     
+            if attendance.date:
+                rectification = self.env['hr.attendance.rectification'].search([('employee_id','=',attendance.employee_id.id),('date','=',attendance.date),('state','in',('submitted','approved'))])
+                if rectification:
+                    raise exceptions.UserError(_('Attendance Rectification Already Exist between selected range!'))         
                
     
     def action_submit(self):
@@ -87,7 +90,7 @@ class HrAttendanceRectification(models.Model):
             
     def action_approve(self):
         for line in self:
-            if line.state =='submitted':
+            if line.state == 'submitted':
                 line.app_date = fields.date.today()
                 if line.attendance_id:
                     attendance_rectify = self.env['hr.attendance'].search([('id','=',line.attendance_id.id)])
@@ -188,13 +191,14 @@ class HrAttendanceRectification(models.Model):
                                         hour_from = shift_line.hour_from
                                         hour_to = shift_line.hour_to
                                     final_check_in= check_in + relativedelta(hours =+ hour_from)
-                                    check_out = final_check_in + relativedelta(hours =+ hour_to)
-                                    
+                                    check_out = check_in + relativedelta(hours =+ hour_to)
+                                    if shift_time.shift_type == 'night':
+                                        check_out = check_out +  timedelta(1) 
                                     vals = {
                                         'employee_id': line.employee_id.id,
-                                        'check_in':final_check_in ,
+                                        'check_in':final_check_in - relativedelta(hours =+ 5),
                                         'att_date':  final_check_in,
-                                        'check_out': check_out ,
+                                        'check_out': check_out - relativedelta(hours =+ 5),
                                         'remarks': 'Comitment Slip',
                                         }
                                     attendance = self.env['hr.attendance'].create(vals)
@@ -237,13 +241,14 @@ class HrAttendanceRectification(models.Model):
                                     hour_from = shift_line.hour_from
                                     hour_to = shift_line.hour_to
                                 final_check_in= check_in + relativedelta(hours =+ hour_from)
-                                check_out = final_check_in + relativedelta(hours =+ hour_to)
-                                
+                                check_out = check_in + relativedelta(hours =+ hour_to)
+                                if shift_time.shift_type == 'night':
+                                    check_out = check_out +  timedelta(1)
                                 vals = {
                                     'employee_id': line.employee_id.id,
-                                    'check_in': final_check_in,
+                                    'check_in': final_check_in - relativedelta(hours =+ 5),
                                     'att_date':  final_check_in,
-                                    'check_out': check_out ,
+                                    'check_out': check_out - relativedelta(hours =+ 5),
                                     'remarks': 'Comitment Slip',
                                     }
                                 attendance = self.env['hr.attendance'].create(vals)

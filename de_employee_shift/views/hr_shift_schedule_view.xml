@@ -142,6 +142,32 @@
                 </kanban>
             </field>
          </record>
+
+            <record id="hr_shift_schedule_line_view_search" model="ir.ui.view">
+            <field name="name">hr.shift.schedule.line.search</field>
+            <field name="model">hr.shift.schedule.line</field>
+            <field name="arch" type="xml">
+                <search string="Search Schedule">
+                    <field name="date"/>
+                    <field name="employee_id"/>
+                    <field name="employee_number"/>
+                    
+                   
+                    <separator />
+                    <filter string="Employee" name="current_employee" domain="[('employee_id.active', '=', True)]"/>
+                   
+                    <separator/>
+                    
+                    <group expand="0" string="Group By">
+                        <filter string="Employee" name="employee_id" domain="[]" context="{'group_by': 'employee_id'}"/>
+                        <filter string="Employee Number" name="employee_number" domain="[]" context="{'group_by': 'employee_number'}"/> 
+                        
+                        <filter string="First Shift" name="first_shift_id" domain="[]" context="{'group_by': 'first_shift_id'}"/>
+                        <filter string="Second Shift" name="second_shift_id" domain="[]" context="{'group_by': 'second_shift_id'}"/>  
+                    </group>
+                </search>
+            </field>
+        </record>
         
             <record id="hr_shift_schedule_line_view_tree" model="ir.ui.view">
             <field name="name">hr.shift.schedule.line.tree</field>

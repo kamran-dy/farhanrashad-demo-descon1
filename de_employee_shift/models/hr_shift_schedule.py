@@ -110,7 +110,7 @@ class HrScheduleLine(models.Model):
             ('draft', 'Draft'),
             ('posted', 'Posted'),
             ('cancel', 'Cancelled'),
-        ], string='Status', required=True, readonly=True, copy=False, tracking=True,
+        ], string='Status', required=True, readonly=False, copy=False, tracking=True,
         default='draft')
     employee_id = fields.Many2one('hr.employee', string='Employee')
     employee_number = fields.Char(string='Employee Number', compute='_compute_emp_number', store=True) 

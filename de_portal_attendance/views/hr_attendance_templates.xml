@@ -58,7 +58,7 @@
                                       <span t-field="rectify.employee_id.name"/>
                                     </td>
                                     <td>
-                                      <span t-field="rectify.employee_id.parent_id.name"/>
+                                      <!--<span t-field="rectify.employee_id.parent_id.name"/> -->
                                     </td>
                                      <td class="text-left">
                                         <t t-if="rectify.check_in"> 

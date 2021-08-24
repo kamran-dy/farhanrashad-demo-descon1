@@ -1,60 +1,15 @@
 <odoo>
   <data>
-    <!-- explicit list view definition -->
-<!--
-    <record model="ir.ui.view" id="de_rectification_oracle_connector.list">
-      <field name="name">de_rectification_oracle_connector list</field>
-      <field name="model">de_rectification_oracle_connector.de_rectification_oracle_connector</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </tree>
-      </field>
-    </record>
--->
-
-    <!-- actions opening views on models -->
-<!--
-    <record model="ir.actions.act_window" id="de_rectification_oracle_connector.action_window">
-      <field name="name">de_rectification_oracle_connector window</field>
-      <field name="res_model">de_rectification_oracle_connector.de_rectification_oracle_connector</field>
-      <field name="view_mode">tree,form</field>
-    </record>
--->
-
-    <!-- server action to the one above -->
-<!--
-    <record model="ir.actions.server" id="de_rectification_oracle_connector.action_server">
-      <field name="name">de_rectification_oracle_connector server</field>
-      <field name="model_id" ref="model_de_rectification_oracle_connector_de_rectification_oracle_connector"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": model._name,
-        }
-      </field>
-    </record>
--->
-
-    <!-- Top menu item -->
-<!--
-    <menuitem name="de_rectification_oracle_connector" id="de_rectification_oracle_connector.menu_root"/>
--->
-    <!-- menu categories -->
-<!--
-    <menuitem name="Menu 1" id="de_rectification_oracle_connector.menu_1" parent="de_rectification_oracle_connector.menu_root"/>
-    <menuitem name="Menu 2" id="de_rectification_oracle_connector.menu_2" parent="de_rectification_oracle_connector.menu_root"/>
--->
-    <!-- actions -->
-<!--
-    <menuitem name="List" id="de_rectification_oracle_connector.menu_1_list" parent="de_rectification_oracle_connector.menu_1"
-              action="de_rectification_oracle_connector.action_window"/>
-    <menuitem name="Server to list" id="de_rectification_oracle_connector" parent="de_rectification_oracle_connector.menu_2"
-              action="de_rectification_oracle_connector.action_server"/>
--->
+            <record id="hr_attendance_rectification_form_view" model="ir.ui.view">
+			<field name="name">hr.attendance.rectification.form.view.inherit</field>
+			<field name="model">hr.attendance.rectification</field>
+			<field name="inherit_id" ref="de_hr_attendance_approvals.view_hr_attendance_rectification_form"/>
+			<field name="arch" type="xml">
+                    <xpath expr="//field[@name='state']" position="after">	                     
+                       <field name="is_posted" readonly="0"/>                     
+		     </xpath>      
+                 </field>
+		</record>
+      
   </data>
 </odoo>

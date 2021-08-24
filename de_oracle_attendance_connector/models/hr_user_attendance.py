@@ -34,8 +34,8 @@ class HrUserAttendance(models.Model):
 
     def action_attendace_validated(self):
         
-        month_datetime = fields.date.today() - timedelta(100)
-        for month_date in range(100):
+        month_datetime = fields.date.today() - timedelta(2)
+        for month_date in range(2):
             attendance_date1 =  month_datetime + timedelta(month_date)
             total_employee = self.env['hr.employee'].search([])
             for employee in total_employee:
@@ -49,6 +49,7 @@ class HrUserAttendance(models.Model):
                         pre_existing_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=', previous_attendance),('check_out','=',False)] , order="check_in asc", limit=1)
                         if pre_existing_attendance.shift_id.shift_type == 'night':
                             pre_existing_attendance.update({
+                                'att_date': attendace.timestamp,
                                 'check_out': attendace.timestamp,
                             }) 
                             attendace.update({
@@ -68,6 +69,7 @@ class HrUserAttendance(models.Model):
                                                     })
                                 else:
                                     existing_attendance.update({
+                                      'att_date': attendace.attendance_date, 
                                       'check_out': attendace.timestamp,
                                     }) 
                                     attendace.update({

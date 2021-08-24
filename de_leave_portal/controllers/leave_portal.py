@@ -42,7 +42,10 @@ def timeoff_page_content(flag = 0):
         'company_info' : company_info
     }
    
-   
+def timeoff_page_exception( e):  
+    return {
+        'e': e
+    }
 
 
 def paging(data, flag1 = 0, flag2 = 0):        
@@ -105,6 +108,19 @@ class CreateTimeOff(http.Controller):
                 'name':kw.get('description'),
             }
             record = request.env['hr.leave'].sudo().create(timeoff_val)
+            if kw.get('date_start') and kw.get('date_end'):
+                dddate_from = datetime.strptime(str(kw.get('date_start')), '%Y-%m-%d')
+                dddate_to = datetime.strptime(str(kw.get('date_end')), '%Y-%m-%d')
+                dddelta = dddate_to - dddate_from
+                if dddelta.days == 0.0:
+                    record.update({
+                    'number_of_days': 1
+                    })
+                else:
+                    record.update({
+                      'number_of_days': dddelta.days + 1
+                    })    
+
             if kw.get('attachment'):
                 Attachments = request.env['ir.attachment']
 
@@ -122,8 +138,7 @@ class CreateTimeOff(http.Controller):
                 record.update({
                    'attachment_id': [(4, attachment_id.id)],
                  })
-             
-            
+
             
         if kw.get('leave_category_id') == 'half_day':
             day_half = kw.get('leave_half_day')
@@ -152,12 +167,16 @@ class CreateTimeOff(http.Controller):
             date_start1 = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
             date_start2 = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
             date_start =  date_start1 + relativedelta(hours =+ float((employee11.shift_id.hours_per_day/2)))       
-            date_end =  date_start2 + relativedelta(hours =+ float((employee11.shift_id.hours_per_day/2)) + 4) 
+            date_end =  date_start2 + relativedelta(hours =+ float((employee11.shift_id.hours_per_day/2)) + 4)
+            leave_period_half = 'first_half'  
+            if kw.get('leave_half_day') == 'pm':
+                leave_period_half = 'second_half'     
             timeoff_val = {
                 'holiday_status_id': int(kw.get('leave_type_id')),
                 'employee_id': int(kw.get('employee_id')),            
                 'date_from':date_start,
                 'date_to': date_end,
+                'leave_period_half': leave_period_half,  
                 'leave_category': kw.get('leave_category_id'),
                 'request_date_from':kw.get('half_day_date'),
                 'request_date_to': kw.get('half_day_date'),
@@ -187,15 +206,16 @@ class CreateTimeOff(http.Controller):
              
             hour_from = kw.get('time_from') 
             employee11 = request.env['hr.employee'].search([('id','=', int(kw.get('employee_id')))], limit=1)
-            hour_to =  str(float(kw.get('time_from')) + (employee11.shift_id.hours_per_day/4))
+            hour_to =  str(float(kw.get('time_from').replace(":",".")) + (employee11.shift_id.hours_per_day/4))
             date_start1 = datetime.strptime(kw.get('hours_date') , '%Y-%m-%d')
             date_start2 = datetime.strptime(kw.get('hours_date') , '%Y-%m-%d')
-            date_start =  date_start1 + relativedelta(hours =+ float(kw.get('time_from')))       
-            date_end =  date_start2 + relativedelta(hours =+ float(kw.get('time_from')) + 2) 
+            date_start =  date_start1 + relativedelta(hours =+ float(kw.get('time_from').replace(":",".")))       
+            date_end =  date_start2 + relativedelta(hours =+ float(kw.get('time_from').replace(":",".")) + 2) 
             timeoff_val = {
                 'holiday_status_id': int(kw.get('leave_type_id')),
                 'employee_id': int(kw.get('employee_id')),            
                 'date_from':date_start,
+                'short_start_time': kw.get('time_from').replace(":","."),
                 'date_to': date_end,
                 'leave_category': kw.get('leave_category_id'),
                 'request_date_from':kw.get('hours_date'),
