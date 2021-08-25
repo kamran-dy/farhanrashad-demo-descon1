@@ -15,7 +15,7 @@
                   <field name="binding_model_id" ref="hr_attendance.model_hr_attendance"/>            
                   <field name="binding_view_types">list</field>
                   <field name="state">code</field>
-                  <field name="code">action = records.action_process_attendance() </field>
+                  <field name="code">action = records.action_update_out_time() </field>
     </record>
   </data>
   <data>    

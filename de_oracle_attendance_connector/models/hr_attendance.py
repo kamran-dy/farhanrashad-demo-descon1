@@ -15,6 +15,35 @@ class HrAttendance(models.Model):
     att_date = fields.Date(string="Attendance Date")
     oralce_employee_no = fields.Char(related='employee_id.emp_number')
 
+    def action_update_out_time(self):
+        for attendance in self:
+            if attendance.check_out == False:
+                hour_from = 4
+                hour_to =  12
+                attendance_date = attendance.att_date
+                for  shift_line in attendance.shift_id.attendance_ids:
+                    hour_from = shift_line.hour_from
+                    hour_to = shift_line.hour_to
+                    if attendance_date.weekday() == shift_line.dayofweek:
+                      hour_from = shift_line.hour_from
+                      hour_to = shift_line.hour_to    
+                date_hour_from = attendance_date + relativedelta(hours =+ hour_from)
+                date_hour_to =  attendance_date + relativedelta(hours =+ hour_to) 
+                check_in = attendance.check_in + relativedelta(hours =+ 5) 
+                if check_in >= date_hour_from and check_in <= date_hour_to:
+                    delta = date_hour_to - check_in
+                    deltain = delta.total_seconds()
+                    if deltain <= 7200:
+                        attendance.update( {
+                                    'check_in': False,
+                                    'check_out': attendance.check_in
+                                    })
+                elif check_in >= date_hour_to:
+                    attendance.update( {
+                                  'check_in': False,
+                                  'check_out': attendance.check_in
+                                  })   
+
 
     def action_process_attendance(self, attendance_id):
         hr_attendances = self.env['hr.attendance'].search([('id','=', attendance_id)])

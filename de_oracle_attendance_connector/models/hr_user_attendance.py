@@ -27,11 +27,6 @@ class HrUserAttendance(models.Model):
     
       
 
-   
-
-
-
-
     def action_attendace_validated(self):
         
         month_datetime = fields.date.today() - timedelta(2)
@@ -47,14 +42,50 @@ class HrUserAttendance(models.Model):
                     for attendace in attendance_list:
                         previous_attendance = attendace.attendance_date - timedelta(1)
                         pre_existing_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=', previous_attendance),('check_out','=',False)] , order="check_in asc", limit=1)
-                        if pre_existing_attendance.shift_id.shift_type == 'night':
-                            pre_existing_attendance.update({
-                                'att_date': attendace.timestamp,
-                                'check_out': attendace.timestamp,
-                            }) 
-                            attendace.update({
-                                    'is_attedance_created' : True
-                                    })         
+                        if pre_existing_attendance:
+                            delta_out = attendace.timestamp - pre_existing_attendance.check_in
+                            deltaout_time = delta_out.total_seconds() 
+                            if deltaout_time < 43200:
+
+                                pre_existing_attendance.update({
+                                    'att_date': attendace.timestamp,
+                                    'check_out': attendace.timestamp,
+                                }) 
+                                attendace.update({
+                                        'is_attedance_created' : True
+                                        })
+                            else:
+                                existing_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=', attendace.attendance_date),('check_out','=',False)] , order="check_in asc", limit=1)
+                                if existing_attendance:
+                                    delta_time = attendace.timestamp - existing_attendance.check_in  
+                                    delta = delta_time.total_seconds() 
+                                    if delta < 600 :
+                                        existing_attendance.update({
+                                        'att_date': attendace.timestamp,    
+                                        'check_in': attendace.timestamp,
+                                        }) 
+                                        attendace.update({
+                                                        'is_attedance_created' : True
+                                                        })
+                                    else:
+                                        existing_attendance.update({
+                                           'att_date': attendace.timestamp,  
+                                          'check_out': attendace.timestamp,
+                                        }) 
+                                        attendace.update({
+                                                        'is_attedance_created' : True
+                                                        })
+                                else:    
+                                    vals = {
+                                        'check_in': attendace.timestamp,
+                                        'att_date': attendace.attendance_date,
+                                        'employee_id': attendace.employee_id.id,
+                                    }   
+                                    attendance = self.env['hr.attendance'].create(vals)
+                                    attendace.update({
+                                                'is_attedance_created' : True
+                                                })
+
                         else:
                             existing_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=', attendace.attendance_date),('check_out','=',False)] , order="check_in asc", limit=1)
                             if existing_attendance:
@@ -62,6 +93,7 @@ class HrUserAttendance(models.Model):
                                 delta = delta_time.total_seconds() 
                                 if delta < 600 :
                                     existing_attendance.update({
+                                    'att_date': attendace.timestamp,    
                                     'check_in': attendace.timestamp,
                                     }) 
                                     attendace.update({
@@ -69,7 +101,7 @@ class HrUserAttendance(models.Model):
                                                     })
                                 else:
                                     existing_attendance.update({
-                                      'att_date': attendace.attendance_date, 
+                                       'att_date': attendace.timestamp,  
                                       'check_out': attendace.timestamp,
                                     }) 
                                     attendace.update({
@@ -85,5 +117,5 @@ class HrUserAttendance(models.Model):
                                 attendace.update({
                                             'is_attedance_created' : True
                                             })
-                                attendance.action_process_attendance(attendance.id)
+#                                 attendance.action_process_attendance(attendance.id)
                                 
