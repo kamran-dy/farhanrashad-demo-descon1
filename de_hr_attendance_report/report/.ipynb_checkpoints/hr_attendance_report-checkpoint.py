@@ -367,13 +367,9 @@ class PurchaseAttendanceReport(models.AbstractModel):
                 if shift_line.first_shift_id:
                     for gazetted_day in shift_line.first_shift_id.global_leave_ids:
                        
-                        
                         if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_day.date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_day.date_to.strftime('%y-%m-%d')):
-                            gazetted_attendance = self.env['hr.attendance'].search([('att_date','=',shift_line.date)])
-                            if gazetted_attendance:
-                                pass
-                            else:
-                                gazetted_days_count += 1 
+                           
+                            gazetted_days_count += 1 
                 if shift_line.rest_day == True:
                     rest_days_initial += 1  
                     if shift_line.first_shift_id:
@@ -457,10 +453,20 @@ class PurchaseAttendanceReport(models.AbstractModel):
 
                 hr_attendance = self.env['hr.attendance'].search([('employee_id','=', employee.id),('att_date','=', date_after_month)]) 
                 if hr_attendance:
+                    datecheck_in_time  = ' '
+                    datecheck_out_time = ' '
+                    day1 = date_after_month.strftime('%A')
+                    shift = employee.shift_id.name
+                    tot_hours = 0
+                    rest_day = 'N'
+                    remarks = ' '
+                    current_shift = employee.shift_id
                     for attendance in hr_attendance:
-
+                        tot_hours +=  attendance.worked_hours
                         emp_leaves = self.env['hr.leave'].search([('employee_id','=', employee.id),('request_date_from','=', date_after_month)], limit=1)
                         shift = attendance.shift_id.name
+                        if not shift:
+                            shift = attendance.employee_id.shift_id.name
                         current_shift = attendance.shift_id
                         if  attendance.check_out and attendance.check_in:
                             remarks = 'Attendance Present.'
@@ -506,18 +512,24 @@ class PurchaseAttendanceReport(models.AbstractModel):
                         datecheck_out_time = check_out_time
                         if check_in_time :
                             datecheck_in_time = datetime.strptime(str(check_in_time), "%Y-%m-%d %H:%M:%S").strftime('%d/%b/%Y %H:%M:%S')
+                            
                         if check_out_time :
-                            datecheck_out_time = datetime.strptime(str(check_out_time), "%Y-%m-%d %H:%M:%S").strftime('%d/%b/%Y %H:%M:%S')    
-                        attendances.append({
+                            datecheck_out_time = datetime.strptime(str(check_out_time), "%Y-%m-%d %H:%M:%S").strftime('%d/%b/%Y %H:%M:%S')
+                     
+                    if tot_hours < (current_shift.hours_per_day -1):
+                        remarks = 'Half Present'
+                    if tot_hours < ((current_shift.hours_per_day -1)/2):
+                        remarks = 'Absent.'    
+                    attendances.append({
                             'date': date_after_month.strftime('%d/%b/%Y'),
                             'day':  day1,
                             'check_in': datecheck_in_time,
                             'check_out':  datecheck_out_time,
-                            'hours': attendance.worked_hours,
+                            'hours': tot_hours,
                             'shift': shift,
                             'rest_day': rest_day,
                             'remarks': remarks,
-                        })
+                    })
                 else:
                     emp_leaves = self.env['hr.leave'].search([('employee_id','=', employee.id),('request_date_from','=', date_after_month)], limit=1)
                     if emp_leaves:
@@ -550,7 +562,8 @@ class PurchaseAttendanceReport(models.AbstractModel):
                     for gazetted_day in current_shift.global_leave_ids:
 
                         if str(date_after_month.strftime('%y-%m-%d')) >= str(gazetted_day.date_from.strftime('%y-%m-%d')) and str(date_after_month.strftime('%y-%m-%d')) <= str(gazetted_day.date_to.strftime('%y-%m-%d')):
-                            remarks = str(gazetted_day.name) 
+                            remarks = str(gazetted_day.name)
+                            rest_day = 'Y' 
                     check_in_time =  ' '
                     check_out_time = ' '
                     
