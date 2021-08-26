@@ -69,7 +69,7 @@ class PurchaseAttendanceReport(models.AbstractModel):
             for timeoff_type in uniq_leave_type:
                 leave_work_days = 0
                 leaves_work_hours = 0 
-                emp_leaves_type = self.env['hr.leave'].search([('holiday_status_id','=', timeoff_type),('employee_id','=', employee1.id),('date_from','>=', date_from),('date_to','<=', date_to),('state','=','validate')])
+                emp_leaves_type = self.env['hr.leave'].search([('holiday_status_id','=', timeoff_type),('employee_id','=', employee1.id),('date_from','>=', date_from),('date_to','<=', date_to),('state','in',('validate','confirm'))])
                 for timeoff in emp_leaves_type:
                     leave_work_days += timeoff.number_of_days
                     total_leave_days += timeoff.number_of_days 
@@ -282,7 +282,7 @@ class PurchaseAttendanceReport(models.AbstractModel):
         for employee11 in portal_employee:
             work_day_line = [] 
             
-            employee = self.env['hr.employee'].search([('id',
+            employee = self.env['hr.employee'].sudo().search([('id',
                                                        '=', employee11)], limit=1)
             date_from = datetime.strptime(str(data['start_date']), "%Y-%m-%d")
             date_to = datetime.strptime(str(data['end_date']), "%Y-%m-%d")
@@ -293,9 +293,9 @@ class PurchaseAttendanceReport(models.AbstractModel):
             """
               Employee Attendance Days
             """ 
-            emp_attendance = self.env['hr.attendance'].search([('employee_id','=', employee.id),('att_date','>=', date_from),('att_date','<=', date_to)])
+            emp_attendance = self.env['hr.attendance'].sudo().search([('employee_id','=', employee.id),('att_date','>=', date_from),('att_date','<=', date_to)])
             previous_date = fields.date.today()
-            work_entry_type = self.env['hr.work.entry.type'].search([('code','=','WORK100')], limit=1)
+            work_entry_type = self.env['hr.work.entry.type'].sudo().search([('code','=','WORK100')], limit=1)
             for attendance in emp_attendance:
                 if attendance.check_out:
                     new_date = attendance.check_out.strftime('%y-%m-%d')
@@ -318,16 +318,16 @@ class PurchaseAttendanceReport(models.AbstractModel):
             leave_type = []
             
             total_leave_days = 0
-            emp_leaves = self.env['hr.leave'].search([('employee_id','=', employee.id),('date_from','>=', date_from),('date_to','<=', date_to),('state','=','validate'),('holiday_status_id.is_rest_day','=',False)])
+            emp_leaves = self.env['hr.leave'].sudo().search([('employee_id','=', employee.id),('date_from','>=', date_from),('date_to','<=', date_to),('state','in',('validate','confirm')),('holiday_status_id.is_rest_day','=',False)])
             previous_date = fields.date.today()
-            leave_work_entry_type = self.env['hr.work.entry.type'].search([('code','=','LEAVE100')], limit=1)
+            leave_work_entry_type = self.env['hr.work.entry.type'].sudo().search([('code','=','LEAVE100')], limit=1)
             for leave in emp_leaves: 
                 leave_type.append(leave.holiday_status_id.id)
             uniq_leave_type = set(leave_type)
             for timeoff_type in uniq_leave_type:
                 leave_work_days = 0
                 leaves_work_hours = 0 
-                emp_leaves_type = self.env['hr.leave'].search([('holiday_status_id','=', timeoff_type),('employee_id','=', employee.id),('date_from','>=', date_from),('date_to','<=', date_to),('state','in',('validate','confirm'))])
+                emp_leaves_type = self.env['hr.leave'].sudo().search([('holiday_status_id','=', timeoff_type),('employee_id','=', employee.id),('date_from','>=', date_from),('date_to','<=', date_to),('state','in',('validate','confirm'))])
                 for timeoff in emp_leaves_type:
                     leave_work_days += timeoff.number_of_days
                     total_leave_days += timeoff.number_of_days 
@@ -360,16 +360,43 @@ class PurchaseAttendanceReport(models.AbstractModel):
             for i in range(0, total_days + 1):
                 absent_work_days_initial = absent_work_days_initial + 1
             rest_days_initial = 0
+            gazetted_days_count = 0
             absent_work_days = 0
-            shift_contract_lines = self.env['hr.shift.schedule.line'].search([('employee_id','=', employee.id),('date','>=',date_from),('date','<=',date_to),('state','=','posted')])
+            shift_contract_lines = self.env['hr.shift.schedule.line'].sudo().search([('employee_id','=', employee.id),('date','>=',date_from),('date','<=',date_to),('state','=','posted')])
             for shift_line in shift_contract_lines:
+                if shift_line.first_shift_id:
+                    for gazetted_day in shift_line.first_shift_id.global_leave_ids:
+                       
+                        if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_day.date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_day.date_to.strftime('%y-%m-%d')):
+                           
+                            gazetted_days_count += 1 
                 if shift_line.rest_day == True:
-                    rest_days_initial += 1 
+                    rest_days_initial += 1  
+                    if shift_line.first_shift_id:
+                        for gazetted_day in shift_line.first_shift_id.global_leave_ids:
+                            if str(shift_line.date) >= str(gazetted_day.date_from.strftime('%y-%m-%d')) and str(shift_line.date) <= str(gazetted_day.date_to.strftime('%y-%m-%d')):
+                                rest_days_initial -= 1     
+                    else:
+                        
+                        current_shift = self.env['resource.calendar'].sudo().search([], limit=1)
+                        current_shift = self.env['resource.calendar'].sudo().search([('company_id','=', employee.company_id.id)], limit=1)
+                        for gazetted_day in current_shift.global_leave_ids:
+                            if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_day.date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_day.date_to.strftime('%y-%m-%d')):
+                                rest_days_initial -= 1 
+                        
+                                   
+            work_day_line.append({
+                   'work_entry_type_id' : 1,
+                   'name': 'Gazetted Holidays',
+                   'sequence': 2,
+                   'number_of_days' : gazetted_days_count,
+                   'number_of_hours' : gazetted_days_count * employee.shift_id.hours_per_day ,
+            })   
             
             """
               Rest Day 
             """
-            rest_day_work_entry_type = self.env['hr.work.entry.type'].search([('code','=','Rest Day')], limit=1)
+            rest_day_work_entry_type = self.env['hr.work.entry.type'].sudo().search([('code','=','Rest Day')], limit=1)
             
             if not rest_day_work_entry_type:
                 vals = {
@@ -378,7 +405,7 @@ class PurchaseAttendanceReport(models.AbstractModel):
                     'round_days': 'NO',
                 }
                 work_entry = self.env['hr.work.entry.type'].sudo().create(vals)  
-            rest_day_work_entry_type = self.env['hr.work.entry.type'].search([('code','=','Rest Day')], limit=1)    
+            rest_day_work_entry_type = self.env['hr.work.entry.type'].sudo().search([('code','=','Rest Day')], limit=1)    
             work_day_line.append({
                'work_entry_type_id' : rest_day_work_entry_type.id,
                'name': rest_day_work_entry_type.name,
@@ -386,21 +413,21 @@ class PurchaseAttendanceReport(models.AbstractModel):
                'number_of_days' : rest_days_initial ,
                'number_of_hours' : rest_days_initial * employee.shift_id.hours_per_day ,
             })
-            absent_work_entry_type = self.env['hr.work.entry.type'].search([('code','=','ABSENT100')], limit=1)
+            absent_work_entry_type = self.env['hr.work.entry.type'].sudo().search([('code','=','ABSENT100')], limit=1)
             if not absent_work_entry_type:
                 vals = {
                     'name': 'Absent Days',
                     'code': 'ABSENT100',
                     'round_days': 'NO',
                 }
-                work_entry = self.env['hr.work.entry.type'].create(vals)
+                work_entry = self.env['hr.work.entry.type'].sudo().create(vals)
             apply_leave_days = 0    
             emp_leaves_apply = self.env['hr.leave'].sudo().search([('employee_id','=', employee.id),('date_from','>=', date_from),('date_to','<=', date_to),('state','=','validate')]) 
             for leave_apply in emp_leaves_apply:
                 apply_leave_days += leave_apply.number_of_days
             
-            absent_work_days = absent_work_days_initial - (rest_days_initial + total_leave_days + work_days)
-            absent_work_entry_type = self.env['hr.work.entry.type'].search([('code','=','ABSENT100')], limit=1)
+            absent_work_days = absent_work_days_initial - (gazetted_days_count + rest_days_initial + total_leave_days + work_days)
+            absent_work_entry_type = self.env['hr.work.entry.type'].sudo().search([('code','=','ABSENT100')], limit=1)
             
             work_day_line.append({
                'work_entry_type_id' : absent_work_entry_type.id,
@@ -426,10 +453,20 @@ class PurchaseAttendanceReport(models.AbstractModel):
 
                 hr_attendance = self.env['hr.attendance'].search([('employee_id','=', employee.id),('att_date','=', date_after_month)]) 
                 if hr_attendance:
+                    datecheck_in_time  = ' '
+                    datecheck_out_time = ' '
+                    day1 = date_after_month.strftime('%A')
+                    shift = employee.shift_id.name
+                    tot_hours = 0
+                    rest_day = 'N'
+                    remarks = ' '
+                    current_shift = employee.shift_id
                     for attendance in hr_attendance:
-
+                        tot_hours +=  attendance.worked_hours
                         emp_leaves = self.env['hr.leave'].search([('employee_id','=', employee.id),('request_date_from','=', date_after_month)], limit=1)
                         shift = attendance.shift_id.name
+                        if not shift:
+                            shift = attendance.employee_id.shift_id.name
                         current_shift = attendance.shift_id
                         if  attendance.check_out and attendance.check_in:
                             remarks = 'Attendance Present.'
@@ -475,18 +512,24 @@ class PurchaseAttendanceReport(models.AbstractModel):
                         datecheck_out_time = check_out_time
                         if check_in_time :
                             datecheck_in_time = datetime.strptime(str(check_in_time), "%Y-%m-%d %H:%M:%S").strftime('%d/%b/%Y %H:%M:%S')
+                            
                         if check_out_time :
-                            datecheck_out_time = datetime.strptime(str(check_out_time), "%Y-%m-%d %H:%M:%S").strftime('%d/%b/%Y %H:%M:%S')    
-                        attendances.append({
+                            datecheck_out_time = datetime.strptime(str(check_out_time), "%Y-%m-%d %H:%M:%S").strftime('%d/%b/%Y %H:%M:%S')
+                     
+                    if tot_hours < (current_shift.hours_per_day -1):
+                        remarks = 'Half Present'
+                    if tot_hours < ((current_shift.hours_per_day)/2):
+                        remarks = 'Absent.'    
+                    attendances.append({
                             'date': date_after_month.strftime('%d/%b/%Y'),
                             'day':  day1,
                             'check_in': datecheck_in_time,
                             'check_out':  datecheck_out_time,
-                            'hours': attendance.worked_hours,
+                            'hours': tot_hours,
                             'shift': shift,
                             'rest_day': rest_day,
                             'remarks': remarks,
-                        })
+                    })
                 else:
                     emp_leaves = self.env['hr.leave'].search([('employee_id','=', employee.id),('request_date_from','=', date_after_month)], limit=1)
                     if emp_leaves:
@@ -519,28 +562,12 @@ class PurchaseAttendanceReport(models.AbstractModel):
                     for gazetted_day in current_shift.global_leave_ids:
 
                         if str(date_after_month.strftime('%y-%m-%d')) >= str(gazetted_day.date_from.strftime('%y-%m-%d')) and str(date_after_month.strftime('%y-%m-%d')) <= str(gazetted_day.date_to.strftime('%y-%m-%d')):
-                            remarks = str(gazetted_day.name) 
+                            remarks = str(gazetted_day.name)
+                            rest_day = 'Y' 
                     check_in_time =  ' '
                     check_out_time = ' '
-                    daily_leave = self.env['hr.leave'].search([('employee_id','=', employee.id),('request_date_from','=', date_after_month.strftime('%Y-%m-%d')),('state','in',('validate','confirm'))]) 
-                    if daily_leave:
-                        if daily_leave.holiday_status_id.is_rest_day != True: 
-                            status = ' '
-                            if daily_leave.state == 'confirm':
-                                status = 'To Approve'     
-                            if daily_leave.state == 'validate':
-                                status = 'Approved'         
-                            remarks =  str(daily_leave.holiday_status_id.name) +' ('+str(status) +')' 
-                    daily_leave = self.env['hr.leave'].search([('employee_id','=', employee.id),('request_date_to','=', date_after_month.strftime('%Y-%m-%d')),('state','in',('validate','confirm'))]) 
-                    if daily_leave:
-                        if daily_leave.holiday_status_id.is_rest_day != True: 
-                            status = ' '
-                            if daily_leave.state == 'confirm':
-                                status = 'To Approve'     
-                            if daily_leave.state == 'validate':
-                                status = 'Approved'         
-                            remarks =  str(daily_leave.holiday_status_id.name) +' ('+str(status) +')' 
-                    daily_leave = self.env['hr.leave'].search([('employee_id','=', employee.id),('request_date_from','>=', date_after_month.strftime('%Y-%m-%d')),('request_date_to','<=', date_after_month.strftime('%Y-%m-%d')),('state','in',('validate','confirm'))]) 
+                    
+                    daily_leave = self.env['hr.leave'].sudo().search([('employee_id','=', employee.id),('request_date_from','<=', date_after_month.strftime('%Y-%m-%d')),('request_date_to','>=', date_after_month.strftime('%Y-%m-%d')),('state','in',('validate','confirm'))]) 
                     if daily_leave:
                         if daily_leave.holiday_status_id.is_rest_day != True: 
                             status = ' '
