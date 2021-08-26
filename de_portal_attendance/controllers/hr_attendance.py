@@ -137,8 +137,34 @@ class CreateAttendance(http.Controller):
                 
         else:
             if kw.get('partial'):
-                check_in_datetime = datetime.strptime(kw.get('date_partial'), '%Y-%m-%d') + relativedelta(hours =+ float(kw.get('check_in_time').replace(":", ".")))
-                check_out_datetime = datetime.strptime(kw.get('date_partial'),'%Y-%m-%d') + relativedelta(hours =+ float(kw.get('check_out_time').replace(":", ".")))
+                if  not kw.get('check_in_time'):
+                    raise UserError('Please slect Time In') 
+                if  not kw.get('check_out_time'):
+                    raise UserError('Please slect Time Out') 
+                timein_data = kw.get('check_in_time').split(":")
+                check_in_hour = 0
+                check_in_minute = 0
+                time_count = 0
+                for deltatime in timein_data:
+                    if time_count == 0:
+                        check_in_hour =  deltatime
+                    time_count += 1
+                    if time_count:
+                        check_in_minute =  deltatime  
+                timeout_data = kw.get('check_out_time').split(":")
+                check_out_hour = 0
+                check_out_minute = 0
+                time_count = 0
+                for deltatime in timeout_data:
+                    if time_count == 0:
+                        check_out_hour =  deltatime
+                    time_count += 1
+                    if time_count:
+                        check_out_minute =  deltatime          
+                timeout_data = float(kw.get('check_in_time').replace(":", "."))
+                check_in_datetime = datetime.strptime(kw.get('date_partial'), '%Y-%m-%d') + relativedelta(hours =+ int(check_in_hour), minutes = int(check_in_minute))
+                check_out_datetime = datetime.strptime(kw.get('date_partial'),'%Y-%m-%d') + relativedelta(hours =+ int(check_out_hour), minutes = int(check_out_minute))
+                
                 rectify_val = {
                     'reason': kw.get('description'),
                     'employee_id': int(kw.get('employee_id')),
