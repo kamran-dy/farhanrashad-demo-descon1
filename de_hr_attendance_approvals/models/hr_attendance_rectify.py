@@ -122,8 +122,7 @@ class HrAttendanceRectification(models.Model):
                                         attendance = self.env['hr.attendance'].create(vals)
                                         line.update({
                                             'state': 'approved'
-                                        }) 
-                                    
+                                        })                                     
                             elif rectify_attendance.check_in:
                                 if line.check_out:
                                     if rectify_attendance.check_in > line.check_out:                           
@@ -133,6 +132,9 @@ class HrAttendanceRectification(models.Model):
                                             'check_out': rectify_attendance.check_in,
                                             'remarks': 'In Time Is Missing',
                                         })
+                                        line.update({
+                                            'state': 'approved'
+                                        })  
                                     elif rectify_attendance.check_in < line.check_out: 
                                         rectify_attendance.update({
                                             'check_in': rectify_attendance.check_in,
@@ -140,6 +142,9 @@ class HrAttendanceRectification(models.Model):
                                             'check_out': line.check_out,
                                             'remarks': 'Out Time Is Missing',
                                         })
+                                        line.update({
+                                            'state': 'approved'
+                                        })  
                                 elif  line.check_in:
                                     if rectify_attendance.check_in > line.check_in:                           
                                         rectify_attendance.update({
@@ -148,6 +153,9 @@ class HrAttendanceRectification(models.Model):
                                             'check_out': rectify_attendance.check_in,
                                             'remarks': 'In Time Is Missing',
                                         })
+                                        line.update({
+                                            'state': 'approved'
+                                        })  
                                     elif rectify_attendance.check_in < line.check_in: 
                                         rectify_attendance.update({
                                             'check_in': rectify_attendance.check_in,
@@ -155,7 +163,19 @@ class HrAttendanceRectification(models.Model):
                                             'check_out': line.check_in,   
                                             'remarks': 'Out Time Is Missing',
                                         }) 
-                                        
+                                        line.update({
+                                            'state': 'approved'
+                                        })  
+                            else:
+                                rectify_attendance.update({
+                                            'check_in': line.check_in,
+                                            'att_date':  line.check_out,
+                                            'check_out': rectify_attendance.check_in,
+                                            'remarks': 'In Time Is Missing',
+                                        }) 
+                                line.update({
+                                            'state': 'approved'
+                                        })                 
                     else:
                         if line.number_of_Days == 0:
                             vals = {
