@@ -45,8 +45,10 @@ class PurchaseAttendanceReport(models.AbstractModel):
                 if attendance.check_out:
                     new_date = attendance.check_out.strftime('%y-%m-%d')
                     if new_date != previous_date:
-                       work_days += 1
-                       work_hours += attendance.worked_hours 
+                       daily_leave = self.env['hr.leave'].sudo().search([('employee_id','=', employee.id),('request_date_from','<=', attendance.att_date),('request_date_to','>=',  attendance.att_date),('state','in',('validate','confirm'))]) 
+                       if not daily_leave:
+                           work_days += 1
+                           work_hours += attendance.worked_hours 
                     previous_date = attendance.check_out.strftime('%y-%m-%d')
             work_day_line.append({
                'work_entry_type_id' : work_entry_type.id ,
@@ -111,22 +113,43 @@ class PurchaseAttendanceReport(models.AbstractModel):
             for shift_line in shift_contract_lines:
                 if shift_line.first_shift_id:
                     for gazetted_day in shift_line.first_shift_id.global_leave_ids:
-                       
-                        if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_day.date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_day.date_to.strftime('%y-%m-%d')):
-                           
+                        gazetted_date_from = gazetted_day.date_from +timedelta(1)
+                        gazetted_date_to = gazetted_day.date_to
+                        if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_date_to.strftime('%y-%m-%d')):
+
                             gazetted_days_count += 1 
+                else:
+                    current_shift = employee.shift_id
+                    if not current_shift:
+                        current_shift = self.env['resource.calendar'].sudo().search([('company_id','=', employee.company_id.id)], limit=1)
+                    if not current_shift:
+                        current_shift = self.env['resource.calendar'].sudo().search([], limit=1)
+
+                    for gazetted_day in current_shift.global_leave_ids:
+                        gazetted_date_from = gazetted_day.date_from +timedelta(1)
+                        gazetted_date_to = gazetted_day.date_to
+                        if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_date_to.strftime('%y-%m-%d')):
+
+                            gazetted_days_count += 1
                 if shift_line.rest_day == True:
-                    rest_days_initial += 1  
+                    exist_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=',shift_line.date)])
+                    if not exist_attendance:
+                        rest_days_initial += 1 
+                        
                     if shift_line.first_shift_id:
                         for gazetted_day in shift_line.first_shift_id.global_leave_ids:
-                            if str(shift_line.date) >= str(gazetted_day.date_from.strftime('%y-%m-%d')) and str(shift_line.date) <= str(gazetted_day.date_to.strftime('%y-%m-%d')):
+                            gazetted_date_from = gazetted_day.date_from +timedelta(1)
+                            gazetted_date_to = gazetted_day.date_to
+                            if str(shift_line.date) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date) <= str(gazetted_date_to.strftime('%y-%m-%d')):
                                 rest_days_initial -= 1     
                     else:
                         
                         current_shift = self.env['resource.calendar'].sudo().search([], limit=1)
                         current_shift = self.env['resource.calendar'].sudo().search([('company_id','=', employee.company_id.id)], limit=1)
                         for gazetted_day in current_shift.global_leave_ids:
-                            if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_day.date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_day.date_to.strftime('%y-%m-%d')):
+                            gazetted_date_from = gazetted_day.date_from +timedelta(1)
+                            gazetted_date_to = gazetted_day.date_to 
+                            if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_date_to.strftime('%y-%m-%d')):
                                 rest_days_initial -= 1 
                         
                                    
@@ -178,8 +201,8 @@ class PurchaseAttendanceReport(models.AbstractModel):
                'work_entry_type_id' : absent_work_entry_type.id,
                'name': absent_work_entry_type.name,
                'sequence': absent_work_entry_type.sequence,
-               'number_of_days' : absent_work_days ,
-               'number_of_hours' : absent_work_days * employee.shift_id.hours_per_day ,
+               'number_of_days' : absent_work_days if absent_work_days > 0.0 else 0,
+               'number_of_hours' : (absent_work_days if absent_work_days > 0.0 else 0) * employee.shift_id.hours_per_day ,
             })
             
 
@@ -261,6 +284,16 @@ class PurchaseAttendanceReport(models.AbstractModel):
                         if check_out_time :
                             datecheck_out_time = datetime.strptime(str(check_out_time), "%Y-%m-%d %H:%M:%S").strftime('%d/%b/%Y %H:%M:%S')
                      
+                    daily_leave = self.env['hr.leave'].sudo().search([('employee_id','=', employee.id),('request_date_from','<=', date_after_month.strftime('%Y-%m-%d')),('request_date_to','>=', date_after_month.strftime('%Y-%m-%d')),('state','in',('validate','confirm'))]) 
+                    if daily_leave:
+                        if daily_leave.holiday_status_id.is_rest_day != True: 
+                            status = ' '
+                            if daily_leave.state == 'confirm':
+                                status = 'To Approve'     
+                            if daily_leave.state == 'validate':
+                                status = 'Approved'         
+                            remarks =  str(daily_leave.holiday_status_id.name) +' ('+str(status) +')'        
+                            
                     if tot_hours < (current_shift.hours_per_day -1):
                         remarks = 'Half Present'
                     if tot_hours < ((current_shift.hours_per_day)/2):
@@ -383,11 +416,13 @@ class PurchaseAttendanceReport(models.AbstractModel):
             previous_date = fields.date.today()
             work_entry_type = self.env['hr.work.entry.type'].sudo().search([('code','=','WORK100')], limit=1)
             for attendance in emp_attendance:
-                if attendance.check_out:
+                if attendance.check_out and attendance.check_in:
                     new_date = attendance.check_out.strftime('%y-%m-%d')
-                    if new_date != previous_date:
-                       work_days += 1
-                       work_hours += attendance.worked_hours 
+                    if new_date != previous_date: 
+                        daily_leave = self.env['hr.leave'].sudo().search([('employee_id','=', employee.id),('request_date_from','<=', attendance.att_date),('request_date_to','>=', attendance.att_date),('state','in',('validate','confirm'))]) 
+                        if not daily_leave:
+                           work_days += 1
+                           work_hours += attendance.worked_hours 
                     previous_date = attendance.check_out.strftime('%y-%m-%d')
             work_day_line.append({
                'work_entry_type_id' : work_entry_type.id ,
@@ -449,25 +484,45 @@ class PurchaseAttendanceReport(models.AbstractModel):
             gazetted_days_count = 0
             absent_work_days = 0
             shift_contract_lines = self.env['hr.shift.schedule.line'].sudo().search([('employee_id','=', employee.id),('date','>=',date_from),('date','<=',date_to),('state','=','posted')])
+            counts = 0
             for shift_line in shift_contract_lines:
                 if shift_line.first_shift_id:
                     for gazetted_day in shift_line.first_shift_id.global_leave_ids:
-                       
-                        if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_day.date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_day.date_to.strftime('%y-%m-%d')):
-                           
-                            gazetted_days_count += 1 
+                        gazetted_date_from = gazetted_day.date_from +timedelta(1)
+                        gazetted_date_to = gazetted_day.date_to
+                        if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_date_to.strftime('%y-%m-%d')):
+                            gazetted_days_count += 1
+                else:
+                    current_shift = employee.shift_id
+                    if not current_shift:
+                        current_shift = self.env['resource.calendar'].sudo().search([('company_id','=', employee.company_id.id)], limit=1)
+                    if not current_shift:
+                        current_shift = self.env['resource.calendar'].sudo().search([], limit=1)
+
+                    for gazetted_day in current_shift.global_leave_ids:
+                        gazetted_date_from = gazetted_day.date_from +timedelta(1)
+                        gazetted_date_to = gazetted_day.date_to
+                        if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_date_to.strftime('%y-%m-%d')):
+
+                            gazetted_days_count += 1        
                 if shift_line.rest_day == True:
-                    rest_days_initial += 1  
+                    exist_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=',shift_line.date)])
+                    if not exist_attendance:
+                        rest_days_initial += 1  
                     if shift_line.first_shift_id:
                         for gazetted_day in shift_line.first_shift_id.global_leave_ids:
-                            if str(shift_line.date) >= str(gazetted_day.date_from.strftime('%y-%m-%d')) and str(shift_line.date) <= str(gazetted_day.date_to.strftime('%y-%m-%d')):
+                            gazetted_date_from = gazetted_day.date_from +timedelta(1)
+                            gazetted_date_to = gazetted_day.date_to
+                            if str(shift_line.date) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date) <= str(gazetted_date_to.strftime('%y-%m-%d')):
                                 rest_days_initial -= 1     
                     else:
                         
                         current_shift = self.env['resource.calendar'].sudo().search([], limit=1)
                         current_shift = self.env['resource.calendar'].sudo().search([('company_id','=', employee.company_id.id)], limit=1)
                         for gazetted_day in current_shift.global_leave_ids:
-                            if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_day.date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_day.date_to.strftime('%y-%m-%d')):
+                            gazetted_date_from = gazetted_day.date_from +timedelta(1)
+                            gazetted_date_to = gazetted_day.date_to
+                            if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_date_to.strftime('%y-%m-%d')):
                                 rest_days_initial -= 1 
                         
                                    
@@ -519,8 +574,8 @@ class PurchaseAttendanceReport(models.AbstractModel):
                'work_entry_type_id' : absent_work_entry_type.id,
                'name': absent_work_entry_type.name,
                'sequence': absent_work_entry_type.sequence,
-               'number_of_days' : absent_work_days ,
-               'number_of_hours' : absent_work_days * employee.shift_id.hours_per_day ,
+               'number_of_days' : absent_work_days  if absent_work_days >0.0 else 0,
+               'number_of_hours' : (absent_work_days if absent_work_days >0.0 else 0) * employee.shift_id.hours_per_day ,
             })
             
 
@@ -601,10 +656,20 @@ class PurchaseAttendanceReport(models.AbstractModel):
                             
                         if check_out_time :
                             datecheck_out_time = datetime.strptime(str(check_out_time), "%Y-%m-%d %H:%M:%S").strftime('%d/%b/%Y %H:%M:%S')
+                            
+                    daily_leave = self.env['hr.leave'].sudo().search([('employee_id','=', employee.id),('request_date_from','<=', date_after_month.strftime('%Y-%m-%d')),('request_date_to','>=', date_after_month.strftime('%Y-%m-%d')),('state','in',('validate','confirm'))]) 
+                    if daily_leave:
+                        if daily_leave.holiday_status_id.is_rest_day != True: 
+                            status = ' '
+                            if daily_leave.state == 'confirm':
+                                status = 'To Approve'     
+                            if daily_leave.state == 'validate':
+                                status = 'Approved'         
+                            remarks =  str(daily_leave.holiday_status_id.name) +' ('+str(status) +')'          
                      
                     if tot_hours < (current_shift.hours_per_day -1):
                         remarks = 'Half Present'
-                    if tot_hours < ((current_shift.hours_per_day -1)/2):
+                    if tot_hours < ((current_shift.hours_per_day)/2):
                         remarks = 'Absent.'    
                     attendances.append({
                             'date': date_after_month.strftime('%d/%b/%Y'),
@@ -685,4 +750,6 @@ class PurchaseAttendanceReport(models.AbstractModel):
                 'date_from': datetime.strptime(str(data['start_date']), "%Y-%m-%d").strftime('%Y-%m-%d'),
                 'date_to': datetime.strptime(str(data['end_date']), "%Y-%m-%d").strftime('%Y-%m-%d'),
                }
+        
+        
         
