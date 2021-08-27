@@ -210,9 +210,20 @@ class HolidaysRequest(models.Model):
                     holiday_sudo.activity_update()
             holiday._get_date_from_to()  
             holiday._get_duration_update_approval()  
-            holiday.action_validate_leave_period()  
+            holiday.action_validate_leave_period()
+            holiday.action_onchange_attachment()  
         return holidays
 
+
+    
+    def action_onchange_attachment(self):
+        if not self.attachment_id:
+            if self.holiday_status_id.attachment  == True:
+                diff = self.number_of_days
+                if diff >= self.holiday_status_id.attachment_validity:
+                    raise ValidationError(_("Please Add Your Medical Certificate !"))
+           
+    
     def action_validate_leave_period(self):
         restrict_date = '2021-07-16'
         for line in self:
