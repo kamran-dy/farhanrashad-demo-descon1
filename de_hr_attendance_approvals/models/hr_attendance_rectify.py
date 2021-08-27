@@ -90,7 +90,7 @@ class HrAttendanceRectification(models.Model):
             
     def action_approve(self):
         for line in self:
-            if line.state == 'submitted':
+            if line.state in ('submitted','approved'):
                 line.app_date = fields.date.today()
                 if line.attendance_id:
                     attendance_rectify = self.env['hr.attendance'].search([('id','=',line.attendance_id.id)])
@@ -171,7 +171,7 @@ class HrAttendanceRectification(models.Model):
                                             'check_in': line.check_in,
                                             'att_date':  line.check_out,
                                             'check_out': rectify_attendance.check_in,
-                                            'remarks': 'In Time Is Missing',
+                                            'remarks': 'In Time Is Missingss',
                                         }) 
                                 line.update({
                                             'state': 'approved'
