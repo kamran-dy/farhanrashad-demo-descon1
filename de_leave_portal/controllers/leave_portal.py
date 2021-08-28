@@ -72,32 +72,62 @@ class CreateTimeOff(http.Controller):
         if kw.get('leave_category_id') == 'day':
             date_start1 = datetime.strptime(kw.get('date_start') , '%Y-%m-%d')
             date_end1 =  datetime.strptime(kw.get('date_end') , '%Y-%m-%d')
+            request_date_start1 = datetime.strptime(kw.get('date_start') , '%Y-%m-%d')
+            request_date_end1 =  datetime.strptime(kw.get('date_end') , '%Y-%m-%d')
+            date_start = date_start1 + relativedelta(hours =+ 4)  
+            date_end =  date_end1 + relativedelta(hours =+ 14)
+            request_date_start = request_date_start1  
+            request_date_end =  request_date_end1 
             
-            days = (date_end1 - date_start1).days
+            days = (date_start1 - date_end1).days
             
             date_weekday = datetime.strptime(kw.get('date_start') , '%Y-%m-%d')
             
             weekday = date_weekday.weekday()
-            hours_from = 8
-            hours_to = 16
+            
             employee_schedule = request.env['hr.employee'].search([('id','=', int(kw.get('employee_id')))])
-            for emp_schedule in employee_schedule.shift_id.attendance_ids:
-                hours_from = emp_schedule.hour_from
-                hours_to = emp_schedule.hour_to               
+            for emp_schedule in employee_schedule.resource_calendar_id.attendance_ids:
                 if emp_schedule.dayofweek == weekday:
-                    hours_from = emp_schedule.hour_from
-                    hours_to = emp_schedule.hour_to       
+                    date_start1 = datetime.strptime(kw.get('date_start') , '%Y-%m-%d')
+                    date_start2 = datetime.strptime(kw.get('date_end') , '%Y-%m-%d')
+                    date_start =  date_start1 + relativedelta(hours =+ emp_schedule.hours_from)       
+                    date_end =  date_start2 + relativedelta(hours =+ emp_schedule.hours_to)  
+                    request_date_start =  date_start1 + relativedelta(hours =+ emp_schedule.hours_from)       
+                    request_date_end =  date_start2 + relativedelta(hours =+ emp_schedule.hours_to)  
             
-            date_start =  date_start1 + relativedelta(hours =+ hours_from) 
-            date_end = date_end1 + relativedelta(hours =+ hours_to)
+
             
+            timeoff_val = {
+                'holiday_status_id': int(kw.get('leave_type_id')),
+                'employee_id': int(kw.get('employee_id')),            
+                'date_from':date_start,
+                'date_to': date_end,
+                'leave_category': kw.get('leave_category_id'),
+                'request_date_from':str(kw.get('date_start')),
+                'request_date_to': str(kw.get('date_end')),
+                'name':kw.get('description'),
+            }
+            record = request.env['hr.leave'].sudo().create(timeoff_val)
+            if kw.get('date_start') and kw.get('date_end'):
+                dddate_from = datetime.strptime(str(kw.get('date_start')), '%Y-%m-%d')
+                dddate_to = datetime.strptime(str(kw.get('date_end')), '%Y-%m-%d')
+                dddelta = dddate_to - dddate_from
+                if dddelta.days == 0.0:
+                    record.update({
+                    'number_of_days': 1
+                    })
+                else:
+                    record.update({
+                      'number_of_days': dddelta.days + 1
+                    })    
+
             if kw.get('attachment'):
                 Attachments = request.env['ir.attachment']
 
                 name = kw.get('attachment').filename
 
                 file = kw.get('attachment')
-                attachment_id = Attachments.sudo().create({
+                attachment_id = Attachments.create({
 
                 'name': name,
 
@@ -105,78 +135,9 @@ class CreateTimeOff(http.Controller):
 
                 'datas': base64.b64encode(file.read()),
                  })
-               
-                timeoff_val = {
-                    'holiday_status_id': int(kw.get('leave_type_id')),
-                    'employee_id': int(kw.get('employee_id')),            
-                    'date_from':date_start,
-                    'date_to': date_end,
-                    'leave_category': kw.get('leave_category_id'),
-                    'attachment_id': [(4, attachment_id.id)],
-                    'request_date_from':str(kw.get('date_start')),
-                    'request_date_to': str(kw.get('date_end')),
-                    'name':kw.get('description'),
-                }
-                record = request.env['hr.leave'].sudo().create(timeoff_val)
-            else:
-                timeoff_val = {
-                    'holiday_status_id': int(kw.get('leave_type_id')),
-                    'employee_id': int(kw.get('employee_id')),            
-                    'date_from':date_start,
-                    'date_to': date_end,
-                    'leave_category': kw.get('leave_category_id'),
-                    'request_date_from':str(kw.get('date_start')),
-                    'request_date_to': str(kw.get('date_end')),
-                    'name':kw.get('description'),
-                }
-                record = request.env['hr.leave'].sudo().create(timeoff_val)
-                
-                
-            if kw.get('date_start') and kw.get('date_end'):
-                dddate_from = datetime.strptime(str(kw.get('date_start')), '%Y-%m-%d')
-                dddate_to = datetime.strptime(str(kw.get('date_end')), '%Y-%m-%d')
-                dddelta = dddate_to - dddate_from
-                shift_schedule_line = request.env['hr.shift.schedule.line'].sudo().search([('employee_id','=',int(kw.get('employee_id'))),('date','>=',str(kw.get('date_start'))),('date','<=',str(kw.get('date_end')))])
-                tot_rest_days = 0
-                gazetted_days_count = 0
-                COUNT_1 = 0
-                for shift_line in shift_schedule_line:
-                    shift = shift_line.first_shift_id
-                    if not shift:
-                        shift = employee_schedule.shift_id
-                    if not shift:
-                        shift = request.env['resource.calendar'].sudo().search([('company_id','=',employee_schedule.company_id.id)], limit=1)
-                    
-                    for gazetted_day in shift.global_leave_ids:
-                        gazetted_date_from = gazetted_day.date_from +timedelta(1)
-                        gazetted_date_to = gazetted_day.date_to
-                        if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_date_to.strftime('%y-%m-%d')):
-                            raise UserError(str(shift_line.date)+' g '+str(gazetted_date_from))
-                            gazetted_days_count += 1 
-                                                
-                    if shift_line.rest_day == True:
-                        for gazetted_day in shift.global_leave_ids:
-                            gazetted_date_from = gazetted_day.date_from +timedelta(1)
-                            gazetted_date_to = gazetted_day.date_to
-                            if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_date_to.strftime('%y-%m-%d')):
-                                gazetted_days_count += 1 
-                                tot_rest_days -= 1    
-                                
-                        tot_rest_days += 1    
-                    
-                   
-                if dddelta.days == 0.0:
-                    record.update({
-                    'number_of_days': 1
-                    })
-                else:
-                    raise UserError(str(tot_rest_days)+' g '+str(gazetted_days_count))
-                    total_days = dddelta.days + 1 - tot_rest_days - gazetted_days_count
-                    record.update({
-                      'number_of_days': total_days
-                    })    
-
-            
+                record.update({
+                   'attachment_id': [(4, attachment_id.id)],
+                 })
 
             
         if kw.get('leave_category_id') == 'half_day':
@@ -184,52 +145,38 @@ class CreateTimeOff(http.Controller):
             date_from = kw.get('half_day_date') 
             date_start = kw.get('half_day_date') 
             date_end =  kw.get('half_day_date') 
-
-            date_weekday = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
-            
-            weekday = date_weekday.weekday()
-            employee11 = request.env['hr.employee'].search([('id','=', int(kw.get('employee_id')))], limit=1)
-            hour_to =  str((employee11.shift_id.hours_per_day/2))
-            date_start1 = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
-            date_start2 = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
-            hours_from = 8
-            hours_to = 16
-            employee_schedule = request.env['hr.employee'].search([('id','=', int(kw.get('employee_id')))])
-            for emp_schedule in employee_schedule.shift_id.attendance_ids:
-                hours_from = emp_schedule.hour_from
-                hours_to = emp_schedule.hour_to               
-                if emp_schedule.dayofweek == weekday:
-                    hours_from = emp_schedule.hour_from
-                    hours_to = emp_schedule.hour_to
-                    
-            date_start =  date_start1 + relativedelta(hours =+ hours_from) 
-            date_end = date_start2 + relativedelta(hours =+ hours_to)  
             
             day_period = 'am'
             if day_half == 'Morning':
                 day_period = 'am'
-                date_end = date_end - relativedelta(hours =+ float(employee_schedule.shift_id.hours_per_day)/2)     
-                
+                date_start1 = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
+                date_start2 = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
+                date_start = date_start1 + relativedelta(hours =+ 4)  
+                date_end =  date_start2 + relativedelta(hours =+ 12)  
             elif day_half == 'Evening':
                 day_period = 'pm'
-                date_start =  date_start + relativedelta(hours =+ float(employee_schedule.shift_id.hours_per_day)/2) 
+                date_start1 = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
+                date_start2 = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
+                date_start = date_start1 + relativedelta(hours =+ 7)  
+                date_end =  date_start2 + relativedelta(hours =+ 11)
            
+
             
-            leave_period_half = 'first_half'
-            request_date_from_period = 'am'
-            if day_half == 'Evening':
-                leave_period_half = 'second_half' 
-                request_date_from_period = 'pm'
-                
+            employee11 = request.env['hr.employee'].search([('id','=', int(kw.get('employee_id')))], limit=1)
+            hour_to =  str((employee11.shift_id.hours_per_day/2))
+            date_start1 = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
+            date_start2 = datetime.strptime(kw.get('half_day_date') , '%Y-%m-%d')
+            date_start =  date_start1 + relativedelta(hours =+ float((employee11.shift_id.hours_per_day/2)))       
+            date_end =  date_start2 + relativedelta(hours =+ float((employee11.shift_id.hours_per_day/2)) + 4)
+            leave_period_half = 'first_half'  
+            if kw.get('leave_half_day') == 'pm':
+                leave_period_half = 'second_half'     
             timeoff_val = {
                 'holiday_status_id': int(kw.get('leave_type_id')),
                 'employee_id': int(kw.get('employee_id')),            
-                'date_from':date_start - relativedelta(hours =+ 5),
-                'date_to': date_end - relativedelta(hours =+ 5),
+                'date_from':date_start,
+                'date_to': date_end,
                 'leave_period_half': leave_period_half,  
-                'request_unit_half': True,
-                'request_date_from_period': request_date_from_period,
-                'leave_category': kw.get('leave_category_id'),
                 'leave_category': kw.get('leave_category_id'),
                 'request_date_from':kw.get('half_day_date'),
                 'request_date_to': kw.get('half_day_date'),
@@ -238,13 +185,7 @@ class CreateTimeOff(http.Controller):
             }
             record = request.env['hr.leave'].sudo().create(timeoff_val)
             record.update({
-                'number_of_days': 0.50,
-                'date_from':date_start - relativedelta(hours =+ 5),
-                'date_to': date_end - relativedelta(hours =+ 5),
-            })
-            record.update({
-                'number_of_days': 0.50,
-
+                'number_of_days': 0.50 
             })
             if kw.get('attachment'):
                 Attachments = request.env['ir.attachment']
@@ -267,9 +208,9 @@ class CreateTimeOff(http.Controller):
             employee11 = request.env['hr.employee'].search([('id','=', int(kw.get('employee_id')))], limit=1)
             hour_to =  str(float(kw.get('time_from').replace(":",".")) + (employee11.shift_id.hours_per_day/4))
             date_start1 = datetime.strptime(kw.get('hours_date') , '%Y-%m-%d')
-            short_leave_start_obj = datetime.strptime(kw.get('time_from'), '%H:%M')
-            date_start =  date_start1 + relativedelta(hours =+ short_leave_start_obj.hour,minutes=short_leave_start_obj.minute)       
-            date_end =  date_start + relativedelta(hours =+ float(employee11.shift_id.hours_per_day/4))
+            date_start2 = datetime.strptime(kw.get('hours_date') , '%Y-%m-%d')
+            date_start =  date_start1 + relativedelta(hours =+ float(kw.get('time_from').replace(":",".")))       
+            date_end =  date_start2 + relativedelta(hours =+ float(kw.get('time_from').replace(":",".")) + 2) 
             timeoff_val = {
                 'holiday_status_id': int(kw.get('leave_type_id')),
                 'employee_id': int(kw.get('employee_id')),            
@@ -284,13 +225,7 @@ class CreateTimeOff(http.Controller):
             }
             record = request.env['hr.leave'].sudo().create(timeoff_val)
             record.update({
-                'number_of_days': 0.25 ,
-                'date_from':date_start - relativedelta(hours =+ 5),
-                'date_to': date_end - relativedelta(hours =+ 5),
-            })
-            record.update({
-                'number_of_days': 0.25 ,
-
+                'number_of_days': 0.25 
             })
             if kw.get('attachment'):
                 Attachments = request.env['ir.attachment']

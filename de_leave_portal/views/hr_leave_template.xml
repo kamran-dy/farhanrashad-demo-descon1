@@ -103,16 +103,16 @@
                                             <i class="badge badge-pill badge-info" >Cancelled</i>
                                         </t>
                                         <t t-if="_timeoff_.state == 'confirm'">
-                                            <i class="badge badge-pill badge-warning" >To Approve</i>
+                                            <i class="badge badge-pill badge-info" >To Approve</i>
                                         </t>
                                         <t t-if="_timeoff_.state == 'refuse'">
-                                            <i class="badge badge-pill badge-danger" >Refused</i>
+                                            <i class="badge badge-pill badge-info" >Refused</i>
                                         </t>
                                         <t t-if="_timeoff_.state == 'validate1'">
                                             <i class="badge badge-pill badge-info" >Second Approved</i>
                                         </t>
                                         <t t-if="_timeoff_.state == 'validate'">
-                                            <i class="badge badge-pill badge-success" >Approved</i>
+                                            <i class="badge badge-pill badge-info" >Approved</i>
                                         </t>                                                                               
                                     </td> 
                                      
