@@ -210,9 +210,20 @@ class HolidaysRequest(models.Model):
                     holiday_sudo.activity_update()
             holiday._get_date_from_to()  
             holiday._get_duration_update_approval()  
-            holiday.action_validate_leave_period()  
+            holiday.action_validate_leave_period()
+            holiday.action_onchange_attachment()  
         return holidays
 
+
+    
+    def action_onchange_attachment(self):
+        if not self.attachment_id:
+            if self.holiday_status_id.attachment  == True:
+                diff = self.number_of_days
+                if diff >= self.holiday_status_id.attachment_validity:
+                    raise ValidationError(_("Please Add Your Medical Certificate !"))
+           
+    
     def action_validate_leave_period(self):
         restrict_date = '2021-07-16'
         for line in self:
@@ -294,3 +305,12 @@ class HolidaysRequest(models.Model):
             approval_request_id.action_confirm()
             approval_request_id.action_date_confirm_update()
             line.approval_request_id = approval_request_id.id
+            if line.holiday_status_id.is_ceo_approval == True:
+                if line.employee_id.company_id.manager_id.user_id:
+                    approver_vals = {
+                        'user_id': line.employee_id.company_id.manager_id.user_id.id,
+                        'request_id': approval_request_id.id,
+                    }
+                    approver_lines = self.env['approval.approver'].sudo().create(approver_vals)
+
+
