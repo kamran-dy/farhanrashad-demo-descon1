@@ -159,7 +159,7 @@ class CreateTimeOff(http.Controller):
                             gazetted_date_from = gazetted_day.date_from +timedelta(1)
                             gazetted_date_to = gazetted_day.date_to
                             if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_date_to.strftime('%y-%m-%d')):
-                                gazetted_days_count += 1 
+                                
                                 tot_rest_days -= 1    
                                 
                         tot_rest_days += 1    
