@@ -29,102 +29,104 @@ class HrPayslip(models.Model):
     def _onchange_employee(self):
 #         if self.employee_id:
 #             raise UserError(("test"))
-        if (not self.employee_id) or (not self.date_from) or (not self.date_to):
-            return
-
-        employee = self.employee_id
-        date_from = self.date_from
-        date_to = self.date_to
-        contracts = []
-        self.company_id = employee.company_id
-        if not self.contract_id or self.employee_id != self.contract_id.employee_id: # Add a default contract if not already defined
-            contracts = employee._get_contracts(date_from, date_to)
-
-            if not contracts or not contracts[0].structure_type_id.default_struct_id:
-                self.contract_id = False
-                self.struct_id = False
+        for payslip in self:
+            if (not payslip.employee_id) or (not payslip.date_from) or (not payslip.date_to):
                 return
-            self.contract_id = contracts[0]
-            self.struct_id = contracts[0].structure_type_id.default_struct_id
 
-        lang = employee.sudo().address_home_id.lang or self.env.user.lang
-        context = {'lang': lang}
-        payslip_name = self.struct_id.payslip_name or _('Salary Slip')
-        del context
+            employee = payslip.employee_id
+            date_from = payslip.date_from
+            date_to = payslip.date_to
+            contracts = []
+            payslip.company_id = employee.company_id
+            if not payslip.contract_id or payslip.employee_id != payslip.contract_id.employee_id: # Add a default contract if not already defined
+                contracts = employee._get_contracts(date_from, date_to)
 
-        self.name = '%s - %s - %s' % (
-            payslip_name,
-            self.employee_id.name or '',
-            format_date(self.env, self.date_from, date_format="MMMM y", lang_code=lang)
-        )
+                if not contracts or not contracts[0].structure_type_id.default_struct_id:
+                    payslip.contract_id = False
+                    payslip.struct_id = False
+                    return
+                payslip.contract_id = contracts[0]
+                payslip.struct_id = contracts[0].structure_type_id.default_struct_id
 
-        if date_to > date_utils.end_of(fields.Date.today(), 'month'):
-            self.warning_message = _(
-                "This payslip can be erroneous! Work entries may not be generated for the period from %(start)s to %(end)s.",
-                start=date_utils.add(date_utils.end_of(fields.Date.today(), 'month'), days=1),
-                end=date_to,
+            lang = employee.sudo().address_home_id.lang or self.env.user.lang
+            context = {'lang': lang}
+            payslip_name = payslip.struct_id.payslip_name or _('Salary Slip')
+            del context
+
+            payslip.name = '%s - %s - %s' % (
+                payslip_name,
+                payslip.employee_id.name or '',
+                format_date(self.env, payslip.date_from, date_format="MMMM y", lang_code=lang)
             )
-        else:
-            self.warning_message = False
-            
-        
-        self.worked_days_line_ids = self._get_new_worked_days_lines()
-        if self.contract_id:
-            contracts = self.contract_id
-            employee = self.employee_id
-            date_from = self.date_from
-            date_to = self.date_to
-            data = []
-            other_inputs = self.env['hr.payslip.input.type'].search([])
-            contract_obj = self.env['hr.contract']
-            emp_id = contract_obj.browse(contracts[0].id).employee_id
-            lon_obj = self.env['hr.loan'].search([('employee_id', '=', emp_id.id), ('state', '=', 'approve')])
-            for loan in lon_obj:
-                for loan_line in loan.loan_lines:
-                    if date_from <= loan_line.date <= date_to and not loan_line.paid:
-                        for result in other_inputs:
-                            if result.code == 'LOAN':  
-                                data.append((0,0,{
-                                'payslip_id': self.id,
-                                'sequence': 1,
-                                'code': result.code,
-                                'contract_id': self.contract_id.id,
-                                'input_type_id': result.id,
-                                'amount': loan_line.amount,
-                                 'loan_line_id': loan_line.id   
-                                }))    
-        self.input_line_ids = data
+
+            if date_to > date_utils.end_of(fields.Date.today(), 'month'):
+                self.warning_message = _(
+                    "This payslip can be erroneous! Work entries may not be generated for the period from %(start)s to %(end)s.",
+                    start=date_utils.add(date_utils.end_of(fields.Date.today(), 'month'), days=1),
+                    end=date_to,
+                )
+            else:
+                self.warning_message = False
+
+
+            payslip.worked_days_line_ids = payslip._get_new_worked_days_lines()
+            if payslip.contract_id:
+                contracts = payslip.contract_id
+                employee = payslip.employee_id
+                date_from = payslip.date_from
+                date_to = payslip.date_to
+                data = []
+                other_inputs = self.env['hr.payslip.input.type'].search([])
+                contract_obj = self.env['hr.contract']
+                emp_id = contract_obj.browse(contracts[0].id).employee_id
+                lon_obj = self.env['hr.loan'].search([('employee_id', '=', emp_id.id), ('state', '=', 'approve')])
+                for loan in lon_obj:
+                    for loan_line in loan.loan_lines:
+                        if date_from <= loan_line.date <= date_to and not loan_line.paid:
+                            for result in other_inputs:
+                                if result.code == 'LOAN':  
+                                    data.append((0,0,{
+                                    'payslip_id': payslip.id,
+                                    'sequence': 1,
+                                    'code': result.code,
+                                    'contract_id': payslip.contract_id.id,
+                                    'input_type_id': result.id,
+                                    'amount': loan_line.amount,
+                                     'loan_line_id': loan_line.id   
+                                    }))    
+            payslip.input_line_ids = data
             
             
     def compute_sheet(self):
-        for other_input in self.input_line_ids:
-            if other_input.code=='LOAN':
-                other_input.unlink()
-        if self.contract_id:
-            contracts = self.contract_id
-            employee = self.employee_id
-            date_from = self.date_from
-            date_to = self.date_to
-            data = []
-            other_inputs = self.env['hr.payslip.input.type'].search([])
-            contract_obj = self.env['hr.contract']
-            emp_id = contract_obj.browse(contracts[0].id).employee_id
-            lon_obj = self.env['hr.loan'].search([('employee_id', '=', emp_id.id), ('state', '=', 'approve')])
-            for loan in lon_obj:
-                for loan_line in loan.loan_lines:
-                    if date_from <= loan_line.date <= date_to and not loan_line.paid:
-                        for result in other_inputs:
-                            if result.code == 'LOAN':  
-                                data.append((0,0,{
-                                'payslip_id': self.id,
-                                'sequence': 1,
-                                'code': result.code,
-                                'contract_id': self.contract_id.id,
-                                'input_type_id': result.id,
-                                'amount': loan_line.amount,
-                                 'loan_line_id': loan_line.id   
-                                }))    
-        self.input_line_ids = data
+        for payslip in self:
+            for other_input in payslip.input_line_ids:
+                if other_input.code=='LOAN':
+                    other_input.unlink()
+            if payslip.contract_id:
+                contracts = payslip.contract_id
+                employee = payslip.employee_id
+                date_from = payslip.date_from
+                date_to = payslip.date_to
+                data = []
+                other_inputs = self.env['hr.payslip.input.type'].search([])
+                contract_obj = self.env['hr.contract']
+                emp_id = contract_obj.browse(contracts[0].id).employee_id
+                lon_obj = self.env['hr.loan'].search([('employee_id', '=', emp_id.id), ('state', '=', 'approve')])
+                for loan in lon_obj:
+                    for loan_line in loan.loan_lines:
+                        if date_from <= loan_line.date <= date_to and not loan_line.paid:
+                            for result in other_inputs:
+                                if result.code == 'LOAN':  
+                                    data.append((0,0,{
+                                    'payslip_id': payslip.id,
+                                    'sequence': 1,
+                                    'code': result.code,
+                                    'contract_id': payslip.contract_id.id,
+                                    'input_type_id': result.id,
+                                    'amount': loan_line.amount,
+                                     'loan_line_id': loan_line.id   
+                                    }))    
+            payslip.input_line_ids = data
         res = super(HrPayslip, self).compute_sheet()
 
         return res
@@ -132,8 +134,9 @@ class HrPayslip(models.Model):
 
 
     def action_payslip_done(self):
-        for line in self.input_line_ids:
-            if line.loan_line_id:
-                line.loan_line_id.paid = True
-                line.loan_line_id.loan_id._compute_loan_amount()
+        for payslip in self:
+            for line in payslip.input_line_ids:
+                if line.loan_line_id:
+                    line.loan_line_id.paid = True
+                    line.loan_line_id.loan_id._compute_loan_amount()
         return super(HrPayslip, self).action_payslip_done()
