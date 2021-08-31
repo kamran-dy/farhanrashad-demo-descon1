@@ -10,7 +10,13 @@
 				<xpath expr="//field[@name='number_of_hours_display']" position="after">
 					<field name="number_of_hours_calc" invisible="1"/>
 					<field name="approval_request_id" invisible="1"/>
+                    <field name="overtime_id" invisible="1"/>
+                    <field name="request_date" invisible="1"/>
                     <field name="category_id" invisible="1"/>
+				</xpath>
+                <xpath expr="//div[@name='button_box']" position="inside">
+					  <button name="%(action_approval_request_view_leave_allcation)d" type="action" class="oe_stat_button" icon="fa-check-square-o" string="Approvals" context="{'allocation_id':id,'category_id':category_id}" attrs="{'invisible': [('approval_request_id', '=', False)]}">
+                        </button> 
 				</xpath>
                 <xpath expr="//field[@name='number_of_hours_display']" position="attributes">
                     <attribute name="invisible" >1</attribute>

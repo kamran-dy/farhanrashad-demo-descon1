@@ -15,6 +15,23 @@ class HrLeaveAllocation(models.Model):
     
     approval_request_id = fields.Many2one('approval.request', string="Approval")
     category_id = fields.Many2one('approval.category', string="Approval Category")
+    overtime_id = fields.Many2one('hr.overtime.request', string="Overtime")
+    request_date = fields.Date(string='Request Date')
+    
+    
+    
+    def cron_expire_allocation(self):
+        for line in self:
+            if line.overtime_id:
+                if line.overtime_id.overtiem_type_id.type == 'rest_day':
+                    rest_diff = fields.date.today() - line.request_date
+                    if rest_diff > 21:
+                        line.action_refuse()
+                elif line.overtime_id.overtiem_type_id.type == 'gazetted':
+                    gazetted_diff = fields.date.today() - line.request_date
+                    if gazetted_diff > 90:
+                        line.action_refuse()
+            
 
     
     @api.model
@@ -28,6 +45,7 @@ class HrLeaveAllocation(models.Model):
         if holiday.validation_type == 'hr':
             holiday.message_subscribe(partner_ids=(holiday.employee_id.parent_id.user_id.partner_id | holiday.employee_id.leave_manager_id.partner_id).ids)
         if not self._context.get('import_file'):
+
             holiday.activity_update()
             holiday.action_create_approval_request_allocation()
         return holiday

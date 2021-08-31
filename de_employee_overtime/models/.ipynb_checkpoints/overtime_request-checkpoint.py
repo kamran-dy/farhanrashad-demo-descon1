@@ -45,7 +45,9 @@ class HrOverTime(models.Model):
         if leave_total_hours > 0:    
             vals = {
                 'holiday_status_id': leave_type,
-                'employee_id': line.employee_id.id,            
+                'employee_id': line.employee_id.id, 
+                'overtime_id': line.id,
+                'request_date': fields.date.today(),
                 'holiday_type': 'employee',
                 'allocation_type': 'regular',
                 'number_of_hours_calc': leave_total_hours,
@@ -198,27 +200,7 @@ class HrOverTime(models.Model):
                             'remarks': '@rate '+str(grate2) ,
                                             }
                     overtime_entry = self.env['hr.overtime.entry'].create(entry_vals)
-            if leave_type > 0:
-                leave_total_hours = 0
-                if leave_period == 'half_day':
-                    leave_total_hours = 4
-                elif leave_period == 'full_day':
-                    leave_total_hours = line.employee_id.shift_id.hours_per_day 
-                if leave_total_hours > 0:    
-                    vals = {
-                        'holiday_status_id': leave_type,
-                        'employee_id': line.employee_id.id,            
-                        'holiday_type': 'employee',
-                        'allocation_type': 'regular',
-                        'number_of_hours_calc': leave_total_hours,
-                        'name':  "Timeoff  Allocation Created From Employee Overtime Compansation Type "+str(line.overtime_type_id.name), 
 
-                                }
-                    timeoff = self.env['hr.leave.allocation'].create(vals)
-                        
-                    timeoff.action_approve()                        
-                            
-                
                 
       
     
@@ -310,25 +292,7 @@ class HrOverTime(models.Model):
                             }
                     overtime_entry = self.env['hr.overtime.entry'].create(entry_vals)
                 
-            if leave_type > 0:
-                leave_total_hours = 0
-                if leave_period == 'half_day':
-                    leave_total_hours = 4
-                elif leave_period == 'full_day':
-                    leave_total_hours = line.employee_id.shift_id.hours_per_day 
-                if leave_total_hours > 0:    
-                    vals = {
-                        'holiday_status_id': leave_type,
-                        'employee_id': line.employee_id.id,            
-                        'holiday_type': 'employee',
-                        'allocation_type': 'regular',
-                        'number_of_hours_calc': leave_total_hours,
-                        'name':  "Timeoff  Allocation Created From Employee Overtime Compansation Type "+str(line.overtime_type_id.name), 
 
-                                }
-                    timeoff = self.env['hr.leave.allocation'].create(vals)
-                        
-                    timeoff.action_approve() 
             
             
             
