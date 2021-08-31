@@ -33,6 +33,45 @@ DummyAttendance = namedtuple('DummyAttendance', 'hour_from, hour_to, dayofweek, 
 
 class HolidaysRequest(models.Model):
     _inherit = 'hr.leave'
+
+        
+    def action_compute_days(self):
+        for line in self:
+            shift_schedule_line = self.env['hr.shift.schedule.line'].sudo().search([('employee_id','=',line.employee_id.id),('date','>=',str(line.request_date_from)),('date','<=',str(line.request_date_to))])
+            tot_rest_days = 0
+            gazetted_days_count = 0
+            COUNT_1 = 0
+            for shift_line in shift_schedule_line:
+                shift = shift_line.first_shift_id
+                if not shift:
+                    shift = line.employee_id.shift_id
+                if not shift:
+                    shift = self.env['resource.calendar'].sudo().search([('company_id','=',line.employee_id.company_id.id)], limit=1)
+
+                for gazetted_day in shift.global_leave_ids:
+                    gazetted_date_from = gazetted_day.date_from +timedelta(1)
+                    gazetted_date_to = gazetted_day.date_to
+                    if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_date_to.strftime('%y-%m-%d')):
+
+                        gazetted_days_count += 1 
+
+                if shift_line.rest_day == True:
+                    for gazetted_day in shift.global_leave_ids:
+                        gazetted_date_from = gazetted_day.date_from +timedelta(1)
+                        gazetted_date_to = gazetted_day.date_to
+                        if str(shift_line.date.strftime('%y-%m-%d')) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(shift_line.date.strftime('%y-%m-%d')) <= str(gazetted_date_to.strftime('%y-%m-%d')):
+                            tot_rest_days -= 1    
+
+                    tot_rest_days += 1    
+
+
+            total_days = line.number_of_days  - tot_rest_days - gazetted_days_count
+            delta_days = line.request_date_to - line.request_date_from
+            qdelta_days = delta_days.days 
+            line.update({
+                  'number_of_days': total_days
+                })    
+                
     
     category_id = fields.Many2one('approval.category', related='holiday_status_id.category_id', string="Approval Category", default=lambda self: self.holiday_status_id.category_id.id, required=False, readonly=True)
     leave_category = fields.Selection([
