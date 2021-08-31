@@ -113,15 +113,30 @@
                                      </t> 
                                       </t>
                                       </t>   
+                                         <t t-if="attendance['remarks'] == 'Half Present'">
+                                     <t t-if="attendance['gazetted'] != '1'">
+                                    <t t-if="attendance['leave'] != '1'">     
+                                       <td style="background-color:red;"> 
+                                        <span t-esc="attendance['remarks']"/>
+                                        </td>    
+                                    </t> 
+                                    </t> 
+                                    </t>     
+                                
+                                      
+                                
+                                     
                                      <t t-if="attendance['remarks'] != 'Restday.'">
                                      <t t-if="attendance['remarks'] != 'Absent.'">
                                     <t t-if="attendance['gazetted'] != '1'">
-                                    <t t-if="attendance['leave'] != '1'">    
+                                    <t t-if="attendance['leave'] != '1'">  
+                                    <t t-if="attendance['remarks'] != 'Half Present'">    
                                         <td>  
                                             <span t-esc="attendance['remarks']"/>
                                         </td>     
                                      </t>
                                       </t>  
+                                      </t>    
                                       </t>      
                                      </t>
                                        <t t-if="attendance['leave'] == '1'">
@@ -301,16 +316,31 @@
                                        </td>    
                                      </t> 
                                       </t>
-                                      </t>   
+                                      </t>
+                                    <t t-if="attendance['remarks'] == 'Half Present'">
+                                     <t t-if="attendance['gazetted'] != '1'">
+                                    <t t-if="attendance['leave'] != '1'">     
+                                       <td style="background-color:red;"> 
+                                        <span t-esc="attendance['remarks']"/>
+                                        </td>    
+                                    </t> 
+                                    </t> 
+                                    </t>     
+                                
+                                      
+                                
+                                     
                                      <t t-if="attendance['remarks'] != 'Restday.'">
                                      <t t-if="attendance['remarks'] != 'Absent.'">
                                     <t t-if="attendance['gazetted'] != '1'">
-                                    <t t-if="attendance['leave'] != '1'">    
+                                    <t t-if="attendance['leave'] != '1'">  
+                                    <t t-if="attendance['remarks'] != 'Half Present'">    
                                         <td>  
                                             <span t-esc="attendance['remarks']"/>
                                         </td>     
                                      </t>
                                       </t>  
+                                      </t>    
                                       </t>      
                                      </t>
                                        <t t-if="attendance['leave'] == '1'">
