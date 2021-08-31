@@ -139,7 +139,7 @@ class HrAttendance(models.Model):
         
         
     def cron_create_overtime(self):                
-        employees = self.env['hr.employee'].search([('allow_overtime','=',True)])
+        employees = self.env['hr.employee'].search([('allow_overtime','=',True),('id','=',334)])
         for employee in employees:
             employee_company = employee.company_id.id
             work_location = employee.work_location_id.id

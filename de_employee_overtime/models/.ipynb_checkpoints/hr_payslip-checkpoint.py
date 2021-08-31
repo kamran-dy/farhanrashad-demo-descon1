@@ -75,8 +75,8 @@ class PayslipOverTime(models.Model):
                     'amount':amount,
                 })
 
-            rec = super(PayslipOverTime, payslip).compute_sheet()
-            return rec
+        rec = super(PayslipOverTime, self).compute_sheet()
+        return rec
 
     
     
@@ -96,7 +96,7 @@ class PayslipOverTime(models.Model):
                 ovt.update({
                     'state': 'paid'
                 })
-            return super(PayslipOverTime, payslip).action_payslip_done()
+        return super(PayslipOverTime, self).action_payslip_done()
 
         
         

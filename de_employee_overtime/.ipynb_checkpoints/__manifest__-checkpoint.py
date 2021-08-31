@@ -14,7 +14,7 @@
     'website': "https://www.dynexcel.com",
     'category': 'Human Resources',
     'version': '14.0.0.2',
-    'depends': ['base' ,'hr', 'hr_contract', 'mail' ,'hr_attendance', 'hr_holidays', 'hr_payroll','de_employee_shift'],
+    'depends': ['base' ,'hr', 'hr_contract', 'mail' ,'hr_attendance', 'hr_holidays', 'hr_payroll','de_employee_shift','approvals'],
     
     'data': [
         'security/security.xml',
@@ -25,6 +25,7 @@
         'wizards/hr_overtime_allocate_wizards.xml',
         'security/ir.model.access.csv', 
         'views/hr_attendace_views.xml',
+        'views/approval_request_views.xml',
         'views/overtime_request_view.xml',
         'views/hr_employee_views.xml',
         'views/hr_overtime_type_view.xml',
