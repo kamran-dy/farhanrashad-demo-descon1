@@ -6,27 +6,44 @@
         <t t-set="employee" t-value="employee.with_context()"/>
         <div class="page">
             <div class="oe_structure"/>
+            
             <div  style="margin-left: 800px; max-width: 250px;height: 20px;">
                <strong>Printed On:</strong>
                <span  t-esc="datetime.datetime.strptime(str(datetime.datetime.now()+ relativedelta(hours =+ 5)), '%Y-%m-%d %H:%M:%S.%f').strftime('%d-%b-%y %H:%M %p')"/>
             </div>
             
-            <div  style="position: relative; max-width: 200px;">
+            <div  style="position: relative; max-width: 400px;">
                <strong>Attendance Report</strong> <br/>
                <table class="table table-sm table-striped table-bordered" >
-
-                <tr style="height: 20px;">
-                    <th style="border:1px solid black; background-color:LightGreen; width:25px; height: 20px;"  align="center"></th>
-                    <td   align="center">Holiday / Rest Day</td>
-                </tr>
-                <tr style="height: 20px;">
-                    <th style="border:1px solid black; background-color:red; width:25px; height: 20px;" align="center"></th>
-                    <td  align="center">Unsetteled Day</td>
+                <tr>   
+                <td style="width:25px; height: 20px;">
+                   <table> 
+                    <tr >
+                        <th style="border:1px solid black; background-color:LightGreen; width:25px; height: 20px;"  align="center"></th>
+                        <td   align="center">Holiday / Rest Day</td>
+                    </tr>
+                    <tr style="height: 20px;">
+                        <th style="border:1px solid black; background-color:red;  width:25px; height: 20px;" align="center"></th>
+                        <td  align="center">Unsetteled Day</td>
+                    </tr>
+                 </table>     
+              </td>    
+                <td style="width:25px; height: 20px;"> 
+                 <table>     
+                    <tr >
+                        <th style="border:1px solid black; background-color:LightBlue; width:25px; height: 20px;"  align="center"></th>
+                        <td   align="center">Leave</td>
+                    </tr>
+                    <tr >
+                        <th style="border:1px solid black; background-color:#C4A484;  width:25px; height: 20px;" align="center"></th>
+                        <td  align="center">Gazetted Day</td>
+                    </tr>
+                    </table>   
+                   </td>    
                 </tr>   
-
             </table>
             </div>
-            
+          
             
             
             <table class="table table-sm table-striped table-bordered">
@@ -78,23 +95,48 @@
                                     
                                         
                                     <t t-if="attendance['remarks'] == 'Restday.'">
+                                      <t t-if="attendance['gazetted'] != '1'">
+                                      <t t-if="attendance['leave'] != '1'">       
                                        <td style="background-color:LightGreen"> 
                                         <span t-esc="attendance['remarks']"/>
                                         </td>    
                                     </t>
+                                    </t>     
+                                     </t>         
+                                   
                                      <t t-if="attendance['remarks'] == 'Absent.'">
+                                      <t t-if="attendance['gazetted'] != '1'">
+                                    <t t-if="attendance['leave'] != '1'">       
                                        <td style="background-color:red;">  
                                         <span t-esc="attendance['remarks']"/>
                                        </td>    
                                      </t> 
+                                      </t>
+                                      </t>   
                                      <t t-if="attendance['remarks'] != 'Restday.'">
                                      <t t-if="attendance['remarks'] != 'Absent.'">
+                                    <t t-if="attendance['gazetted'] != '1'">
+                                    <t t-if="attendance['leave'] != '1'">    
                                         <td>  
                                             <span t-esc="attendance['remarks']"/>
                                         </td>     
                                      </t>
+                                      </t>  
+                                      </t>      
                                      </t>
-   
+                                       <t t-if="attendance['leave'] == '1'">
+                                       <t t-if="attendance['gazetted'] != '1'">     
+                                       <td style="background-color:LightBlue"> 
+                                        <span t-esc="attendance['remarks']"/>
+                                        </td>    
+                                    </t>
+                                    </t>       
+                                     <t t-if="attendance['gazetted'] == '1'">
+                                       <td style="background-color:#C4A484"> 
+                                        <span t-esc="attendance['remarks']"/>
+                                        </td>    
+                                    </t> 
+                                        
                                         
 
                                </tr>
@@ -161,22 +203,37 @@
                <span  t-esc="datetime.datetime.strptime(str(datetime.datetime.now()+ relativedelta(hours =+ 5)), '%Y-%m-%d %H:%M:%S.%f').strftime('%d-%b-%y %H:%M %p')"/>
             </div>
             
-            <div  style="position: relative; max-width: 200px;">
+            <div  style="position: relative; max-width: 400px;">
                <strong>Attendance Report</strong> <br/>
                <table class="table table-sm table-striped table-bordered" >
-
-                <tr style="height: 20px;">
-                    <th style="border:1px solid black; background-color:LightGreen; width:25px; height: 20px;"  align="center"></th>
-                    <td   align="center">Holiday / Rest Day</td>
-                </tr>
-                <tr style="height: 20px;">
-                    <th style="border:1px solid black; background-color:red; width:25px; height: 20px;" align="center"></th>
-                    <td  align="center">Unsetteled Day</td>
+                <tr>   
+                <td style="width:25px; height: 20px;">
+                   <table> 
+                    <tr >
+                        <th style="border:1px solid black; background-color:LightGreen;width:25px; height: 20px;"  align="center"></th>
+                        <td   align="center">Holiday / Rest Day</td>
+                    </tr>
+                    <tr style="height: 20px;">
+                        <th style="border:1px solid black; background-color:red;width:25px; height: 20px;" align="center"></th>
+                        <td  align="center">Unsetteled Day</td>
+                    </tr>
+                 </table>     
+              </td>    
+                <td style="width:25px; height: 20px;"> 
+                 <table>     
+                    <tr >
+                        <th style="border:1px solid black; background-color:LightBlue; width:25px; height: 20px;"  align="center"></th>
+                        <td   align="center">Leave</td>
+                    </tr>
+                    <tr >
+                        <th style="border:1px solid black; background-color:#C4A484;width:25px; height: 20px; " align="center"></th>
+                        <td  align="center">Gazetted Day</td>
+                    </tr>
+                    </table>   
+                   </td>    
                 </tr>   
-
             </table>
             </div>
-            
             
             
             <table class="table table-sm table-striped table-bordered">
@@ -226,26 +283,50 @@
                                 <td><span t-esc="attendance['shift']"/></td>
                                 <td ><span t-esc="attendance['rest_day']"/></td>
                                     
-                                        
-                                    <t t-if="attendance['remarks'] == 'Restday.'">
+                                         <t t-if="attendance['remarks'] == 'Restday.'">
+                                      <t t-if="attendance['gazetted'] != '1'">
+                                      <t t-if="attendance['leave'] != '1'">       
                                        <td style="background-color:LightGreen"> 
                                         <span t-esc="attendance['remarks']"/>
                                         </td>    
                                     </t>
+                                    </t>     
+                                     </t>         
+                                   
                                      <t t-if="attendance['remarks'] == 'Absent.'">
+                                      <t t-if="attendance['gazetted'] != '1'">
+                                    <t t-if="attendance['leave'] != '1'">       
                                        <td style="background-color:red;">  
                                         <span t-esc="attendance['remarks']"/>
                                        </td>    
                                      </t> 
+                                      </t>
+                                      </t>   
                                      <t t-if="attendance['remarks'] != 'Restday.'">
                                      <t t-if="attendance['remarks'] != 'Absent.'">
+                                    <t t-if="attendance['gazetted'] != '1'">
+                                    <t t-if="attendance['leave'] != '1'">    
                                         <td>  
                                             <span t-esc="attendance['remarks']"/>
                                         </td>     
                                      </t>
+                                      </t>  
+                                      </t>      
                                      </t>
-   
+                                       <t t-if="attendance['leave'] == '1'">
+                                       <t t-if="attendance['gazetted'] != '1'">     
+                                       <td style="background-color:LightBlue"> 
+                                        <span t-esc="attendance['remarks']"/>
+                                        </td>    
+                                    </t>
+                                    </t>       
+                                     <t t-if="attendance['gazetted'] == '1'">
+                                       <td style="background-color:#C4A484"> 
+                                        <span t-esc="attendance['remarks']"/>
+                                        </td>    
+                                    </t> 
                                         
+
 
                                </tr>
                           </t>
