@@ -157,6 +157,7 @@ class SiteAttendnace(models.Model):
                 overtime_lines = self.env['hr.overtime.request'].create(vals)
                 
             if line.days > 0:
+                
                 shift = self.env['resource.calendar'].search([('company_id','=',line.employee_id.company_id.id),('shift_type','=','general')], limit=1)
                 shift = line.employee_id.shift_id
                 if not shift:
@@ -168,7 +169,11 @@ class SiteAttendnace(models.Model):
                     check_out =  shift_line.hour_to
                 count_day = 0    
                 for attendance in range(round(line.days)):
+                    
                     count_date = self.date_from  + timedelta(count_day)
+                    shift_line = self.env['hr.shift.schedule.line'].search([('employee_id','= line.employee_id.id),('date','=',count_date),('state','=','posted')], limit=1)
+                    if shift_line.first_shift_id: 
+                        shift = shift_line.first_shift_id     
                     site_check_in1 = count_date + relativedelta(hours =+ check_in)
                     site_check_out1 = count_date + relativedelta(hours =+ check_out)
                     site_check_in = site_check_in1 - relativedelta(hours =+ 5)
