@@ -90,7 +90,7 @@ class HrAttendanceRectification(models.Model):
             
     def action_approve(self):
         for line in self:
-            if line.state == 'submitted':
+            if line.state =='submitted':
                 line.app_date = fields.date.today()
                 if line.attendance_id:
                     attendance_rectify = self.env['hr.attendance'].search([('id','=',line.attendance_id.id)])
@@ -133,6 +133,9 @@ class HrAttendanceRectification(models.Model):
                                             'check_out': rectify_attendance.check_in,
                                             'remarks': 'In Time Is Missing',
                                         })
+                                        line.update({
+                                            'state': 'approved'
+                                        })  
                                     elif rectify_attendance.check_in < line.check_out: 
                                         rectify_attendance.update({
                                             'check_in': rectify_attendance.check_in,
@@ -140,6 +143,9 @@ class HrAttendanceRectification(models.Model):
                                             'check_out': line.check_out,
                                             'remarks': 'Out Time Is Missing',
                                         })
+                                        line.update({
+                                            'state': 'approved'
+                                        })  
                                 elif  line.check_in:
                                     if rectify_attendance.check_in > line.check_in:                           
                                         rectify_attendance.update({
@@ -148,13 +154,29 @@ class HrAttendanceRectification(models.Model):
                                             'check_out': rectify_attendance.check_in,
                                             'remarks': 'In Time Is Missing',
                                         })
+                                        line.update({
+                                            'state': 'approved'
+                                        })  
                                     elif rectify_attendance.check_in < line.check_in: 
                                         rectify_attendance.update({
                                             'check_in': rectify_attendance.check_in,
                                             'att_date':  line.check_out,
                                             'check_out': line.check_in,   
                                             'remarks': 'Out Time Is Missing',
+                                            })
+                                        line.update({
+                                            'state': 'approved'
+                                        })  
+                            else:
+                                rectify_attendance.update({
+                                            'check_in': line.check_in,
+                                            'att_date':  line.check_out,
+                                            'check_out': rectify_attendance.check_in,
+                                            'remarks': 'In Time Is Missing',
                                         }) 
+                                line.update({
+                                            'state': 'approved'
+                                        })    
                                         
                     else:
                         if line.number_of_Days == 0:
