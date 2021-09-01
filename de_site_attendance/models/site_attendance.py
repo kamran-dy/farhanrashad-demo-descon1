@@ -171,7 +171,7 @@ class SiteAttendnace(models.Model):
                 for attendance in range(round(line.days)):
                     
                     count_date = self.date_from  + timedelta(count_day)
-                    shift_line = self.env['hr.shift.schedule.line'].search([('employee_id','= line.employee_id.id),('date','=',count_date),('state','=','posted')], limit=1)
+                    shift_line = self.env['hr.shift.schedule.line'].search([('employee_id','=', line.employee_id.id),('date','=',count_date),('state','=','posted')], limit=1)
                     if shift_line.first_shift_id: 
                         shift = shift_line.first_shift_id     
                     site_check_in1 = count_date + relativedelta(hours =+ check_in)
