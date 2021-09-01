@@ -152,7 +152,7 @@ class PurchaseAttendanceReport(models.AbstractModel):
                             else:
                                 gazetted_days_count += 1
                 if shift_line.rest_day == True:
-                    exist_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=',shift_line.date)])
+                    exist_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=',shift_line.date)], limit=1)
                     if  exist_attendance.check_in and exist_attendance.check_out:
                         pass
                     else:
@@ -576,7 +576,7 @@ class PurchaseAttendanceReport(models.AbstractModel):
                             else:
                                 gazetted_days_count += 1       
                 if shift_line.rest_day == True:
-                    exist_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=',shift_line.date)])
+                    exist_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=',shift_line.date)], limit=1)
                     if  exist_attendance.check_in and exist_attendance.check_out:
                         pass
                     else:
