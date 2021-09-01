@@ -164,16 +164,17 @@ class SiteAttendnace(models.Model):
                     shift = self.env['resource.calendar'].search([('company_id','=',line.employee_id.company_id.id),('shift_type','=','general')], limit=1)    
                 check_in = 0
                 check_out = 0 
-                for shift_line in shift.attendance_ids:
-                    check_in =   shift_line.hour_from
-                    check_out =  shift_line.hour_to
                 count_day = 0    
                 for attendance in range(round(line.days)):
                     
                     count_date = self.date_from  + timedelta(count_day)
                     shift_line = self.env['hr.shift.schedule.line'].search([('employee_id','=', line.employee_id.id),('date','=',count_date),('state','=','posted')], limit=1)
                     if shift_line.first_shift_id: 
-                        shift = shift_line.first_shift_id     
+                        shift = shift_line.first_shift_id 
+                    
+                    for shift_time in shift.attendance_ids:
+                        check_in =   shift_time.hour_from
+                        check_out =  shift_time.hour_to    
                     site_check_in1 = count_date + relativedelta(hours =+ check_in)
                     site_check_out1 = count_date + relativedelta(hours =+ check_out)
                     site_check_in = site_check_in1 - relativedelta(hours =+ 5)
