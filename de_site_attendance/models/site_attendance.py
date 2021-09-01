@@ -173,6 +173,8 @@ class SiteAttendnace(models.Model):
                     site_check_out1 = count_date + relativedelta(hours =+ check_out)
                     site_check_in = site_check_in1 - relativedelta(hours =+ 5)
                     site_check_out = site_check_out1 - relativedelta(hours =+ 5)
+                    if shift.shift_type=='night':
+                        site_check_out = site_check_out + timedelta(1) 
                     attendance_vals = {
                         'employee_id': line.employee_id.id,
                         'check_in': site_check_in ,
