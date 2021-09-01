@@ -119,8 +119,8 @@ class SiteAttendnace(models.Model):
                     'company_id': line.employee_id.company_id.id,
                     'date':  self.date_from,
                     'date_from': self.date_from,
-                    'date_to': self.date_from,
-                    'hours': line.days,
+                    'date_to': self.date_to,
+                    'hours': line.normal_overtime,
                     'overtime_hours': line.normal_overtime,
                     'overtime_type_id': overtime_type.id,     
                         }
@@ -149,8 +149,8 @@ class SiteAttendnace(models.Model):
                     'company_id': line.employee_id.company_id.id,
                     'date':  self.date_from,
                     'date_from': self.date_from,
-                    'date_to': self.date_from,
-                    'hours': line.days,
+                    'date_to': self.date_to,
+                    'hours': line.gazetted_overtime,
                     'overtime_hours': line.gazetted_overtime,
                     'overtime_type_id': overtime_type.id,     
                         }
