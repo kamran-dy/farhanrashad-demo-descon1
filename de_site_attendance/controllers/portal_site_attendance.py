@@ -2,6 +2,8 @@
 
 from . import config
 from . import update
+from datetime import date, datetime, timedelta
+
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models, _
@@ -15,6 +17,7 @@ from odoo.http import request
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 from odoo.tools import groupby as groupbyelem
 from odoo.osv.expression import OR
+import ast
 
 
 employee_list_attendance = []
@@ -27,7 +30,20 @@ def site_attendance_page_content(flag = 0):
         'emps': employees,
         'managers': managers.line_manager,
         'employee_list': employee_list_attendance,
-        'success_flag' : flag,
+    }
+
+
+def site_attendance_lines_content(diff_date, date_from, date_to): 
+    global employee_list_attendance
+    employees = request.env['hr.employee'].search([('site_incharge_id.user_id','=',http.request.env.context.get('uid'))])
+    managers = request.env['hr.employee'].search([('user_id','=',http.request.env.context.get('uid'))])
+    return {
+        'emps': employees,
+        'diff_date': diff_date,
+        'date_from': date_from,
+        'date_to': date_to,
+        'managers': managers.line_manager,
+        'employee_list': employee_list_attendance,
     }
 
 
@@ -57,6 +73,13 @@ class CreateAttendance(http.Controller):
         return request.render("de_site_attendance.portal_create_site_attendances", site_attendance_page_content())
     
     
+    @http.route('/hr/site/attendance/save',type="http", website=True, auth='user')
+    def site_attendance_create_template(self, **kw):
+        date_from = datetime.strptime(str(kw.get('date_from')) , '%Y-%m-%d')
+        date_to = datetime.strptime(str(kw.get('date_to')) , '%Y-%m-%d')
+        diff_range = (date_to - date_from).days
+        diff_range_count = diff_range + 1
+        return request.render("de_site_attendance.portal_create_site_attendances_lines", site_attendance_lines_content(diff_range_count, date_from, date_to))
     
   
    
@@ -64,49 +87,36 @@ class CreateAttendance(http.Controller):
     
     
     
-    @http.route('/hr/site/attendance/save', type="http", auth="public", website=True)
-    def create_site_attendance(self, **kw):
+    @http.route('/hr/site/attendance/line/save', type="http", auth="public", website=True)
+    def create_site_attendance_line(self, **kw):
         list = []
         employees = request.env['hr.employee'].search([('user_id','=',http.request.env.context.get('uid'))], limit=1)
-        workers = request.env['hr.employee'].search([('site_incharge_id.user_id','=',http.request.env.context.get('uid'))], limit=1)
-        global employee_list_attendance
-        
+        site_attendance_vals_list = ast.literal_eval(kw.get('site_attendance_vals'))
         siteattendane_val = {
             'incharge_id': employees.id,
             'date_from': kw.get('date_from'),
             'date_to':  kw.get('date_to'),
-            'attendance_line_ids': kw.get('unit_expense'),
         }
         record = request.env['hr.attendance.site'].sudo().create(siteattendane_val)
-        for worker in employee_list_attendance:
-            line_vals = {
-                'site_id': record.id,
-                'employee_id': worker['employee_id'],
-                'days': worker['days'],
-                'normal_overtime': worker['normal_overtime'],
-                'gazetted_overtime':  worker['gazetted_overtime'],
-                }
-            record_lines = request.env['hr.attendance.site.line'].sudo().create(line_vals)
+        count = 0
+        for worker in site_attendance_vals_list:
+            count += 1
+            if count > 1:
+                if float(worker['col2']) > 0.0:
+                    line_vals = {
+                        'site_id': record.id,
+                        'employee_id': int(worker['col1']),
+                        'days': float(worker['col2']),
+                        'normal_overtime': float(worker['col3']),
+                        'gazetted_overtime':  float(worker['col4']),
+                        }
+                    record_lines = request.env['hr.attendance.site.line'].sudo().create(line_vals)
         employee_list_attendance = []
         return request.render("de_site_attendance.site_attendane_submited", {})
     
     
     
-    @http.route('/hr/site/attendance/line/save', type="http", auth="public", website=True)
-    def create_site_attendance_line(self, **kw):
-        global employee_list_attendance
-        emp = request.env['hr.employee'].search([('id','=',int(kw.get('employee_id')))], limit=1)
-        line_vals = {
-                'employee_id': int(kw.get('employee_id')),
-                'name': emp.name,
-                'days':  int(kw.get('total_days')),
-                'normal_overtime':  float(kw.get('normal_overtime')),
-                'gazetted_overtime':  float(kw.get('gazetted_overtime')),
-                }
-        employee_list_attendance.append(line_vals)
-        return request.render("de_site_attendance.portal_create_site_attendances", site_attendance_page_content())
-    
-    
+
     
    
 

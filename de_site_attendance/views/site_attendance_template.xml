@@ -115,67 +115,7 @@
                 </div>
             </t>
             <t t-if="emps">
-                <t t-call="portal.portal_table"   id="optionTable">
-                           
-                        <thead>
-                            
-                            <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
-                                <th class="text-left">Employee</th>
-                                <th class="text-left">Payable Days</th>
-                                <th class="text-left">Normal Overtime</th>
-                                <th class="text-left">Gazetted Overtime</th>
-                                <th class="text-left">Action</th>
-                            </tr>
-                            
-                        </thead>
-                        <tbody>
-                            <tr>
-                            
-                            </tr>
-                            
-                                
-                        <form id="portal_site_attendance_form_line" data-toggle="validator" action="/hr/site/attendance/line/save">
-                                
-                                <tr>
-                                   
-                                     <td > 
-                                      <select id="selectid" class="form-control  o_website_form_input" name="employee_id" readonly="1" required="1">
-                                            <t t-foreach="emps" t-as="emp">
-                                                <option t-att-value="emp.id">
-                                                    <t t-esc="emp.name"  />
-                                                </option>
-                                            </t>
-                                       </select>
-
-                                    </td>
-                                    
-                                     <td class="text-left">
-                                        <input type="float" class="form-control s_website_form_input" name="total_days" id="tot_days"   value="0"/>
-                                    </td>
-                                    <td class="text-left">
-                                        <input type="float" class="form-control s_website_form_input" name="normal_overtime" id="tot_normal_ovt"  value="0" />
-                                    </td>
-                                    <td class="text-left">
-                                        <input type="float" class="form-control s_website_form_input" name="gazetted_overtime" id="tot_gazetted_ovt"  value="0" />
-                                    </td>
-                                     
-                                        <td id="submit_1"   class="new">
-                                         <div class="form-group col-12 s_website_form_submit" data-name="Submit Button Line">
-                                            <div style="width: 200px;" class="s_website_form_label"></div>
-                                            <button type="submit" class="btn btn-primary pull-left" id="submit_line">Add</button>
-                                            <span id="s_website_form_result"></span>
-                                         </div>
-                                         </td>
-                                      
-                                </tr>
-                                </form> 
-                                 <tr>                                
-                            </tr>
-                            
-                        </tbody>
-                </t>
-                
-                 <br/>
+           
                 <form id="portal_site_attendance_form" data-toggle="validator" action="/hr/site/attendance/save">
                       
                     <t t-call="portal.portal_table">
@@ -230,62 +170,123 @@
                               });
                               
                             }); 
-                        </script>  
+                    </script>                                 
+              </t>               
+            <br/>
+            <br/>
+        </t>
+    </template>
+    
+    
+    
+        <template id="portal_create_site_attendances_lines" name="hr_site_attendance_create">
+         <t t-set="foo" t-value="2 + 1"/>
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Site Attendance</t>
+            </t>
+            <t t-if="not emps">
+                <div class="alert alert-warning mt8" role="alert">
+                    There are no Site Attendance.
+                </div>
+            </t>
+            <t t-if="emps">
+                <form id="portal_site_attendance_form_line" data-toggle="validator" action="/hr/site/attendance/line/save">
+                <table class="table table-sm table-striped table-bordered"   id="siteattendanceTable">
+                           
+                            
+                            <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
+                                <th class="text-left">Employee</th>
+                                <th class="text-left">Payable Days</th>
+                                <th class="text-left">Normal Overtime</th>
+                                <th class="text-left">Gazetted Overtime</th>
+                                <th class="text-left">Action</th>
+                            </tr>
+                            
+                        
+                            <t t-foreach="emps" t-as="emp">   
+                                
+                                <tr>
+                                   
+                                     <td class="employee"> 
+                                       <input type="hidden" class="form-control s_website_form_input" name="employee_id" id="employee_id"   t-att-value="emp.id"/>
+                                        <span t-esc="emp.name" />
+                                    </td>
+                                    
+                                     <td class="totaldays">
+                                        <input type="float" class="form-control s_website_form_input" name="total_days" id="tot_days"   t-att-value="diff_date"/>
+                                    </td>
+                                    <td class="totnormalovt">
+                                        <input type="float" class="form-control s_website_form_input" name="normal_overtime" id="tot_normal_ovt"  value="0" />
+                                    </td>
+                                    <td class="totgazettedovt">
+                                        <input type="float" class="form-control s_website_form_input" name="gazetted_overtime" id="tot_gazetted_ovt"  value="0" />
+                                    </td>
+                                     
+                                      
+                                </tr>
+                               
+                            </t>
+                            
+                  </table>
+           
+                    <input type="hidden" id="site_attendance_vals" class="form-control s_website_form_input" name="site_attendance_vals"  multiple="true" />  
+                       <input type="hidden" id="date_from" class="form-control s_website_form_input" name="date_from" t-att-value="date_from"  multiple="true" /> 
+                        <input type="hidden" id="date_to" class="form-control s_website_form_input" name="date_to" t-att-value="date_to"  multiple="true" /> 
+                         
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+                      <script type="text/javascript">
+                          
+                        $(document).ready(function(){
+
+                        $("#siteattendance").on('click',function(){
+                          
+                           var siteattendancedata=[];
+                           // loop over each table row (tr)
+                           $("#siteattendanceTable tr").each(function(){
+                                var currentRow=$(this);
+                                
+                                var col1_value=currentRow.find(".employee input").val();
+                                var col2_value=currentRow.find(".totaldays input").val();
+                                var col3_value=currentRow.find(".totnormalovt input").val();
+                                var col4_value=currentRow.find(".totgazettedovt input").val();
+
+                                var obj={};
+                                obj.col1=col1_value;
+                                obj.col2=col2_value;
+                                obj.col3=col3_value;
+                                obj.col4=col4_value;
+
+                                siteattendancedata.push(obj);
+                          
+                           });
+                         siteattendancedictionary = JSON.stringify(siteattendancedata); 
+                         var lista = document.getElementById("site_attendance_vals")
+                         lista.value = siteattendancedictionary 
+                         console.log(siteattendancedata);   
+                         });
+
+                       });
+                      </script> 
+                       
+                     <div class="form-group col-12 s_website_form_submit" data-name="Submit Button">
+                            <div style="width: 200px;" class="s_website_form_label"></div>
+                            <button type="submit" id="siteattendance" class="btn btn-primary pull-left">Submit</button>
+                            <span id="s_website_form_result"></span>
+                        </div>
                 
                 
-                
-                
+                </form>
                 
             </t>   
             
             <br/>
             <br/>
             
-            <t t-call="portal.portal_table"   id="optionTable1">
-                           
-                        <thead>
-                            
-                            <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
-                                <th class="text-left"></th>
-                                <th class="text-left"></th>
-                                <th class="text-left"></th>
-                                <th class="text-left"></th>
-                                <th class="text-left"></th>
-                            </tr>
-                            
-                        </thead>
-                        <tbody>
-                           
-                            
-                                
-                            <t t-foreach="employee_list" t-as="emp_site"> 
-                                <tr>
-                                   
-                                    <td>
-                                      <span t-esc="emp_site['name']" />
-
-                                    </td>
-                                    
-                                     <td class="text-left">
-                                      <span t-esc="emp_site['days']" />
-                                    </td>
-                                    
-                                    <td class="text-left">
-                                      <span t-esc="emp_site['normal_overtime']" />
-                                    </td>
-                                    
-                                    <td class="text-left">
-                                      <span t-esc="emp_site['gazetted_overtime']" />
-                                    </td>
-                                     <td class="text-left">
-                                    </td>
-                                     
-                                       
-                                      
-                                 </tr>
-                            </t>
-                        </tbody>
-                </t>
+       
+        
             
         </t>
     </template>
