@@ -53,7 +53,7 @@
                     <td  align="center"><span t-esc="employee_attendance['name']"/></td>
                     <th  align="center">Employee No:</th>
                     <td  align="center"> <span t-esc="employee_attendance['employee_no']"/></td>
-                    <th  align="center">Month:</th>
+                    <th  align="center">Period:</th>
                     <td  align="center"> 
                         
                          <span t-esc="datetime.datetime.strptime(str(employee.start_date), '%Y-%m-%d').strftime('%d %B %y')"/>,  
@@ -81,6 +81,7 @@
                 </thead>
                        
                     <tbody class="attendance_tbody">
+                        
                         <t t-foreach="employee_attendance['attendances']" t-as="attendance">
                             <tr>
                                 <td ><span t-esc="attendance['date']"/></td>
@@ -99,6 +100,7 @@
                                       <t t-if="attendance['leave'] != '1'">       
                                        <td style="background-color:LightGreen"> 
                                         <span t-esc="attendance['remarks']"/>
+                                        
                                         </td>    
                                     </t>
                                     </t>     
@@ -109,6 +111,7 @@
                                     <t t-if="attendance['leave'] != '1'">       
                                        <td style="background-color:red;">  
                                         <span t-esc="attendance['remarks']"/>
+                                        
                                        </td>    
                                      </t> 
                                       </t>
@@ -118,6 +121,7 @@
                                     <t t-if="attendance['leave'] != '1'">     
                                        <td style="background-color:red;"> 
                                         <span t-esc="attendance['remarks']"/>
+                                        
                                         </td>    
                                     </t> 
                                     </t> 
@@ -156,6 +160,7 @@
 
                                </tr>
                           </t>
+                         
                     </tbody>
             </table>
             <br/>
@@ -185,6 +190,10 @@
 
                                </tr>
                           </t>
+                          <tr>
+                             <td>Total</td>
+                             <td ><span t-esc="(datetime.datetime.strptime(str(employee.end_date), '%Y-%m-%d')-datetime.datetime.strptime(str(employee.start_date), '%Y-%m-%d')).days"/></td>
+                          </tr>
                     </tbody>
             </table>
             
@@ -258,7 +267,7 @@
                     <td  align="center"><span t-esc="employee_attendance['name']"/></td>
                     <th  align="center">Employee No:</th>
                     <td  align="center"> <span t-esc="employee_attendance['employee_no']"/></td>
-                    <th  align="center">Month:</th>
+                    <th  align="center">Period:</th>
                     <td  align="center"> 
                         
                          <span t-esc="datetime.datetime.strptime(str(date_from), '%Y-%m-%d').strftime('%d %B %y')"/>,  
@@ -389,6 +398,10 @@
 
                                </tr>
                           </t>
+                         <tr>
+                             <td>Total</td>
+                             <td ><span t-esc="(datetime.datetime.strptime(str(date_to), '%Y-%m-%d')-datetime.datetime.strptime(str(date_from), '%Y-%m-%d')).days"/></td>
+                          </tr>
                     </tbody>
             </table>
             
