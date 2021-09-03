@@ -46,6 +46,13 @@ def site_attendance_lines_content(diff_date, date_from, date_to):
         'employee_list': employee_list_attendance,
     }
 
+def site_attendance_lines_content_constrains(diff_date, employee): 
+    employees = request.env['hr.employee'].search([('id','=',employee)])
+    return {
+        'diff_date': diff_date,
+       'employee': employees,
+    }
+
 
 def stringToList(string):
     listRes = list(string.split(" "))
@@ -66,26 +73,25 @@ def paging(data, flag1 = 0, flag2 = 0):
                 
         
 class CreateAttendance(http.Controller):
+
     @http.route('/hr/site/attendance/create/',type="http", website=True, auth='user')
-    def approvals_create_template(self, **kw):
-        global employee_list_attendance
-        employee_list_attendance = []
-        return request.render("de_site_attendance.portal_create_site_attendances", site_attendance_page_content())
-    
-    
-    @http.route('/hr/site/attendance/save',type="http", website=True, auth='user')
     def site_attendance_create_template(self, **kw):
-        date_from = datetime.strptime(str(kw.get('date_from')) , '%Y-%m-%d')
-        date_to = datetime.strptime(str(kw.get('date_to')) , '%Y-%m-%d')
+        inchasrge_employee = request.env['hr.employee'].search([('user_id','=',http.request.env.context.get('uid'))], limit=1)
+        
+        from_days = inchasrge_employee.company_id.from_date
+        to_days = inchasrge_employee.company_id.to_date
+        total_days = inchasrge_employee.company_id.from_date + inchasrge_employee.company_id.to_date
+        today_date = fields.date.today()
+        month_date_from = fields.date.today() - timedelta(today_date.day) 
+        date_from = month_date_from + timedelta(inchasrge_employee.company_id.from_date) 
+        to_date = date_from + timedelta(total_days)
+        diff_to_date = to_date.day -  to_days
+        date_to = to_date - timedelta(diff_to_date)
         diff_range = (date_to - date_from).days
         diff_range_count = diff_range + 1
         return request.render("de_site_attendance.portal_create_site_attendances_lines", site_attendance_lines_content(diff_range_count, date_from, date_to))
     
-  
-   
-    
-    
-    
+      
     
     @http.route('/hr/site/attendance/line/save', type="http", auth="public", website=True)
     def create_site_attendance_line(self, **kw):
@@ -103,6 +109,12 @@ class CreateAttendance(http.Controller):
             count += 1
             if count > 1:
                 if float(worker['col2']) > 0.0:
+                    totaldays = (datetime.strptime(str(kw.get('date_from')), '%Y-%m-%d') - datetime.strptime(str(kw.get('date_from')), '%y-%m-%d')).days
+                    
+                    if float(worker['col2']) > (totaldays + 1) :
+                        date_from = kw.get('date_from')
+                        date_to = kw.get('date_to')
+                        return request.render("de_site_attendance.cannot_submit_greater_days", site_attendance_lines_content_constrains(diff_range_count, int(worker['col1'])))
                     line_vals = {
                         'site_id': record.id,
                         'employee_id': int(worker['col1']),

@@ -102,81 +102,7 @@
     </template>
     
     
-        <template id="portal_create_site_attendances" name="hr_site_attendance_create">
-         <t t-set="foo" t-value="2 + 1"/>
-        <t t-call="portal.portal_layout">
-            <t t-set="breadcrumbs_searchbar" t-value="True"/>
-            <t t-call="portal.portal_searchbar">
-                <t t-set="title">Site Attendance</t>
-            </t>
-            <t t-if="not emps">
-                <div class="alert alert-warning mt8" role="alert">
-                    There are no Site Attendance.
-                </div>
-            </t>
-            <t t-if="emps">
-           
-                <form id="portal_site_attendance_form" data-toggle="validator" action="/hr/site/attendance/save">
-                      
-                    <t t-call="portal.portal_table">
-                            <tr>
-                                <th>Date From</th>
-                                <td>
-                                <input type="date" class="form-control s_website_form_input" name="date_from" required="1"  />
 
-                                </td>
-                                <th>Date To</th>
-                                <td>
-                                <input type="date" class="form-control s_website_form_input" name="date_to" required="1"  />
-                                </td>
-                               <th>Manager</th>
-                                <td>
-<!--                                  <select id="selectid1" class="form-control  o_website_form_input" name="manager_id" readonly="1" required="1"> -->
-                                            
-                                         <t t-esc="managers"  />
-                                               
-<!--                                        </select> -->
-                                </td>
-                            </tr>
-                   </t>
-                    <br/>
-                    <div class="form-group col-12 s_website_form_submit" data-name="Submit Button">
-                            <div style="width: 200px;" class="s_website_form_label"></div>
-                            <button type="submit" class="btn btn-primary pull-left">Submit</button>
-                            <span id="s_website_form_result"></span>
-                        </div>
-                  </form>
-                    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-                    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-                    <script>
-                        
-                          $(function () {
-                        
-                            $("#selectid").change(function(){                              
-                            $("#submit_1").hide();
-                              });   
- 
-                            });
-                              
-                        $(document).ready(function(){
-                        
-                        $("#submit_1").click(function(){                              
-                            $("#submit_1").hide();
-                              });
-                        
-                        $("#selectid").click(function(){                              
-                            $("#submit_1").show();
-                              });
-                              
-                            }); 
-                    </script>                                 
-              </t>               
-            <br/>
-            <br/>
-        </t>
-    </template>
-    
     
     
         <template id="portal_create_site_attendances_lines" name="hr_site_attendance_create">
@@ -213,6 +139,7 @@
                                        <input type="hidden" class="form-control s_website_form_input" name="employee_id" id="employee_id"   t-att-value="emp.id"/>
                                         <span t-esc="emp.name" />
                                     </td>
+                                   
                                     
                                      <td class="totaldays">
                                         <input type="float" class="form-control s_website_form_input" name="total_days" id="tot_days"   t-att-value="diff_date"/>
@@ -224,7 +151,6 @@
                                         <input type="float" class="form-control s_website_form_input" name="gazetted_overtime" id="tot_gazetted_ovt"  value="0" />
                                     </td>
                                      
-                                      
                                 </tr>
                                
                             </t>
@@ -241,6 +167,8 @@
                           
                         $(document).ready(function(){
 
+
+                          
                         $("#siteattendance").on('click',function(){
                           
                            var siteattendancedata=[];
@@ -252,7 +180,7 @@
                                 var col2_value=currentRow.find(".totaldays input").val();
                                 var col3_value=currentRow.find(".totnormalovt input").val();
                                 var col4_value=currentRow.find(".totgazettedovt input").val();
-
+                                
                                 var obj={};
                                 obj.col1=col1_value;
                                 obj.col2=col2_value;
@@ -290,6 +218,43 @@
             
         </t>
     </template>
+    
+    
+    
+        <template id="cannot_submit_greater_days" name="Cannot Submit Greater Days">
+        <t t-call="portal.portal_layout">
+               <div id="wrap">
+	               <div class="container mt-4 mb-5">
+	                   <div class="row">
+	                       <div class="col-lg-7 col-xl-6 mr-lg-auto">
+	                           <div class="oe_structure" data-oe-model="ir.ui.view" data-oe-id="2052" data-oe-field="arch" data-oe-xpath="/t[1]/t[1]/div[1]/div[2]/div[1]/div[1]/div[1]">
+	                               <section class="s_text_block" data-snippet="s_text_block">
+	                                   <div class="container">
+	                                       <div class="row">
+	                                       		<div class="row">
+			                                       <h1 class="text-center"><i class="fa fa-times fa-2x text-fail" role="img" aria-label="Fail" title="fail"/></h1>
+			                                       <h5>Not Allowed to Submit Days greater than! </h5>		
+                                                    <h3><span t-esc='diff_date'/></h3>   
+                                                    <p>For Employee</p>
+                                                    <h3><span t-esc='employee'/></h3>
+		                                           <div class='section-custom col-md-12'>
+						                              <a class="mb-5" id="checkin-rectify-back" t-attf-href="/hr/attendance/rectify">
+						                                   <button t-attf-class="btn btn-primary #{'col-md-10' if multi_type else 'col-md-12'} mb-2">Go Back</button>
+						                               </a>
+						                           </div>
+			                                     </div>
+	                                       </div>
+	                                   </div>
+	                               </section>
+	                           </div>
+	                      </div>
+	                  </div>
+	              	</div>
+	            </div>
+	         </t>
+
+    </template>
+    
     
     
     
