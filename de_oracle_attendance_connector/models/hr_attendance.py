@@ -14,7 +14,72 @@ class HrAttendance(models.Model):
     
     att_date = fields.Date(string="Attendance Date")
     oralce_employee_no = fields.Char(related='employee_id.emp_number')
-
+    
+    
+    def action_update_night_shift(self):
+        for rec in self:
+            if rec.shift_id.shift_type=='night':
+                time_from = 0
+                time_to = 0
+                for shift_line in rec.shift_id.attendance_ids:
+                    time_from = shift_line.hour_from
+                    time_to = shift_line.hour_to
+                if rec.check_out:
+                    shift_timeinmin = datetime.strptime(str(time_from).replace('.',':'), '%H:%M') - relativedelta(hours =+ 1)
+                    shift_timeinmax = datetime.strptime(str(time_from).replace('.',':'), '%H:%M') + relativedelta(hours =+ 1)
+                    shift_timeoutmin = datetime.strptime(str(time_to).replace('.',':'), '%H:%M') - relativedelta(hours =+ 1)
+                    shift_timeoutmax = datetime.strptime(str(time_to).replace('.',':'), '%H:%M') + relativedelta(hours =+ 1)
+#                     raise UserError(str(shift_timeoutmin.strftime('%H:%M'))+' '+str(shift_timeoutmax.strftime('%H:%M')))   
+                    if rec.check_out.strftime('%H:%M') >  shift_timeoutmin.strftime('%H:%M') and rec.check_out.strftime('%H:%M') < shift_timeoutmin.strftime('%H:%M'):
+                        raise UserError('test')   
+                        pass    
+                    elif rec.check_out.strftime('%H:%M') > shift_timeinmin.strftime('%H:%M') and rec.check_out.strftime('%H:%M') < shift_timeinmin.strftime('%H:%M'):
+                        raise UserError('test')   
+                        date_attendance = rec.att_date + timedelta(1)    
+                        next_att = self.env['hr.attendance'].search([('employee_id','=',rec.employee_id.id),('att_date','=',date_attendance)], order='check_in asc', limit=1)
+                        if next_att.check_in:
+                            rec.update({
+                            'check_in': rec.check_out,
+                            'check_out': next_att.check_in,
+                            'att_date': next_att.check_in, 
+                            })
+                            next_att.update({
+                            'check_in': False
+                            })
+                        elif next_att.check_out:
+                            if next_att.check_out.strftime('%H:%M') > shift_timeoutmin.strftime('%H:%M') and next_att.check_out.strftime('%H:%M') < shift_timeoutmax.strftime('%H:%M'):
+                                rec.update({
+                                'check_in': rec.check_out,
+                                'check_out': next_att.check_out,
+                                'att_date': next_att.check_out, 
+                                })
+                                next_att.update({
+                                'check_out': False
+                                })
+                            
+                elif rec.check_in:
+                    shift_timeinmin = datetime.strptime(str(time_from).replace('.',':'), '%H:%M') - relativedelta(hours =+ 1)
+                    shift_timeinmax = datetime.strptime(str(time_from).replace('.',':'), '%H:%M') + relativedelta(hours =+ 1)
+                    shift_timeoutmin = datetime.strptime(str(time_to).replace('.',':'), '%H:%M') - relativedelta(hours =+ 1)
+                    shift_timeoutmax = datetime.strptime(str(time_to).replace('.',':'), '%H:%M') + relativedelta(hours =+ 1)
+                    
+                    if rec.check_in.strftime('%H:%M') >  shift_timeinmin.strftime('%H:%M') and rec.check_in.strftime('%H:%M') < shift_timeinmax.strftime('%H:%M'):
+                        date_attendance = rec.att_date + timedelta(1)    
+                        next_att = self.env['hr.attendance'].search([('employee_id','=',rec.employee_id.id),('att_date','=',date_attendance)], order='check_in asc', limit=1)
+                        if next_att.check_in:
+                            rec.update({
+                            'check_in': rec.check_out,
+                            'check_out': next_att.check_in,
+                            'att_date': next_att.check_in, 
+                            })
+                            next_att.update({
+                            'check_in': False
+                            })   
+                    elif rec.check_in.strftime('%H:%M') > shift_timeoutmin.strftime('%H:%M') and rec.check_in.strftime('%H:%M') < shift_timeoutmax.strftime('%H:%M'):
+                        pass
+ 
+                    
+                         
 
     def action_process_attendance(self, attendance_id):
         hr_attendances = self.env['hr.attendance'].search([('id','=', attendance_id)])
