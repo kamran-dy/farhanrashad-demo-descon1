@@ -90,152 +90,41 @@ class HrAttendanceRectification(models.Model):
             
     def action_approve(self):
         for line in self:
-            if line.state in ('submitted','approved'):
+            if line.state =='submitted':
                 line.app_date = fields.date.today()
                 if line.attendance_id:
                     attendance_rectify = self.env['hr.attendance'].search([('id','=',line.attendance_id.id)])
-
                     attendance_rectify.update({
                         'check_in': line.check_in,
                         'att_date':  line.check_in,
                         'check_out': line.check_out,
+                        'remarks':'IN/OUT Missing',
                     })
                     line.update({
                         'state': 'approved'
                     })
-                elif line.date:
-                    attendance_rectify = self.env['hr.attendance'].search([('employee_id','=',line.employee_id.id),('att_date','=', line.date)])
-                    if attendance_rectify:
-                        for rectify_attendance in attendance_rectify:
-                            if rectify_attendance.check_in and rectify_attendance.check_out:
-                                if line.check_out and line.check_in:
-                                    if rectify_attendance.check_in >= line.check_in and  rectify_attendance.check_in >= line.check_out:
-                                        pass
-                                    else:
-                                        vals = {
-                                            'employee_id': line.employee_id.id,
-                                            'check_in': line.check_in,
-                                            'att_date':  line.check_in,
-                                            'check_out': line.check_out,
-                                            'remarks': 'Comitment Slip',
-                                        }
-                                        attendance = self.env['hr.attendance'].create(vals)
-                                        line.update({
-                                            'state': 'approved'
-                                        })                                     
-                            elif rectify_attendance.check_in:
-                                if line.check_out:
-                                    if rectify_attendance.check_in > line.check_out:                           
-                                        rectify_attendance.update({
-                                            'check_in': line.check_out,
-                                            'att_date':  line.check_out,
-                                            'check_out': rectify_attendance.check_in,
-                                            'remarks': 'In Time Is Missing',
-                                        })
-                                        line.update({
-                                            'state': 'approved'
-                                        })  
-                                    elif rectify_attendance.check_in < line.check_out: 
-                                        rectify_attendance.update({
-                                            'check_in': rectify_attendance.check_in,
-                                            'att_date':  line.check_out,
-                                            'check_out': line.check_out,
-                                            'remarks': 'Out Time Is Missing',
-                                        })
-                                        line.update({
-                                            'state': 'approved'
-                                        })  
-                                elif  line.check_in:
-                                    if rectify_attendance.check_in > line.check_in:                           
-                                        rectify_attendance.update({
-                                            'check_in': line.check_in,
-                                            'att_date':  line.check_out,
-                                            'check_out': rectify_attendance.check_in,
-                                            'remarks': 'In Time Is Missing',
-                                        })
-                                        line.update({
-                                            'state': 'approved'
-                                        })  
-                                    elif rectify_attendance.check_in < line.check_in: 
-                                        rectify_attendance.update({
-                                            'check_in': rectify_attendance.check_in,
-                                            'att_date':  line.check_out,
-                                            'check_out': line.check_in,   
-                                            'remarks': 'Out Time Is Missing',
-                                        }) 
-                                        line.update({
-                                            'state': 'approved'
-                                        })  
-                            else:
-                                rectify_attendance.update({
-                                            'check_in': line.check_in,
-                                            'att_date':  line.check_out,
-                                            'check_out': rectify_attendance.check_in,
-                                            'remarks': 'In Time Is Missingss',
-                                        }) 
-                                line.update({
-                                            'state': 'approved'
-                                        })                 
-                    else:
-                        if line.number_of_Days == 0:
-                            vals = {
-                                'employee_id': line.employee_id.id,
-                                'check_in': line.check_in,
-                                'att_date':  line.check_out,
-                                'check_out': line.check_out,
-                                'remarks': 'Comitment Slip',
-                            }
-                            attendance = self.env['hr.attendance'].create(vals)
-                            line.update({
-                                'state': 'approved'
-                            }) 
-                        else:
-                            if line.check_in and line.check_out:
-                                delta_days_count = line.number_of_Days + 1
-                                for day in range(delta_days_count):
-                                    check_ina = line.check_in.strftime("%y-%m-%d")
-                                    check_inaa = datetime.strptime(str(check_ina),'%y-%m-%d')
-                                    check_in = check_inaa + timedelta(day)
-                                    hour_from = 4
-                                    hour_to = 8
-
-                                    shift_time = self.env['resource.calendar'].search([('company_id','=',line.employee_id.company_id.id),('shift_type','=','general')], limit=1)
-                                    if line.employee_id.shift_id:
-                                        shift_time =  line.employee_id.shift_id   
-                                    shift_line = self.env['hr.shift.schedule.line'].search([('employee_id','=',line.employee_id.id),('date','=',check_in)], limit=1)
-                                    
-                                    if shift_line.first_shift_id:
-                                        shift_time = shift_line.first_shift_id
-                                        
-                                    for  shift_line in shift_time.attendance_ids:
-                                        hour_from = shift_line.hour_from
-                                        hour_to = shift_line.hour_to
-                                    final_check_in= check_in + relativedelta(hours =+ hour_from)
-                                    check_out = check_in + relativedelta(hours =+ hour_to)
-                                    if shift_time.shift_type == 'night':
-                                        check_out = check_out +  timedelta(1) 
-                                    vals = {
-                                        'employee_id': line.employee_id.id,
-                                        'check_in':final_check_in - relativedelta(hours =+ 5),
-                                        'att_date':  final_check_in,
-                                        'check_out': check_out - relativedelta(hours =+ 5),
-                                        'remarks': 'Comitment Slip',
-                                        }
-                                    attendance = self.env['hr.attendance'].create(vals)
-                                    line.update({
-                                        'state': 'approved'
-                                    })          
-                               
+                elif  line.partial == 'Partial':
+                    vals = {
+                            'employee_id': line.employee_id.id,
+                            'check_in': line.check_in,
+                            'att_date':  line.check_out,
+                            'check_out': line.check_out,
+                            'remarks': 'Partial',
+                        }
+                    attendance = self.env['hr.attendance'].sudo().create(vals)
+                    line.update({
+                            'state': 'approved'
+                    }) 
                 else:
                     if line.number_of_Days == 0:
                         vals = {
-                                'employee_id': line.employee_id.id,
-                                'check_in': line.check_in,
-                                'att_date':  line.check_out,
-                                'check_out': line.check_out,
-                                'remarks': 'Comitment Slip',
+                            'employee_id': line.employee_id.id,
+                            'check_in': line.check_in,
+                            'att_date':  line.check_out,
+                            'check_out': line.check_out,
+                            'remarks': 'Comitment Slip',
                         }
-                        attendance = self.env['hr.attendance'].create(vals)
+                        attendance = self.env['hr.attendance'].sudo().create(vals)
                         line.update({
                             'state': 'approved'
                         }) 
@@ -253,28 +142,28 @@ class HrAttendanceRectification(models.Model):
                                 if line.employee_id.shift_id:
                                     shift_time =  line.employee_id.shift_id   
                                 shift_line = self.env['hr.shift.schedule.line'].search([('employee_id','=',line.employee_id.id),('date','=',check_in)], limit=1)
-                                
+
                                 if shift_line.first_shift_id:
                                     shift_time = shift_line.first_shift_id
-                                        
+
                                 for  shift_line in shift_time.attendance_ids:
                                     hour_from = shift_line.hour_from
                                     hour_to = shift_line.hour_to
                                 final_check_in= check_in + relativedelta(hours =+ hour_from)
                                 check_out = check_in + relativedelta(hours =+ hour_to)
                                 if shift_time.shift_type == 'night':
-                                    check_out = check_out +  timedelta(1)
+                                    check_out = check_out +  timedelta(1) 
                                 vals = {
                                     'employee_id': line.employee_id.id,
-                                    'check_in': final_check_in - relativedelta(hours =+ 5),
+                                    'check_in':final_check_in - relativedelta(hours =+ 5),
                                     'att_date':  final_check_in,
                                     'check_out': check_out - relativedelta(hours =+ 5),
                                     'remarks': 'Comitment Slip',
                                     }
-                                attendance = self.env['hr.attendance'].create(vals)
+                                attendance = self.env['hr.attendance'].sudo().create(vals)
                                 line.update({
                                     'state': 'approved'
-                                })    
+                                }) 
                 
             
     def action_refuse(self):

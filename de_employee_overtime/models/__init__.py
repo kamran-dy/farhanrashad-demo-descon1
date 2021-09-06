@@ -8,5 +8,3 @@ from . import hr_overtime_entry
 from . import hr_leave_allocation
 
 from . import hr_work_location
-from . import approval_request
-

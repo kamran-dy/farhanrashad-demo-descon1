@@ -12,7 +12,7 @@ class AttendanceRectification(models.Model):
     is_posted = fields.Boolean(string='Post to Oracle')
     
     def action_send_rectification_data_fetch(self):
-        conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')    
+        conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')    
         cur = conn.cursor()
         statement = 'select * from ODOO_HR_COMMITMENT_SLIP_HEADER'
         cur.execute(statement)
@@ -26,8 +26,8 @@ class AttendanceRectification(models.Model):
         raise UserError('Count '+str(ccomitment_data )+'  '+str(comitment_data)+'     Detail Data '+str(dcomitment_data))
             
     def action_send_rectification_data(self):
-        
-        for rectify in self:
+        rectifications = self.env['hr.attendance.rectification'].search([('is_posted','!=',True),('state','=','approved'),('date','>','2021-07-15')])
+        for rectify in rectifications:
             if rectify.is_posted == False and rectify.state =='approved':
                 APPLICANT_ID = rectify.employee_id.barcode.lstrip("0")
                 APPROVER_ID = rectify.employee_id.parent_id.barcode.lstrip("0")
@@ -80,16 +80,16 @@ class AttendanceRectification(models.Model):
                 REQ_ID = rectify.id
                 LOG_ID = rectify.id
                 if  rectify.partial == 'Check In Time Missing':                    
-                    IO_TIME =  rectify.check_in
-                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
+                    IO_TIME =  rectify.check_in + relativedelta(hours =+ 5) 
+                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
                     cur = conn.cursor()
                     statement = 'insert into ODOO_HR_COMMITMENT_SLIP_HEADER(APPLICANT_ID,IO_TIME,APPROVER_ID,APP_DATE,CMTMT_DATE,CMTMT_DATE_TO, APP_REMARKS,CMTMT_STATUS, CMTMT_TYPE, POST, PREVIOUS_DAY_NIGHT_SHIFT, REASON_CODE, REMARKS, REQ_DATE, REQ_ID,LOG_ID) values(: 2,:3,: 4,:5,: 6,:7,: 8,:9,: 10,:11,: 12,:13,:14,:15,:16,:17)'
                     cur.execute(statement, (
                                                                        APPLICANT_ID,IO_TIME,APPROVER_ID,APP_DATE,CMTMT_DATE,CMTMT_DATE_TO, APP_REMARKS,CMTMT_STATUS, CMTMT_TYPE, POST, PREVIOUS_DAY_NIGHT_SHIFT, REASON_CODE, REMARKS, REQ_DATE, REQ_ID,LOG_ID))
                     conn.commit()
                 elif rectify.partial == 'Out Time Missing':
-                    IO_TIME =  rectify.check_out
-                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
+                    IO_TIME =  rectify.check_out + relativedelta(hours =+ 5) 
+                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
                     cur = conn.cursor()
                     statement = 'insert into ODOO_HR_COMMITMENT_SLIP_HEADER(APPLICANT_ID,IO_TIME,APPROVER_ID,APP_DATE,CMTMT_DATE,CMTMT_DATE_TO, APP_REMARKS,CMTMT_STATUS, CMTMT_TYPE, POST, PREVIOUS_DAY_NIGHT_SHIFT, REASON_CODE, REMARKS, REQ_DATE, REQ_ID,LOG_ID) values(: 2,:3,: 4,:5,: 6,:7,: 8,:9,: 10,:11,: 12,:13,:14,:15,:16,:17)'
                     cur.execute(statement, (
@@ -97,14 +97,14 @@ class AttendanceRectification(models.Model):
                     conn.commit()
                 elif rectify.partial == 'Partial':
                 
-                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
+                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
                     cur = conn.cursor()
                     statement = 'insert into ODOO_HR_COMMITMENT_SLIP_HEADER(APPLICANT_ID,APPROVER_ID,APP_DATE,CMTMT_DATE,CMTMT_DATE_TO,CMTMT_TIME_FROM,CMTMT_TIME_TO, APP_REMARKS,CMTMT_STATUS, CMTMT_TYPE, POST, PREVIOUS_DAY_NIGHT_SHIFT, REASON_CODE, REMARKS, REQ_DATE, REQ_ID,LOG_ID) values(: 2,:3,: 4,:5,: 6,:7,: 8,:9,: 10,:11,: 12,:13,:14,:15,:16,:17,:18)'
                     cur.execute(statement, (
                                                                        APPLICANT_ID,APPROVER_ID,APP_DATE,CMTMT_DATE,CMTMT_DATE_TO,  CMTMT_TIME_FROM,CMTMT_TIME_TO,APP_REMARKS,CMTMT_STATUS, CMTMT_TYPE, POST, PREVIOUS_DAY_NIGHT_SHIFT, REASON_CODE, REMARKS, REQ_DATE, REQ_ID,LOG_ID))
                     conn.commit() 
                 else: 
-                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
+                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
                     cur = conn.cursor()
                     statement = 'insert into ODOO_HR_COMMITMENT_SLIP_HEADER(APPLICANT_ID,APPROVER_ID,APP_DATE,CMTMT_DATE,CMTMT_DATE_TO, APP_REMARKS,CMTMT_STATUS, CMTMT_TYPE, POST, PREVIOUS_DAY_NIGHT_SHIFT, REASON_CODE, REMARKS, REQ_DATE, REQ_ID,LOG_ID) values(: 2,:3,: 4,:5,: 6,:7,: 8,:9,: 10,:11,: 12,:13,:14,:15,:16)'
                     cur.execute(statement, (
@@ -123,7 +123,7 @@ class AttendanceRectification(models.Model):
                 for day in range(round(count_run)):
                     CMTMT_DATE = linerectify.date + timedelta(day)
                     REQ_ID = linerectify.id          
-                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
+                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
                     cur = conn.cursor()
                     statement = 'insert into ODOO_HR_COMMITMENT_SLIP_DETAIL(CMTMT_DATE,REQ_ID) values(: 2,:3)'
                     cur.execute(statement, (CMTMT_DATE,REQ_ID))
@@ -131,7 +131,7 @@ class AttendanceRectification(models.Model):
             else:
                 CMTMT_DATE = linerectify.date if linerectify.date else fields.date.today()
                 REQ_ID = linerectify.id          
-                conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
+                conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
                 cur = conn.cursor()
                 statement = 'insert into ODOO_HR_COMMITMENT_SLIP_DETAIL(CMTMT_DATE,REQ_ID) values(: 2,:3)'
                 cur.execute(statement, (CMTMT_DATE,REQ_ID))

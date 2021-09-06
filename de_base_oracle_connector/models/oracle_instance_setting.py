@@ -38,7 +38,7 @@ class OracleInstanceSetting(models.Model):
             thost = self.host
             tport = self.port
             tinstance = self.db_name
-            conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.153:1524/test3')
+            conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
             cur = conn.cursor()
             if conn:
                 self.write({

@@ -13,6 +13,10 @@
                   <field name="attachment"  />
                   <field name="attachment_validity" attrs="{'invisible': [('attachment', '!=', True)],'required':[('attachment', '=', True)]}" />
                 </group>
+                <group string="CEO Approvals">
+                  <field name="is_ceo_approval"  />
+                  
+                </group>
             </xpath>
        </field>
     </record>

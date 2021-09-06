@@ -136,20 +136,13 @@ class HREmployee(models.Model):
                  ('company_id', '=', employee.company_id.id)])
             if employee.confirm_date == current_date_year_ago:
                 num_of_days = 0
-                if employee.emp_type == 'permanent' or employee.emp_type == 'contractor':
+                if employee.emp_type == 'permanent':
                     if employee.pro_rate_annual_leaves_allocated == False:
                         for timeoff in time_off_for_annual:
                             if employee.emp_type == 'permanent':
-                                    end_month = date(employee.confirm_date.year, 12, 31)
-                                    delta = end_month - employee.confirm_date
-                                    remaining = (delta.days / 365) * 12
-                                    num_of_days = (12 / 12) * remaining
-
+                                num_of_days = 21
                             elif employee.emp_type == 'contractor':
-                                    end_month = date(employee.confirm_date.year, 12, 31)
-                                    delta = end_month - employee.confirm_date
-                                    remaining = (delta.days / 365) * 12
-                                    num_of_days = (10 / 12) * remaining
+                                num_of_days = 0
                             vals = {
                                 'name': 'ProRate Annual Allocation For ' + employee.name,
                                 'holiday_status_id': timeoff.id,

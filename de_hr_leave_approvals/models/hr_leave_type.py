@@ -10,4 +10,5 @@ class HRLeaveType(models.Model):
     category_id = fields.Many2one('approval.category', string="Category", required=False)
     attachment = fields.Boolean(string="Attachment")
     attachment_validity = fields.Integer(string="Require after Days")
+    is_ceo_approval = fields.Boolean(string="Approver")
 

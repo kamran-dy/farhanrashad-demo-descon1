@@ -27,7 +27,7 @@ class HrLeave(models.Model):
 
     def action_send_leave_data_fetch(self):
          
-        conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')    
+        conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')    
         cur = conn.cursor()
         statement = 'select * from ODOO_LEAVE_TRANSACTION'
         cur.execute(statement)
@@ -37,23 +37,15 @@ class HrLeave(models.Model):
         ccomitment_data = cur.fetchall()
         dstatement = 'select * from ODOO_LEAVE_TRANSACTION_DTL'
         cur.execute(dstatement)
+        #conn.commit()
         dcomitment_data = cur.fetchall()
         raise UserError('Count '+str(ccomitment_data)+' '+str(comitment_data)+'     Detail Data '+str(dcomitment_data))
     
     
-    
     def action_send_holiday_data(self):
-        conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')    
-        cur = conn.cursor()
-        statement = 'delete from ODOO_LEAVE_TRANSACTION'
-        cur.execute(statement)
-        conn.commit() 
-        conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')    
-        cur = conn.cursor()
-        statement = 'delete from ODOO_LEAVE_TRANSACTION_DTL'
-        cur.execute(statement)
-        conn.commit() 
-        for leave in self:
+        holidays = self.env['hr.leave'].search([('is_posted','!=', True),('state','=','validate'),('request_date_from','>','2021-07-15'),('holiday_status_id.name','!=','Rest Day')], limit=100)
+        
+        for leave in holidays:
             if leave.is_posted == False and leave.state =='validate': 
                 ACTIVITY_ID = 2
                 OFFICE_EMP_ID = leave.employee_id.barcode.lstrip("0")
@@ -95,31 +87,42 @@ class HrLeave(models.Model):
                     HR_APPROVAL_FLG = 1
                     HR_APPROVAL_ID = leave.employee_id.department_id.manager_id.barcode.lstrip("0")
                     HR_APPROVAL_REQUIRED = 'Y'
-                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
+                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
                     cur = conn.cursor()
                     statement = 'insert into ODOO_LEAVE_TRANSACTION(ACTIVITY_ID,OFFICE_EMP_ID,APPROVED_BY, APPROVED_DATE, COMPANY_ID,CREATED_BY,CREATION_DATE,EFFECTIVE_DATE,EMPLOYEE_ID,END_DATE,  FORWARDED_TO, HR_ACTION_DATE, HR_APPROVAL_FLG, HR_APPROVAL_ID, HR_APPROVAL_REQUIRED, LEAVE_DAYS, LEAVE_DAY_TYPE, LEAVE_STATUS, LEAVE_TYPE_ID, REASON, REMARKS, START_DATE, TRANSACTION_ID,YEAR) values(: 2,:3,: 4,:5,: 6,:7,: 8,:9,: 10,:11,: 12,:13,: 14,:15,: 16,:17,: 18,:19,: 20,:21,: 22,:23,:24,:25)'
                     cur.execute(statement, (
                     ACTIVITY_ID,OFFICE_EMP_ID,APPROVED_BY, APPROVED_DATE, COMPANY_ID,CREATED_BY,CREATION_DATE,EFFECTIVE_DATE,EMPLOYEE_ID,END_DATE,  FORWARDED_TO, HR_ACTION_DATE, HR_APPROVAL_FLG, HR_APPROVAL_ID, HR_APPROVAL_REQUIRED, LEAVE_DAYS, LEAVE_DAY_TYPE, LEAVE_STATUS, LEAVE_TYPE_ID, REASON, REMARKS, START_DATE, TRANSACTION_ID,YEAR))
                     conn.commit()
+                    leave.update({
+                        'is_posted': True
+                        })
                 elif leave.leave_category == 'hours':
                     START_TIME = leave.request_date_from  + relativedelta(hours =+ leave.short_start_time)
                     END_TIME  = START_TIME + relativedelta(hours =+ 2)
-                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
+                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
                     cur = conn.cursor()
                     statement = 'insert into ODOO_LEAVE_TRANSACTION(START_TIME, END_TIME, ACTIVITY_ID,OFFICE_EMP_ID,APPROVED_BY, APPROVED_DATE, COMPANY_ID,CREATED_BY,CREATION_DATE,EFFECTIVE_DATE,EMPLOYEE_ID,END_DATE,  FORWARDED_TO,LEAVE_DAYS, LEAVE_DAY_TYPE, LEAVE_STATUS, LEAVE_TYPE_ID, REASON, REMARKS, START_DATE, TRANSACTION_ID,YEAR) values(: 2,:3,: 4,:5,: 6,:7,: 8,:9,: 10,:11,: 12,:13,: 14,:15,: 16,:17,: 18,:19,: 20,:21,: 22,:23)'
                     cur.execute(statement, (
                      START_TIME, END_TIME, ACTIVITY_ID,OFFICE_EMP_ID,APPROVED_BY, APPROVED_DATE, COMPANY_ID,CREATED_BY,CREATION_DATE,EFFECTIVE_DATE,EMPLOYEE_ID,END_DATE,  FORWARDED_TO, LEAVE_DAYS, LEAVE_DAY_TYPE, LEAVE_STATUS, LEAVE_TYPE_ID, REASON, REMARKS, START_DATE, TRANSACTION_ID,YEAR))
                     conn.commit()
+                    leave.update({
+                        'is_posted': True
+                        })
                 else:
-                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
+                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
                     cur = conn.cursor()
                     statement = 'insert into ODOO_LEAVE_TRANSACTION(ACTIVITY_ID,OFFICE_EMP_ID,APPROVED_BY, APPROVED_DATE, COMPANY_ID,CREATED_BY,CREATION_DATE,EFFECTIVE_DATE,EMPLOYEE_ID,END_DATE,  FORWARDED_TO,LEAVE_DAYS, LEAVE_DAY_TYPE, LEAVE_STATUS, LEAVE_TYPE_ID, REASON, REMARKS, START_DATE, TRANSACTION_ID,YEAR) values(: 2,:3,: 4,:5,: 6,:7,: 8,:9,: 10,:11,: 12,:13,: 14,:15,: 16,:17,: 18,:19,: 20,:21)'
                     cur.execute(statement, (
                     ACTIVITY_ID,OFFICE_EMP_ID,APPROVED_BY, APPROVED_DATE, COMPANY_ID,CREATED_BY,CREATION_DATE,EFFECTIVE_DATE,EMPLOYEE_ID,END_DATE,  FORWARDED_TO, LEAVE_DAYS, LEAVE_DAY_TYPE, LEAVE_STATUS, LEAVE_TYPE_ID, REASON, REMARKS, START_DATE, TRANSACTION_ID,YEAR))
                     conn.commit()
+                    leave.update({
+                        'is_posted': True
+                        })
 
                 leave.action_send_holiday_line_data(leave.id)
-                leave.is_posted = True
+                leave.update({
+                    'is_posted' : True
+                     })
 
 
     def action_send_holiday_line_data(self,leave):
@@ -129,7 +132,7 @@ class HrLeave(models.Model):
                 for day in range(round(leave.number_of_days)):            
                     EMPLOYEE_ID = leave.employee_id.barcode.lstrip("0")
                     ENABLED = 'Y'
-                    LEAVE_DATE = leave.request_date_from
+                    LEAVE_DATE = leave.request_date_from + timedelta(day)
                     LEAVE_DAYS = -1
                     LEAVE_DAY_TYPE = 'Full Day'
                     if leave.leave_category == 'day':
@@ -146,7 +149,7 @@ class HrLeave(models.Model):
                     LTD_ID = int(individual_id)
                     TRANSACTION_ID = leave.id
                     YEAR = fields.date.today().year            
-                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
+                    conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
                     cur = conn.cursor()
                     statement = 'insert into ODOO_LEAVE_TRANSACTION_DTL(EMPLOYEE_ID,ENABLED, LEAVE_DATE, LEAVE_DAYS,LEAVE_DAY_TYPE,LTD_ID,TRANSACTION_ID,YEAR) values(: 2,:3,: 4,:5,: 6,:7,: 8,:9)'
                     cur.execute(statement, (
@@ -174,7 +177,7 @@ class HrLeave(models.Model):
                 LTD_ID = int(individual_id) 
                 TRANSACTION_ID = leave.id
                 YEAR = fields.date.today().year           
-                conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.7.152:1523/test2')
+                conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
                 cur = conn.cursor()
                 statement = 'insert into ODOO_LEAVE_TRANSACTION_DTL(EMPLOYEE_ID,ENABLED, LEAVE_DATE, LEAVE_DAYS,LEAVE_DAY_TYPE,LTD_ID,TRANSACTION_ID,YEAR) values(: 2,:3,: 4,:5,: 6,:7,: 8,:9)'
                 cur.execute(statement, (
