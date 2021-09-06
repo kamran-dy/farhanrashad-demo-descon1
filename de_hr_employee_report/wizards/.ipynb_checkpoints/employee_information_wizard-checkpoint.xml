@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="employee_information_wizard_view" model="ir.ui.view">
+        <field name="name">employee.information.report</field>
+        <field name="model">employee.information</field>
+        <field name="arch" type="xml">
+            <form string="Employee Information Wizard">
+                <group>
+                    <field name="department_ids" widget="many2many_tags"/>
+                </group>
+                <group>
+                    <field name="employee_type_ids"  widget="many2many_tags"/>
+                    <field name="grade_type_ids"  widget="many2many_tags"/>
+                    <field name="email"/>
+                    <field name="mobile"/>
+                    <field name="address"/>
+                    <field name="religion"/>
+                    <field name="cnic"/>
+                    <field name="blood_group"/>
+                    <field name="bank_account_number"/>
+                    <field name="card_no"/>
+                    <field name="emergency_contact"/>
+                    <field name="assets"/>
+                    <field name="dependent"/>
+                    <field name="pfund"/>
+                    <field name="eobi_number"/>
+                    <field name="gratuity"/>
+                    <field name="contract_details"/>
+                    
+                </group>
+
+                <footer>
+                   <button name="action_gnerate_excel" type="object" string="Create Excel Report"
+                           class="oe_highlight"/>
+                    <button name="action_generate_pdf" type="object" string="Print PDF" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_employee_information_wizard" model="ir.actions.act_window">
+        <field name="name">Employee Information Report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">employee.information</field>
+        <field name="view_id" ref="de_hr_employee_report.employee_information_wizard_view"/>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

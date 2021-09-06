@@ -26,6 +26,11 @@
                   parent="hr.hr_menu_hr_reports"
                   action="de_hr_employee_report.action_employee_age_wizard" sequence="7"
         />
+        <menuitem id="menu_employee_information_report"
+                  name="Employee Information Report"
+                  parent="hr.hr_menu_hr_reports"
+                  action="de_hr_employee_report.action_employee_information_wizard" sequence="8"
+        />
     </data>
 </odoo>
 

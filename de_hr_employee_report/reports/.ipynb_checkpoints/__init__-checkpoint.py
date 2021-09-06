@@ -6,3 +6,5 @@ from . import cost_center_distribution_report_pdf
 from . import cost_center_distribution_report_xlsx
 from . import employee_age_report_pdf
 from . import employee_age_report_xlsx
+from . import employee_information_report_pdf
+from . import employee_information_report_xlsx

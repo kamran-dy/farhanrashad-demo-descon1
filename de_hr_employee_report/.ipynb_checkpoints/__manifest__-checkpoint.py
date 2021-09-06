@@ -13,13 +13,14 @@
     "website": "http://www.dynexcel.co",
     "version": '14.1.0.0',
     # "depends": ['base', 'hr', 'report_xlsx', 'de_employee_enhancement'],
-    "depends": ['base', 'hr', 'report_xlsx', 'de_employee_overtime'],
+    "depends": ['base', 'hr','account', 'report_xlsx', 'de_employee_overtime'],
     "data": [
         'security/ir.model.access.csv',
         'wizards/contract_expiry_wizard_view.xml',
         'wizards/cost_center_wise_wizard_view.xml',
         'wizards/cost_center_distribution_wizard_view.xml',
         'wizards/employee_age_wizard_view.xml',
+        'wizards/employee_information_wizard.xml',
         'views/view_employee_type.xml',
         'views/hr_employee_report_menuitem.xml',
         'reports/contract_expiry_report_xlsx.xml',
@@ -31,7 +32,9 @@
         'reports/cost_center_distribution_report_xlsx.xml',
         'reports/employee_age_report_pdf.xml',
         'reports/employee_age_report_xlsx.xml',
-        'reports/employee_card.xml'
+        'reports/employee_card.xml',
+        'reports/employee_information_report_pdf.xml',
+        'reports/employee_information_report_xlsx.xml'
 ],
     "installable": True,
     "application": False,

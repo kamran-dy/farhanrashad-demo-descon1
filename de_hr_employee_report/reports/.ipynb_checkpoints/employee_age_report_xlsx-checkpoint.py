@@ -40,7 +40,7 @@ class EmployeeAgeReport(models.AbstractModel):
         age_to = data['age_to']
         
         format1 = workbook.add_format({'font_size': '14', 'align': 'vcenter', 'bold': True})
-        sheet = workbook.add_worksheet('Cost Center Wise Report')
+        sheet = workbook.add_worksheet('Employee Age Report')
         
         sheet.write(3, 0, 'Age From', format1)
         sheet.write(3, 1, age_from, format1)

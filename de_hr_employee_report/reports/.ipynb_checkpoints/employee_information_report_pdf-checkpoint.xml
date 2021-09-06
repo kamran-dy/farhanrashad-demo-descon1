@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="employee_information_pdf">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="text-left">
+                            <h3 class="text-center">Employee Information Report</h3>
+                            <div class="row">
+                                <div class="col-5">
+                                    <b>
+                                       Department:
+                                   </b>
+                                   <span t-esc="department"/>
+                                </div>
+                                <div class="col-2">
+                                </div>
+                                <div class="col-5">
+                                    <b>
+                                       Employee Type:
+                                   </b>
+                                   <span t-esc="employee_type"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <b>
+                                       Grade Type:
+                                   </b>
+                                   <span t-esc="grade_type"/>
+                                </div>
+                                <div class="col-2">
+                                </div>
+                                <div class="col-5">
+                                </div>
+                            </div>
+                        </div>
+                       <div>
+                           <table class="table table-condensed" style="border: 1px solid black;border-collapse: collapse;width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid black;">
+                                                <b style="color:black">Employee Type</b>
+                                        </th>
+                                        <th style="border: 1px solid black;">
+                                                <b style="color:black">Grade Type</b>
+                                        </th>
+                                        <th style="border: 1px solid black;">
+                                                <b style="color:black">Department</b>
+                                        </th>
+                                        <t t-if="email == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Email </b>
+                                            </th>
+                                        </t>
+                                        <t t-if="mobile == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Mobile</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="address == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Address</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="religion == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Religion</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="cnic == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">CNIC</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="blood_group == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Blood Group</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="bank_account_number == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Bank Account Number</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="card_no == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Card No.</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="emergency_contact == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Emergency Contact</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="assets == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Asset Name</b>
+                                            </th>
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Issue Date</b>
+                                            </th>
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Estimate Life Span</b>
+                                            </th>
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Recovery</b>
+                                            </th>
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Discovery</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="dependent == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Dependent Name</b>
+                                            </th>
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Relationship</b>
+                                            </th>
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Date of Birth</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="pfund == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Pfund</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="eobi_number == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">EOBI Number</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="gratuity == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Gratuity</b>
+                                            </th>
+                                        </t>
+                                        <t t-if="contract_details == true">
+                                            <th style="border: 1px solid black;">
+                                                <b style="color:black">Contract Details</b>
+                                            </th>
+                                        </t>
+                                    </tr>
+                                </thead>
+                               <t t-foreach="active_contract" t-as="o">
+                                   <t t-if="assets == true">
+                                       <t t-if="o.employee_id.asset_lines">
+                                           <t t-foreach="o.employee_id.asset_lines" t-as="al">
+                                               <tbody class="invoice_tbody">
+                                                   <tr style="border: 1px solid black">
+                                                       <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.emp_type"/>
+                                                        </td>
+                                                       <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.grade_type.name"/>
+                                                        </td>
+                                                       <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.department_id.name"/>
+                                                        </td>
+                                                       <t t-if="email == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.private_email"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="mobile == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.mobile_phone"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="address == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.address_home_id.name"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="religion == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.religion"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="cnic == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.cnic"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="blood_group == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.blood_group"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="bank_account_number == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.bank_account_id"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="card_no == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.identification_id"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="emergency_contact == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.emergency_contact"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="assets == true">
+<!--                                                            <p>Assets Found</p> -->
+                                                           <t t-if="o.employee_id.asset_lines">
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="al.asset_id"/>
+                                                               </td>
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="al.issue_date"/>
+                                                               </td>
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="al.estimated_life_span"/>
+                                                               </td>
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="al.recovery_date"/>
+                                                               </td>
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="al.description"/>
+                                                               </td>
+                                                           </t>
+                                                       </t>
+                                                       <t t-if="dependent == true">
+                                                           <t t-if="f.name">
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="f.name"/>
+                                                               </td>
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="f.relation_ship"/>
+                                                               </td>
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="f.date_of_birth"/>
+                                                               </td>
+                                                           </t>
+                                                       </t>
+                                                       <t t-if="pfund == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.identification_id"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="eobi_number == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.eobi_number"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="gratuity == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.gratuity"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="contract_details == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.gratuity"/>
+                                                           </td>
+                                                       </t>
+                                                   </tr>
+                                               </tbody>
+                                           </t>
+                                       </t>
+                                   </t>
+                                   <t t-if="dependent == true">
+                                       <t t-if="o.employee_id.employee_family_ids">
+                                           <t t-foreach="o.employee_id.employee_family_ids" t-as="f">
+                                               <tbody class="invoice_tbody">
+                                                   <tr style="border: 1px solid black">
+                                                       <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.emp_type"/>
+                                                        </td>
+                                                       <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.grade_type.name"/>
+                                                        </td>
+                                                       <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.department_id.name"/>
+                                                        </td>
+                                                       <t t-if="email == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.private_email"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="mobile == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.mobile_phone"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="address == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.address_home_id.name"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="religion == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.religion"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="cnic == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.cnic"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="blood_group == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.blood_group"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="bank_account_number == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.bank_account_id"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="card_no == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.identification_id"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="emergency_contact == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.emergency_contact"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="assets == true">
+                                                           <t t-if="al.asset_id.name">
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="al.asset_id.name"/>
+                                                               </td>
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="al.issue_date"/>
+                                                               </td>
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="al.estimated_life_span"/>
+                                                               </td>
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="al.recovery_date"/>
+                                                               </td>
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="al.description"/>
+                                                               </td>
+                                                           </t>
+                                                       </t>
+                                                       <t t-if="dependent == true">
+                                                           <t t-if="f.name">
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="f.name"/>
+                                                               </td>
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="f.relation_ship"/>
+                                                               </td>
+                                                               <td style="border: 1px solid black;">
+                                                                   <span t-esc="f.date_of_birth"/>
+                                                               </td>
+                                                           </t>
+                                                       </t>
+                                                       <t t-if="pfund == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.identification_id"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="eobi_number == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.eobi_number"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="gratuity == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.gratuity"/>
+                                                           </td>
+                                                       </t>
+                                                       <t t-if="contract_details == true">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="o.employee_id.gratuity"/>
+                                                           </td>
+                                                       </t>
+                                                   </tr>
+                                               </tbody>
+                                           </t>
+                                       </t>
+                                   </t>
+                                   <t t-else="">
+                                       <tbody class="invoice_tbody">
+                                           <tr style="border: 1px solid black">
+                                               <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.emp_type"/>
+                                                </td>
+                                               <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.grade_type.name"/>
+                                                </td>
+                                               <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.department_id.name"/>
+                                                </td>
+                                               <t t-if="email == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.private_email"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="mobile == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.mobile_phone"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="address == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.address_home_id.name"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="religion == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.religion"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="cnic == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.cnic"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="blood_group == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.blood_group"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="bank_account_number == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.bank_account_id"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="card_no == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.identification_id"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="emergency_contact == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.emergency_contact"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="assets == true">
+                                                   <t t-if="o.employee_id.asset_lines">
+                                                       <t t-foreach="o.employee_id.asset_lines" t-as="al">
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="al.asset_id.name"/>
+                                                           </td>
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="al.issue_date"/>
+                                                           </td>
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="al.estimated_life_span"/>
+                                                           </td>
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="al.recovery_date"/>
+                                                           </td>
+                                                           <td style="border: 1px solid black;">
+                                                               <span t-esc="al.description"/>
+                                                           </td>
+                                                       </t>
+                                                   </t>
+                                               </t>
+                                               <t t-if="dependent == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="f.name"/>
+                                                   </td>
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="f.relation_ship"/>
+                                                   </td>
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="f.date_of_birth"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="pfund == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.identification_id"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="eobi_number == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.eobi_number"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="gratuity == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.gratuity"/>
+                                                   </td>
+                                               </t>
+                                               <t t-if="contract_details == true">
+                                                   <td style="border: 1px solid black;">
+                                                       <span t-esc="o.employee_id.gratuity"/>
+                                                   </td>
+                                               </t>
+                                           </tr>
+                                       </tbody>
+                                   </t>
+                               </t>
+                           </table>
+                       </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

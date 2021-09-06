@@ -31,5 +31,13 @@
             <field name="report_file">de_hr_employee_report.employee_age_pdf</field>
         </record>
         
+        <record id="action_report_employee_age" model="ir.actions.report">
+            <field name="name">Employee Information</field>
+            <field name="model">employee.information</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">de_hr_employee_report.employee_information_pdf</field>
+            <field name="report_file">de_hr_employee_report.employee_information_pdf</field>
+        </record>
+        
     </data>
 </odoo>

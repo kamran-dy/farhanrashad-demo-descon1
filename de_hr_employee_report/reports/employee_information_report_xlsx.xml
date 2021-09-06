@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+                id="employee_information_xlsx"
+                model="employee.information"
+                string="Print to XLSX"
+                report_type="xlsx"
+                name="de_hr_employee_report.employee_information_xlsx"
+                file="Employee Information XLSX Report"/>
+    </data>
+</odoo>
