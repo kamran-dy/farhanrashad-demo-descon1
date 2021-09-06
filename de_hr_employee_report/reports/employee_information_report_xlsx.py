@@ -193,7 +193,7 @@ class EmployeeAgeReport(models.AbstractModel):
                         else:
                             blood_group = None
                         if data['bank_account_number'] == True:
-                            bank_account_number = o.employee_id.bank_account_id
+                            bank_account_number = o.employee_id.bank_account_id.id
                         else:
                             bank_account_number = None
                         if data['card_no'] == True:
@@ -234,10 +234,16 @@ class EmployeeAgeReport(models.AbstractModel):
                                 for f in o.employee_id.employee_family_ids:
                                     if f.name:
                                         f_name = f.name
+                                    else:
+                                        f_name = None
                                     if f.relation_ship:
                                         f_relationship = f.relation_ship
+                                    else:
+                                        f_relationship = None
                                     if f.date_of_birth:
                                         f_dob = f.date_of_birth.strftime("%Y/%m/%d")
+                                    else:
+                                        f_dob = None
                             else:
                                 f_name = None
                                 f_relationship = None
@@ -323,7 +329,8 @@ class EmployeeAgeReport(models.AbstractModel):
                     else:
                         blood_group = None
                     if data['bank_account_number'] == True:
-                        bank_account_number = o.employee_id.bank_account_id
+                        bank_account_number = o.employee_id.bank_account_id.id
+                        #raise UserError(bank_account_number)
                     else:
                         bank_account_number = None
                     if data['card_no'] == True:
@@ -364,10 +371,16 @@ class EmployeeAgeReport(models.AbstractModel):
                             for f in o.employee_id.employee_family_ids:
                                 if f.name:
                                     f_name = f.name
+                                else:
+                                    f_name = None
                                 if f.relation_ship:
                                     f_relationship = f.relation_ship
+                                else:
+                                    f_relationship = None
                                 if f.date_of_birth:
                                     f_dob = f.date_of_birth.strftime("%Y/%m/%d")
+                                else:
+                                    f_dob = None
                         else:
                             f_name = None
                             f_relationship = None
@@ -457,7 +470,7 @@ class EmployeeAgeReport(models.AbstractModel):
                         else:
                             blood_group = None
                         if data['bank_account_number'] == True:
-                            bank_account_number = o.employee_id.bank_account_id
+                            bank_account_number = o.employee_id.bank_account_id.id
                         else:
                             bank_account_number = None
                         if data['card_no'] == True:
@@ -496,10 +509,16 @@ class EmployeeAgeReport(models.AbstractModel):
                         if data['dependent'] == True:
                             if f.name:
                                 f_name = f.name
+                            else:
+                                f_name = None
                             if f.relation_ship:
                                 f_relationship = f.relation_ship
+                            else:
+                                f_relationship = None
                             if f.date_of_birth:
                                 f_dob = f.date_of_birth.strftime("%Y/%m/%d")
+                            else:
+                                f_dob = None
                         else:
                             f_name = None
                             f_relationship = None
@@ -579,7 +598,7 @@ class EmployeeAgeReport(models.AbstractModel):
                     else:
                         blood_group = None
                     if data['bank_account_number'] == True:
-                        bank_account_number = o.employee_id.bank_account_id
+                        bank_account_number = o.employee_id.bank_account_id.id
                     else:
                         bank_account_number = None
                     if data['card_no'] == True:
@@ -620,10 +639,16 @@ class EmployeeAgeReport(models.AbstractModel):
                             for f in o.employee_id.employee_family_ids:
                                 if f.name:
                                     f_name = f.name
+                                else:
+                                    f_name = None
                                 if f.relation_ship:
                                     f_relationship = f.relation_ship
+                                else:
+                                    f_relationship = None
                                 if f.date_of_birth:
                                     f_dob = f.date_of_birth.strftime("%Y/%m/%d")
+                                else:
+                                    f_dob = None
                         else:
                             f_name = None
                             f_relationship = None
@@ -708,7 +733,7 @@ class EmployeeAgeReport(models.AbstractModel):
                 else:
                     blood_group = None
                 if data['bank_account_number'] == True:
-                    bank_account_number = o.employee_id.bank_account_id
+                    bank_account_number = o.employee_id.bank_account_id.id
                 else:
                     bank_account_number = None
                 if data['card_no'] == True:
@@ -749,10 +774,16 @@ class EmployeeAgeReport(models.AbstractModel):
                         for f in o.employee_id.employee_family_ids:
                             if f.name:
                                 f_name = f.name
+                            else:
+                                f_namae = None
                             if f.relation_ship:
                                 f_relationship = f.relation_ship
+                            else:
+                                f_relationship = None
                             if f.date_of_birth:
                                 f_dob = f.date_of_birth.strftime("%Y/%m/%d")
+                            else:
+                                f_dob = None
                     else:
                         f_name = None
                         f_relationship = None
