@@ -41,6 +41,7 @@ def site_attendance_lines_content(diff_date, date_from, date_to):
         'emps': employees,
         'diff_date': diff_date,
         'date_from': date_from,
+        'days': diff_date,
         'date_to': date_to,
         'managers': managers.line_manager,
         'employee_list': employee_list_attendance,
@@ -50,7 +51,7 @@ def site_attendance_lines_content_constrains(diff_date, employee):
     employees = request.env['hr.employee'].search([('id','=',employee)])
     return {
         'diff_date': diff_date,
-       'employee': employees,
+       'employee': employees.name,
     }
 
 
@@ -98,6 +99,9 @@ class CreateAttendance(http.Controller):
         list = []
         employees = request.env['hr.employee'].search([('user_id','=',http.request.env.context.get('uid'))], limit=1)
         site_attendance_vals_list = ast.literal_eval(kw.get('site_attendance_vals'))
+        already_req = request.env['hr.attendance.site'].search([('incharge_id','=',employees.id),('date_from','=',kw.get('date_from')),('date_to','=',kw.get('date_to')),('state','in',('draft','submitted','approved'))])
+        if already_req:
+            raise UserError('Site Attendance Request Already exist!')    
         siteattendane_val = {
             'incharge_id': employees.id,
             'date_from': kw.get('date_from'),
@@ -109,12 +113,12 @@ class CreateAttendance(http.Controller):
             count += 1
             if count > 1:
                 if float(worker['col2']) > 0.0:
-                    totaldays = (datetime.strptime(str(kw.get('date_from')), '%Y-%m-%d') - datetime.strptime(str(kw.get('date_from')), '%y-%m-%d')).days
+                    totaldays = int(kw.get('days'))
                     
                     if float(worker['col2']) > (totaldays + 1) :
                         date_from = kw.get('date_from')
                         date_to = kw.get('date_to')
-                        return request.render("de_site_attendance.cannot_submit_greater_days", site_attendance_lines_content_constrains(diff_range_count, int(worker['col1'])))
+                        return request.render("de_site_attendance.cannot_submit_greater_days", site_attendance_lines_content_constrains(totaldays, int(worker['col1'])))
                     line_vals = {
                         'site_id': record.id,
                         'employee_id': int(worker['col1']),
@@ -126,12 +130,6 @@ class CreateAttendance(http.Controller):
         employee_list_attendance = []
         return request.render("de_site_attendance.site_attendane_submited", {})
     
-    
-    
-
-    
-   
-
 
 class CustomerPortal(CustomerPortal):
 
