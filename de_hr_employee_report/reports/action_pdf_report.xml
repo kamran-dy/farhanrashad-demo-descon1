@@ -39,5 +39,13 @@
             <field name="report_file">de_hr_employee_report.employee_information_pdf</field>
         </record>
         
+        <record id="employee_dob" model="ir.actions.report">
+            <field name="name">Employee DOB</field>
+            <field name="model">employee.dob</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">de_hr_employee_report.employee_dob_pdf</field>
+            <field name="report_file">de_hr_employee_report.employee_dob_pdf</field>
+        </record>
+        
     </data>
 </odoo>

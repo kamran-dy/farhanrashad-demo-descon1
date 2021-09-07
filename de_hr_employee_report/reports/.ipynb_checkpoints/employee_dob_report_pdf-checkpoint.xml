@@ -1,0 +1,77 @@
+<odoo>
+    <data>
+        <template id="employee_dob_pdf">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="text-left">
+                            <div class="row" style="margin-top:0 !important;">
+                                <div class="col-3">
+                                    <img style="text-align:left;" src='/web/binary/company_logo'/>
+                                </div>
+                                <div class="col-6">
+                                    <h1 style="font-size:20px;color:blue;"><strong t-esc="employees[0]['company']"/></h1>
+                                    <br></br>
+                                    <a style="font-weight:bold;font-size:20px;color:blue;">Employee's Birthday Report</a>
+                                </div>
+                            </div>
+                        </div>
+                       <div>
+                           <br/>
+                           <table class="table table-condensed" style="border: 1px solid black;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Code</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Name</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Department</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">DOJ</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">DOB</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Birthday</b>
+                                        </th>
+                                    </tr>
+                                </thead>
+                               <t t-foreach="employees" t-as="employee">
+                                   
+                                   <tbody class="invoice_tbody">
+                                       <tr style="border: 1px solid black">
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['emp_code']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['name']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['dep_name']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['doj']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['dob']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['birthday']"/>
+                                           </td>
+                                       </tr>
+                                   </tbody>
+                               </t>
+                           </table>
+                       </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

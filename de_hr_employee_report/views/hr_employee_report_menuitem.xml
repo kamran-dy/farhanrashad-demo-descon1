@@ -31,6 +31,11 @@
                   parent="hr.hr_menu_hr_reports"
                   action="de_hr_employee_report.action_employee_information_wizard" sequence="8"
         />
+        <menuitem id="menu_dob_report"
+                  name="DOB Report"
+                  parent="hr.hr_menu_hr_reports"
+                  action="de_hr_employee_report.action_dob_wizard" sequence="9"
+        />
     </data>
 </odoo>
 
