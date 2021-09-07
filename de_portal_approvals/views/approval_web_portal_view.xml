@@ -237,19 +237,7 @@
                    
                    
                        
-                    <t t-if='approval.allocation_id'>
-                   <h3><p style='color:blue;'>Details</p></h3>
-                       <br/>    
-                   <div class="row mb-4">
-                        <div class="col-12 col-md-6 mb-1">
-                            <strong>Overtime Date:</strong> <span t-field="approval.allocation_id.overtime_id.actual_ovt_hours" />
-                        </div>
-                        <div class="col-12 col-md-6" t-if="approval.id">
-                            <strong>Overtime Hours:</strong> <span t-field="approval.allocation_id.overtime_id.date" />
-                        </div>
-                    </div>
-                   <br/>
-                   </t>   
+                   
                    <t t-if='approval.leave_id'>
                    <h3><p style='color:blue;'>Details</p></h3>
                        <br/>    
@@ -347,6 +335,19 @@
                    <t t-if='not approval.rectification_id'>  
                      <h3><p style='color:blue;'>Details</p></h3>
                      <br/>
+                      <t t-if='approval.allocation_id'>
+                   
+                       <br/>    
+                   <div class="row mb-4">
+                        <div class="col-12 col-md-6 mb-1">
+                            <strong>Overtime Date:</strong> <span t-field="approval.allocation_id.overtime_id.date" />
+                        </div>
+                        <div class="col-12 col-md-6" t-if="approval.id">
+                            <strong>Overtime Hours:</strong> <span t-field="approval.allocation_id.overtime_id.actual_ovt_hours" />
+                        </div>
+                    </div>
+                   <br/>
+                   </t>   
                     <div class="row"> 
                         <div t-attf-class="col-12 col-lg-12  mb-md-0 ">
                             <hr class="mb-1"/>
