@@ -13,6 +13,8 @@ class EmployeeDOBPDF(models.AbstractModel):
 
     def _get_report_values(self, docids, data):
         
+        todays_date = date.today()
+        todays_year = todays_date.year
         company_ids = self.env['res.company'].search([('id', 'in', data['company_ids'])])
         companyids = []
         for rec in company_ids:
@@ -30,7 +32,7 @@ class EmployeeDOBPDF(models.AbstractModel):
                 department = contract.employee_id.department_id.name
                 doj = contract.employee_id.date.strftime("%d-%m-%Y")
                 dob = contract.employee_id.birthday.strftime("%d-%m-%y")
-                birthday = contract.employee_id.birthday.strftime("%d-%m-2020")
+                birthday = contract.employee_id.birthday.strftime("%d-%m-{}".format(todays_year))
                 company = contract.employee_id.company_id.name
                 #raise UserError(emp_code)
                 
