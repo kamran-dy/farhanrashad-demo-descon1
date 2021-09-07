@@ -8,6 +8,14 @@
                   <field name="state">code</field>
                   <field name="code">action = records.action_attendace_validated() </field>
     </record>
+    <record id="view_oracle_attendance_server_action" model="ir.actions.server">
+                  <field name="name">View Oracle Attendance</field>
+                  <field name="model_id" ref="de_oracle_attendance_connector.model_hr_user_attendance"/>
+                  <field name="binding_model_id" ref="de_oracle_attendance_connector.model_hr_user_attendance"/>            
+                  <field name="binding_view_types">list</field>
+                  <field name="state">code</field>
+                  <field name="code">action = records.action_view_attendance_data() </field>
+    </record>
     
     <record id="hr_attendance_process_calculation_server_action" model="ir.actions.server">
                   <field name="name">Process Attendance</field>

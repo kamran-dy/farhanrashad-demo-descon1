@@ -5,6 +5,7 @@ from datetime import date, datetime, timedelta
 from odoo import exceptions
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError, ValidationError
+import cx_Oracle
 
 class HrUserAttendance(models.Model):
     _name = 'hr.user.attendance'
@@ -24,13 +25,24 @@ class HrUserAttendance(models.Model):
     remarks = fields.Char(string='Remarks')
     updation_date = fields.Char(string='Updation Date')
     is_attedance_created = fields.Boolean(string="Attendance Posted")
+
+    
+    def action_view_attendance_data(self):
+        user_attendance = self.env['hr.user.attendance']
+        attendance_ids = []
+        conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
+        cur = conn.cursor()
+        statement = 'select count(*) from attend_data p where p.creation_date >= sysdate-8'
+        cur.execute(statement)
+        attendances = cur.fetchall()
+        raise UserError(str(attendances))
     
       
 
     def action_attendace_validated(self):
         
         month_datetime = fields.date.today() - timedelta(2)
-        for month_date in range(2):
+        for month_date in range(3):
             attendance_date1 =  month_datetime + timedelta(month_date)
             total_employee = self.env['hr.employee'].search([])
             for employee in total_employee:

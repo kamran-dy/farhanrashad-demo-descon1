@@ -55,12 +55,24 @@ class OracleSettingConnector(models.Model):
         except Exception as e:
             raise ValidationError(e)
 
+
+    def action_view_attendance_data(self):
+        user_attendance = self.env['hr.user.attendance']
+        attendance_ids = []
+        conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
+        cur = conn.cursor()
+        statement = 'select count(*) from attend_data p where p.creation_date >= sysdate-8'
+        cur.execute(statement)
+        attendances = cur.fetchall()
+        raise UserError(str(attendances))
+
+
     def action_get_attendance_data(self):
         user_attendance = self.env['hr.user.attendance']
         attendance_ids = []
         conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
         cur = conn.cursor()
-        statement = 'select p.att_time AS timestamp, p.mac_number AS machine, p.card_no AS card, p.att_date AS attendance_date, p.creation_date AS creation_date, p.remarks AS remarks, p.updation_date AS updation_date from attend_data p where p.creation_date >= sysdate-2'
+        statement = 'select p.att_time AS timestamp, p.mac_number AS machine, p.card_no AS card, p.att_date AS attendance_date, p.creation_date AS creation_date, p.remarks AS remarks, p.updation_date AS updation_date from attend_data p where p.creation_date >= sysdate-3'
         cur.execute(statement)
         attendances = cur.fetchall()
         for attendance in attendances:
