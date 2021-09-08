@@ -4,7 +4,8 @@ import time
 from odoo import api, models, _
 from odoo.exceptions import UserError
 from dateutil.relativedelta import relativedelta
-from datetime import date
+from datetime import datetime
+from datetime import date, datetime, timedelta
 
 
 class EmployeeDOBPDF(models.AbstractModel):
@@ -31,7 +32,7 @@ class EmployeeDOBPDF(models.AbstractModel):
                 name = contract.employee_id.name
                 department = contract.employee_id.department_id.name
                 doj = contract.employee_id.date.strftime("%d-%m-%Y")
-                dob = contract.employee_id.birthday.strftime("%d-%m-%y")
+                dob = contract.employee_id.birthday
                 birthday = contract.employee_id.birthday.strftime("%d-%m-{}".format(todays_year))
                 company = contract.employee_id.company_id.name
                 #raise UserError(emp_code)

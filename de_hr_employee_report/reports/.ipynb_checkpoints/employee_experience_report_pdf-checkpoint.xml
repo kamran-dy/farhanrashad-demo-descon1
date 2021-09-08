@@ -1,7 +1,7 @@
 <odoo>
     <data>
         <record id="paperformat_custom" model="report.paperformat">
-            <field name="name">Employee DOB</field>
+            <field name="name">Employee Experience</field>
             <field name="default" eval="True"/>
             <field name="format">A4</field>
             <field name="page_height">0</field>
@@ -12,7 +12,7 @@
             <field name="margin_left">7</field>
             <field name="margin_right">7</field>
             <field name="header_line" eval="False"/>
-            <field name="header_spacing">3</field>
+            <field name="header_spacing">0</field>
             <field name="dpi">90</field>
         </record>
         
@@ -22,7 +22,7 @@
 
         </record> -->
         
-        <template id="employee_dob_pdf">
+        <template id="employee_experience_pdf">
             <t t-call="web.html_container">
                 <t t-call="web.external_layout">
                     <div class="header">
@@ -37,7 +37,7 @@
                                 <div class="col-6">
                                     <h1 style="font-size:20px;color:blue;"><strong t-esc="employees[0]['company']"/></h1>
                                     <br></br>
-                                    <a style="font-weight:bold;font-size:20px;color:blue;">Employee's Birthday Report</a>
+                                    <a style="font-weight:bold;font-size:20px;color:blue;">Employee's Experience Report</a>
                                 </div>
                             </div>
                         </div>
@@ -47,10 +47,22 @@
                                 <thead>
                                     <tr>
                                         <th style="border: 1px solid black">
-                                            <b style="color:black">Code</b>
+                                            <b style="color:black">Sr. #</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Company</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Emp #</b>
                                         </th>
                                         <th style="border: 1px solid black">
                                             <b style="color:black">Name</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Designation</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Grade</b>
                                         </th>
                                         <th style="border: 1px solid black">
                                             <b style="color:black">Department</b>
@@ -59,10 +71,13 @@
                                             <b style="color:black">DOJ</b>
                                         </th>
                                         <th style="border: 1px solid black">
-                                            <b style="color:black">DOB</b>
+                                            <b style="color:black">Years</b>
                                         </th>
                                         <th style="border: 1px solid black">
-                                            <b style="color:black">Birthday</b>
+                                            <b style="color:black">Months</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Days</b>
                                         </th>
                                     </tr>
                                 </thead>
@@ -71,22 +86,37 @@
                                    <tbody class="invoice_tbody">
                                        <tr style="border: 1px solid black">
                                            <td style="border: 1px solid black">
+                                               <span t-esc="employee['sr_no']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['company']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
                                                <span t-esc="employee['emp_code']"/>
                                            </td>
                                            <td style="border: 1px solid black">
                                                <span t-esc="employee['name']"/>
                                            </td>
                                            <td style="border: 1px solid black">
-                                               <span t-esc="employee['dep_name']"/>
+                                               <span t-esc="employee['designation']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['grade']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['department']"/>
                                            </td>
                                            <td style="border: 1px solid black">
                                                <span t-esc="employee['doj']"/>
                                            </td>
                                            <td style="border: 1px solid black">
-                                               <span t-esc="employee['dob']"/>
+                                               <span t-esc="employee['years']"/>
                                            </td>
                                            <td style="border: 1px solid black">
-                                               <span t-esc="employee['birthday']"/>
+                                               <span t-esc="employee['months']"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="employee['days']"/>
                                            </td>
                                        </tr>
                                    </tbody>

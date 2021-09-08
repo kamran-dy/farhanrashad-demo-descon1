@@ -47,5 +47,14 @@
             <field name="report_file">de_hr_employee_report.employee_dob_pdf</field>
         </record>
         
+        <record id="employee_experience" model="ir.actions.report">
+            <field name="name">Employee Experience</field>
+            <field name="model">employee.experience</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">de_hr_employee_report.employee_experience_pdf</field>
+            <field name="report_file">de_hr_employee_report.employee_experience_pdf</field>
+        </record>
+        
+        
     </data>
 </odoo>

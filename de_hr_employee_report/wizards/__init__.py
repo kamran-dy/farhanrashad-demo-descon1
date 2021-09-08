@@ -4,3 +4,4 @@ from . import cost_center_distribution_wizard
 from . import employee_age_wizard
 from . import employee_information_wizard
 from . import dob_wizard
+from . import employee_experience_wizard

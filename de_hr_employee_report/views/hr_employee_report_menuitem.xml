@@ -36,6 +36,11 @@
                   parent="hr.hr_menu_hr_reports"
                   action="de_hr_employee_report.action_dob_wizard" sequence="9"
         />
+        <menuitem id="menu_experience_report"
+                  name="Experience Report"
+                  parent="hr.hr_menu_hr_reports"
+                  action="de_hr_employee_report.action_experience_wizard" sequence="10"
+        />
     </data>
 </odoo>
 
