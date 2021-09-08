@@ -258,8 +258,8 @@ class HrGenerateShift(models.Model):
                             'wizard_generate_id': self.id,
                             'date': date_after_month,
                             'day': day_week.id,
-                            'first_shift_id':False,
-                            'second_shift_id': False,
+                            'first_shift_id':shift_one,
+                            'second_shift_id': shift_two,
                             'rest_day': rest_day
                         }
                         self.env['hr.shift.schedule.generate.line'].create(vals)
@@ -285,6 +285,9 @@ class HrGenerateShift(models.Model):
         """Create mass schedule for all departments based on the shift scheduled in corresponding employee's contract"""
         
         if self.employee_ids:
+            shift_schedule = self.env['hr.shift.schedule'].search([('end_date','>',self.start_date),('employee_id','in',self.employee_ids.ids),('state','in',['posted','draft'])], limit=1)
+            if shift_schedule:
+                raise UserError('Not Allow to create Duplicate Shift for Employee! '+str(shift_schedule.employee_id.name)) 
             for employee in self.employee_ids:  
                 vals = {
                     'start_date': self.start_date,
