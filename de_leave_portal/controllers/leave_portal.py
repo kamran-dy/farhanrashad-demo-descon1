@@ -27,7 +27,7 @@ import json
 def timeoff_page_content(flag = 0):
     leave_type = request.env['hr.leave.type'].search([('is_publish','=', True)])
     employees = request.env['hr.employee'].sudo().search([('user_id','=',http.request.env.context.get('uid'))])
-    leave_allocation = request.env['hr.leave.allocation'].sudo().search([('employee_id.user_id', '=', http.request.env.context.get('uid'),('max_leaves','>',0.0) )])
+    leave_allocation = request.env['hr.leave.allocation'].sudo().search([('employee_id.user_id', '=', http.request.env.context.get('uid'))])
     
     company_info = request.env['res.users'].sudo().search([('id','=',http.request.env.context.get('uid'))])
     managers = employees.line_manager
