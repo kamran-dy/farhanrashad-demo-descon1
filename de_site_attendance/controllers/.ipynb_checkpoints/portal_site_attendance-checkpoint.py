@@ -109,24 +109,41 @@ class CreateAttendance(http.Controller):
         }
         record = request.env['hr.attendance.site'].sudo().create(siteattendane_val)
         count = 0
+        inncount = 0
         for worker in site_attendance_vals_list:
+            
+            inncount += 1
+            if inncount > 1:
+                totaldays = kw.get('days')+ ' Attendance Days' 
+                totaldaysa = int(kw.get('days'))
+                if float(worker['col2']) > (totaldaysa + 1) :
+                    date_from = kw.get('date_from')
+                    date_to = kw.get('date_to')
+                    return request.render("de_site_attendance.cannot_submit_greater_days", site_attendance_lines_content_constrains(totaldays, int(siteworker['col1'])))
+                totaldays = kw.get('days')+ ' Attendance Days' 
+                totaldaysa = int(kw.get('days'))
+                normal_ovt_limit = request.env['hr.overtime.rule'].search([('company_id','=',employees.company_id.id),('rule_type','=', 'maximum'),('rule_period','=','month')])
+                if not normal_ovt_limit:
+                    normal_ovt_limit =  request.env['hr.overtime.rule'].search([('rule_type','=', 'maximum'),('rule_period','=','month')])   
+                if normal_ovt_limit:
+                    if float(worker['col3']) > normal_ovt_limit.hours:
+                        totaldays =  str(normal_ovt_limit.hours) + ' Normal OverTime'
+                        return request.render("de_site_attendance.cannot_submit_greater_days", site_attendance_lines_content_constrains(totaldays, int(worker['col1'])))
+                    if float(worker['col4']) > normal_ovt_limit.hours:
+                        totaldays =  str(normal_ovt_limit.hours) + ' Gazetted OverTime'
+                        return request.render("de_site_attendance.cannot_submit_greater_days", site_attendance_lines_content_constrains(totaldays, int(worker['col1']))) 
+        
+        for siteworker in site_attendance_vals_list:
             count += 1
             if count > 1:
-                if float(worker['col2']) > 0.0:
-                    totaldays = int(kw.get('days'))
-                    
-                    if float(worker['col2']) > (totaldays + 1) :
-                        date_from = kw.get('date_from')
-                        date_to = kw.get('date_to')
-                        return request.render("de_site_attendance.cannot_submit_greater_days", site_attendance_lines_content_constrains(totaldays, int(worker['col1'])))
-                    line_vals = {
+                line_vals = {
                         'site_id': record.id,
-                        'employee_id': int(worker['col1']),
-                        'days': float(worker['col2']),
-                        'normal_overtime': float(worker['col3']),
-                        'gazetted_overtime':  float(worker['col4']),
+                        'employee_id': int(siteworker['col1']),
+                        'days': float(siteworker['col2']),
+                        'normal_overtime': float(siteworker['col3']),
+                        'gazetted_overtime':  float(siteworker['col4']),
                         }
-                    record_lines = request.env['hr.attendance.site.line'].sudo().create(line_vals)
+                record_lines = request.env['hr.attendance.site.line'].sudo().create(line_vals)
         employee_list_attendance = []
         return request.render("de_site_attendance.site_attendane_submited", {})
     

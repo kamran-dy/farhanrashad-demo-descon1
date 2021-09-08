@@ -119,6 +119,16 @@
             </t>
             <t t-if="emps">
                 <form id="portal_site_attendance_form_line" data-toggle="validator" action="/hr/site/attendance/line/save">
+                <table class="table table-sm table-striped table-bordered"   id="datepanel">
+                           
+                            
+                            <tr>
+                                <th class="text-left">Date From</th>
+                                <td class="text-left"><span t-esc='date_from'  t-options='{"widget": "date"}' /></td>
+                                <th class="text-left">Date To</th>
+                                <td class="text-left"><span t-esc='date_to' t-options='{"widget": "date"}' /></td>
+                            </tr>
+                </table>                
                 <table class="table table-sm table-striped table-bordered"   id="siteattendanceTable">
                            
                             
@@ -233,16 +243,12 @@
 	                                   <div class="container">
 	                                       <div class="row">
 	                                       		<div class="row">
-			                                       <h1 class="text-center"><i class="fa fa-times fa-2x text-fail" role="img" aria-label="Fail" title="fail"/></h1>
+			                                       <h1 class="text-center"></h1>
 			                                       <h5>Not Allowed to Submit Days greater than! </h5>		
-                                                    <h3><span t-esc='diff_date'/></h3>   
-                                                    <p>For Employee</p>
-                                                    <h3><span t-esc='employee'/></h3>
-		                                           <div class='section-custom col-md-12'>
-						                              <a class="mb-5" id="checkin-rectify-back" t-attf-href="/hr/attendance/rectify">
-						                                   <button t-attf-class="btn btn-primary #{'col-md-10' if multi_type else 'col-md-12'} mb-2">Go Back</button>
-						                               </a>
-						                           </div>
+                                                    <h5><span t-esc='diff_date'/></h5>   
+                                                    <p>For Employee </p><br/>
+                                                    <h5><span t-esc='employee'/></h5>
+		                                           
 			                                     </div>
 	                                       </div>
 	                                   </div>
