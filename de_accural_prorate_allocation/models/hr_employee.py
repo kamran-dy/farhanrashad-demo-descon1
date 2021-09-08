@@ -24,16 +24,16 @@ class HREmployee(models.Model):
                     , ('company_id', '=', employee.company_id.id)])
             if employee.date and time_off_for_probation:
                 if employee.date.year == current_date.year:
-                    if employee.confirm_date > current_date:
-                        if employee.emp_type == 'permanent' or employee.emp_type == 'contractor':
-                            if employee.probation_leaves_allocated == False:
-                                for timeoff in time_off_for_probation:
-                                    temp = ''
-                                    if timeoff.request_unit == 'day':
-                                        temp = 'days'
-                                    elif timeoff.request_unit == 'hour':
-                                        temp = 'hours'
-                                    vals = {
+                    
+                    if employee.emp_type == 'permanent' or employee.emp_type == 'contractor':
+                        if employee.probation_leaves_allocated == False:
+                            for timeoff in time_off_for_probation:
+                                temp = ''
+                                if timeoff.request_unit == 'day':
+                                    temp = 'days'
+                                elif timeoff.request_unit == 'hour':
+                                    temp = 'hours'
+                                vals = {
                                         'name': 'Probation Allocation For ' + employee.name,
                                         'holiday_status_id': timeoff.id,
                                         'allocation_type': 'accrual',
@@ -46,29 +46,29 @@ class HREmployee(models.Model):
                                         'number_of_days': 0,
                                         'interval_number': 30,
                                         'interval_unit': 'days',
-                                    }
-                                    if timeoff.request_unit == 'day':
-                                        vals.update({
+                                }
+                                if timeoff.request_unit == 'day':
+                                    vals.update({
                                             'number_of_days_display': 0.0,
                                         })
-                                    elif timeoff.request_unit == 'hour':
-                                        vals.update({
+                                elif timeoff.request_unit == 'hour':
+                                    vals.update({
                                             'number_of_hours_display': 0.0,
                                         })
-                                    leave_obj = self.env['hr.leave.allocation'].create(vals)
-                                    if timeoff.leave_validation_type == 'both':
-                                        leave_obj.action_approve()
-                                        if leave_obj.state == 'validate':
-                                            pass
-                                        else:
-                                            leave_obj.action_validate()
+                                leave_obj = self.env['hr.leave.allocation'].create(vals)
+                                if timeoff.leave_validation_type == 'both':
+                                    leave_obj.action_approve()
+                                    if leave_obj.state == 'validate':
+                                        pass
                                     else:
-                                        leave_obj.action_approve()
+                                        leave_obj.action_validate()
+                                else:
+                                    leave_obj.action_approve()
 
-                                    if leave_obj:
-                                        employee.probation_leaves_allocated = True
-                            else:
-                                pass
+                                if leave_obj:
+                                    employee.probation_leaves_allocated = True
+                        else:
+                            pass
 
     def schedular_confirmation(self):
         """
