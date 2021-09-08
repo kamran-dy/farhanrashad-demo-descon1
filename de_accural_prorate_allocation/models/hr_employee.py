@@ -145,7 +145,7 @@ class HREmployee(models.Model):
                                 if employee.emp_type == 'permanent':
                                     end_month = date(employee.confirm_date.year, 12, 31)
                                     delta = end_month - employee.confirm_date
-                                    remaining = (delta.days / 365) * 12
+                                    remaining = (delta.days / 365) * 21
                                     num_of_days = (12 / 12) * remaining
                                 elif employee.emp_type == 'contractor':
                                     num_of_days = 0
