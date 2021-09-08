@@ -83,8 +83,10 @@ class CreateAttendance(http.Controller):
         to_days = inchasrge_employee.company_id.to_date
         total_days = inchasrge_employee.company_id.from_date + inchasrge_employee.company_id.to_date
         today_date = fields.date.today()
-        month_date_from = fields.date.today() - timedelta(today_date.day) 
-        date_from = month_date_from + timedelta(inchasrge_employee.company_id.from_date) 
+        month_date_fromcurr = fields.date.today() - timedelta(today_date.day) 
+        replmonth_date_from = month_date_fromcurr - timedelta(1)
+        month_date_from = replmonth_date_from.replace(day=1)
+        date_from = month_date_from - timedelta(1)  + timedelta(inchasrge_employee.company_id.from_date) 
         to_date = date_from + timedelta(total_days)
         diff_to_date = to_date.day -  to_days
         date_to = to_date - timedelta(diff_to_date)
