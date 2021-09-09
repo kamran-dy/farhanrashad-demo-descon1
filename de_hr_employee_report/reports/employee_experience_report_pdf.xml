@@ -42,8 +42,15 @@
                             </div>
                         </div>
                        <div>
-                           <br/>
-                           <table class="table table-condensed" style="border: 1px solid black;">
+                        <br/>           
+                        <t t-set="e_type" t-value="[]"/>
+                        <t t-foreach="employees" t-as="e">
+                            <t t-set="e_type" t-value="e_type+[e['emp_type']]"/>
+                        </t>
+                        <t t-foreach="set(e_type)" t-as="e">
+                            <div style="page-break-after:avoid;"/>
+                            <div><span t-esc="e" style="font-size:50px;margin-top: 500px;line-height: 200%"/></div>
+                            <table class="table table-condensed" style="border: 1px solid black;">
                                 <thead>
                                     <tr>
                                         <th style="border: 1px solid black">
@@ -79,53 +86,60 @@
                                         <th style="border: 1px solid black">
                                             <b style="color:black">Days</b>
                                         </th>
+
                                     </tr>
                                 </thead>
-                               <t t-foreach="employees" t-as="employee">
-                                   
-                                   <tbody class="invoice_tbody">
-                                       <tr style="border: 1px solid black">
-                                           <td style="border: 1px solid black">
-                                               <span t-esc="employee['sr_no']"/>
-                                           </td>
-                                           <td style="border: 1px solid black">
-                                               <span t-esc="employee['company']"/>
-                                           </td>
-                                           <td style="border: 1px solid black">
-                                               <span t-esc="employee['emp_code']"/>
-                                           </td>
-                                           <td style="border: 1px solid black">
-                                               <span t-esc="employee['name']"/>
-                                           </td>
-                                           <td style="border: 1px solid black">
-                                               <span t-esc="employee['designation']"/>
-                                           </td>
-                                           <td style="border: 1px solid black">
-                                               <span t-esc="employee['grade']"/>
-                                           </td>
-                                           <td style="border: 1px solid black">
-                                               <span t-esc="employee['department']"/>
-                                           </td>
-                                           <td style="border: 1px solid black">
-                                               <span t-esc="employee['doj']"/>
-                                           </td>
-                                           <td style="border: 1px solid black">
-                                               <span t-esc="employee['years']"/>
-                                           </td>
-                                           <td style="border: 1px solid black">
-                                               <span t-esc="employee['months']"/>
-                                           </td>
-                                           <td style="border: 1px solid black">
-                                               <span t-esc="employee['days']"/>
-                                           </td>
-                                       </tr>
-                                   </tbody>
-                               </t>
-                           </table>
+                                <t t-foreach="employees" t-as="em">
+                                    <t t-if="e==em['emp_type']">
+                                        <tbody class="invoice_tbody">
+                                            <tr style="border: 1px solid black">
+                                                
+                                               <td style="border: 1px solid black">
+                                                   <span t-esc="em['sr_no']"/>
+                                               </td>
+                                               <td style="border: 1px solid black">
+                                                   <span t-esc="em['company']"/>
+                                               </td>
+                                               <td style="border: 1px solid black">
+                                                   <span t-esc="em['emp_code']"/>
+                                               </td>
+                                               <td style="border: 1px solid black">
+                                                   <span t-esc="em['name']"/>
+                                               </td>
+                                               <td style="border: 1px solid black">
+                                                   <span t-esc="em['designation']"/>
+                                               </td>
+                                               <td style="border: 1px solid black">
+                                                   <span t-esc="em['grade']"/>
+                                               </td>
+                                               <td style="border: 1px solid black">
+                                                   <span t-esc="em['department']"/>
+                                               </td>
+                                               <td style="border: 1px solid black">
+                                                   <span t-esc="em['doj']"/>
+                                               </td>
+                                               <td style="border: 1px solid black">
+                                                   <span t-esc="em['years']"/>
+                                               </td>
+                                               <td style="border: 1px solid black">
+                                                   <span t-esc="em['months']"/>
+                                               </td>
+                                               <td style="border: 1px solid black">
+                                                   <span t-esc="em['days']"/>
+                                               </td>
+                                           </tr>
+                                        </tbody>
+                                    
+                                    </t>
+                                </t>
+                            </table>
+                            <div style="page-break-after:always;margin-top: 500px;line-height: 200%"/>
+<!--                             <div style='clear:both;'></div> -->
+                        </t>
                        </div>
                     </div>
                 </t>
             </t>
         </template>
-    </data>
+    </data>s
 </odoo>

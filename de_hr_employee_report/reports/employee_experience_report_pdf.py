@@ -6,6 +6,7 @@ from odoo.exceptions import UserError
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from datetime import date, datetime, timedelta
+from itertools import groupby
 
 
 class EmployeeExperiencePDF(models.AbstractModel):
@@ -36,6 +37,7 @@ class EmployeeExperiencePDF(models.AbstractModel):
             for contract in active_contract:
                 employee_dict = dict()
                 sr_no = count
+                e_type = contract.employee_id.emp_type
                 company = contract.employee_id.company_id.name
                 emp_code =  contract.employee_id.emp_number
                 name = contract.employee_id.name
@@ -52,6 +54,7 @@ class EmployeeExperiencePDF(models.AbstractModel):
                 employee_dict['sr_no'] = sr_no
                 employee_dict['company'] = company
                 employee_dict['emp_code'] = emp_code
+                employee_dict['emp_type'] = e_type
                 employee_dict['name'] = name
                 employee_dict['designation'] = designation
                 employee_dict['grade'] = grade
@@ -70,6 +73,7 @@ class EmployeeExperiencePDF(models.AbstractModel):
             for contract in active_contract:
                 employee_dict = dict()
                 sr_no = count
+                e_type = contract.employee_id.emp_type
                 company = contract.employee_id.company_id.name
                 emp_code =  contract.employee_id.emp_number
                 name = contract.employee_id.name
@@ -86,6 +90,7 @@ class EmployeeExperiencePDF(models.AbstractModel):
                 employee_dict['sr_no'] = sr_no
                 employee_dict['company'] = company
                 employee_dict['emp_code'] = emp_code
+                employee_dict['emp_type'] = e_type
                 employee_dict['name'] = name
                 employee_dict['designation'] = designation
                 employee_dict['grade'] = grade
@@ -104,6 +109,7 @@ class EmployeeExperiencePDF(models.AbstractModel):
             for contract in active_contract:
                 employee_dict = dict()
                 sr_no = count
+                e_type = contract.employee_id.emp_type
                 company = contract.employee_id.company_id.name
                 emp_code =  contract.employee_id.emp_number
                 name = contract.employee_id.name
@@ -120,6 +126,7 @@ class EmployeeExperiencePDF(models.AbstractModel):
                 employee_dict['sr_no'] = sr_no
                 employee_dict['company'] = company
                 employee_dict['emp_code'] = emp_code
+                employee_dict['emp_type'] = e_type
                 employee_dict['name'] = name
                 employee_dict['designation'] = designation
                 employee_dict['grade'] = grade
@@ -131,6 +138,8 @@ class EmployeeExperiencePDF(models.AbstractModel):
                 employees.append(employee_dict)
         
         employees = sorted(employees, key = lambda i: i['emp_code'])
+        
+        
                     
         return {
             'doc_ids': self.ids,
