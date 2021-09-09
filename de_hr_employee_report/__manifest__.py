@@ -11,7 +11,7 @@
     "sequence": 1,
     "author": "Dynexcel",
     "website": "http://www.dynexcel.co",
-    "version": '14.1.0.0',
+    "version": '14.1.0.1',
     # "depends": ['base', 'hr', 'report_xlsx', 'de_employee_enhancement'],
     "depends": ['base', 'hr','account', 'report_xlsx', 'de_employee_overtime'],
     "data": [

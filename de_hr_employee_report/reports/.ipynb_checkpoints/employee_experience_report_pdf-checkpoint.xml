@@ -47,6 +47,7 @@
                         <t t-foreach="employees" t-as="e">
                             <t t-set="e_type" t-value="e_type+[e['emp_type']]"/>
                         </t>
+                        <t t-set="count" t-value="1"/>
                         <t t-foreach="set(e_type)" t-as="e">
                             <div style="page-break-after:avoid;"/>
                             <div><span t-esc="e" style="font-size:50px;margin-top: 500px;line-height: 200%"/></div>
@@ -95,7 +96,7 @@
                                             <tr style="border: 1px solid black">
                                                 
                                                <td style="border: 1px solid black">
-                                                   <span t-esc="em['sr_no']"/>
+                                                   <span t-esc="count"/>
                                                </td>
                                                <td style="border: 1px solid black">
                                                    <span t-esc="em['company']"/>
@@ -127,6 +128,7 @@
                                                <td style="border: 1px solid black">
                                                    <span t-esc="em['days']"/>
                                                </td>
+                                                <t t-set="count" t-value="count+1"/>
                                            </tr>
                                         </tbody>
                                     

@@ -27,12 +27,19 @@ class EmployeeExperiencePDF(models.AbstractModel):
         
         gr_type = ','.join(g_type)
         
+        company_ids = self.env['res.company'].search([('id', 'in', data['company_ids'])])
+        companyids = []
+        for rec in company_ids:
+            companyids.append(rec.name)
+        
         employees = []
         
-        if employee_type and grade_type:
+        if employee_type and grade_type and companyids:
             active_contract = self.env['hr.contract'].search([('state', '=', 'open'),
                                                               ('employee_id.emp_type', 'in', employee_type),
-                                                              ('employee_id.grade_type', 'in', g_type)])
+                                                              ('employee_id.grade_type', 'in', g_type),
+                                                                ('employee_id.company_id', 'in', companyids),
+                                                             ])
             count = 1
             for contract in active_contract:
                 employee_dict = dict()
@@ -65,6 +72,115 @@ class EmployeeExperiencePDF(models.AbstractModel):
                 employee_dict['days'] = days
                 employees.append(employee_dict)
         
+        elif grade_type and companyids:
+            active_contract = self.env['hr.contract'].search([('state', '=', 'open'),
+                                                              ('employee_id.grade_type', 'in', g_type),
+                                                                ('employee_id.company_id', 'in', companyids),
+                                                             ])
+            count = 1
+            for contract in active_contract:
+                employee_dict = dict()
+                sr_no = count
+                e_type = contract.employee_id.emp_type
+                company = contract.employee_id.company_id.name
+                emp_code =  contract.employee_id.emp_number
+                name = contract.employee_id.name
+                designation = contract.employee_id.job_id.name
+                grade = contract.employee_id.grade_designation.name
+                department = contract.employee_id.department_id.name
+                doj = contract.employee_id.date
+                years = relativedelta(date.today(),doj).years
+                months = relativedelta(date.today(),doj).months
+                days = relativedelta(date.today(),doj).days
+                
+                count = count + 1
+                
+                employee_dict['sr_no'] = sr_no
+                employee_dict['company'] = company
+                employee_dict['emp_code'] = emp_code
+                employee_dict['emp_type'] = e_type
+                employee_dict['name'] = name
+                employee_dict['designation'] = designation
+                employee_dict['grade'] = grade
+                employee_dict['department'] = department
+                employee_dict['doj'] = doj
+                employee_dict['years'] = years
+                employee_dict['months'] = months
+                employee_dict['days'] = days
+                employees.append(employee_dict)
+        
+        elif employee_type and companyids:
+            active_contract = self.env['hr.contract'].search([('state', '=', 'open'),
+                                                              ('employee_id.emp_type', 'in', employee_type),
+                                                                ('employee_id.company_id', 'in', companyids),
+                                                             ])
+            count = 1
+            for contract in active_contract:
+                employee_dict = dict()
+                sr_no = count
+                e_type = contract.employee_id.emp_type
+                company = contract.employee_id.company_id.name
+                emp_code =  contract.employee_id.emp_number
+                name = contract.employee_id.name
+                designation = contract.employee_id.job_id.name
+                grade = contract.employee_id.grade_designation.name
+                department = contract.employee_id.department_id.name
+                doj = contract.employee_id.date
+                years = relativedelta(date.today(),doj).years
+                months = relativedelta(date.today(),doj).months
+                days = relativedelta(date.today(),doj).days
+                
+                count = count + 1
+                
+                employee_dict['sr_no'] = sr_no
+                employee_dict['company'] = company
+                employee_dict['emp_code'] = emp_code
+                employee_dict['emp_type'] = e_type
+                employee_dict['name'] = name
+                employee_dict['designation'] = designation
+                employee_dict['grade'] = grade
+                employee_dict['department'] = department
+                employee_dict['doj'] = doj
+                employee_dict['years'] = years
+                employee_dict['months'] = months
+                employee_dict['days'] = days
+                employees.append(employee_dict)
+        
+        elif companyids:
+            active_contract = self.env['hr.contract'].search([('state', '=', 'open'),
+                                                              ('employee_id.company_id', 'in', companyids)
+                                                            ])
+            count = 1
+            for contract in active_contract:
+                employee_dict = dict()
+                sr_no = count
+                e_type = contract.employee_id.emp_type
+                company = contract.employee_id.company_id.name
+                emp_code =  contract.employee_id.emp_number
+                name = contract.employee_id.name
+                designation = contract.employee_id.job_id.name
+                grade = contract.employee_id.grade_designation.name
+                department = contract.employee_id.department_id.name
+                doj = contract.employee_id.date
+                years = relativedelta(date.today(),doj).years
+                months = relativedelta(date.today(),doj).months
+                days = relativedelta(date.today(),doj).days
+                
+                count = count + 1
+                
+                employee_dict['sr_no'] = sr_no
+                employee_dict['company'] = company
+                employee_dict['emp_code'] = emp_code
+                employee_dict['emp_type'] = e_type
+                employee_dict['name'] = name
+                employee_dict['designation'] = designation
+                employee_dict['grade'] = grade
+                employee_dict['department'] = department
+                employee_dict['doj'] = doj
+                employee_dict['years'] = years
+                employee_dict['months'] = months
+                employee_dict['days'] = days
+                employees.append(employee_dict)
         elif employee_type:
             active_contract = self.env['hr.contract'].search([('state', '=', 'open'),
                                                               ('employee_id.emp_type', 'in', employee_type)
