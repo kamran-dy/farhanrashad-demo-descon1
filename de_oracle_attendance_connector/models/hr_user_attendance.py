@@ -32,9 +32,20 @@ class HrUserAttendance(models.Model):
         attendance_ids = []
         conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
         cur = conn.cursor()
-        statement = 'select count(*) from attend_data p where p.creation_date >= sysdate-8'
+        statement = 'select count(*) from attend_data'
         cur.execute(statement)
         attendances = cur.fetchall()
+        raise UserError(str(attendances))
+
+
+    def action_view_attendance_data_record(self):
+        user_attendance = self.env['hr.user.attendance']
+        attendance_ids = []
+        conn = cx_Oracle.connect('xx_odoo/xxodoo123$@//10.8.8.191:1521/PROD')
+        cur = conn.cursor()
+        statement = 'select * from attend_data where att_date=TRUNC(sysdate)'
+        cur.execute(statement)
+        attendances = cur.fetchone()
         raise UserError(str(attendances))
     
       

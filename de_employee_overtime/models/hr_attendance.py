@@ -160,8 +160,8 @@ class HrAttendance(models.Model):
             month_ovt_hours = 0
             month_total_hours = 0
             attendance_ids = []
-
-            employee_attendance = self.env['hr.attendance'].search([('is_overtime','=',False),('employee_id','=',employee.id)])
+            date_of_execution = fields.date.today() - timedelta(9)
+            employee_attendance = self.env['hr.attendance'].search([('is_overtime','=',False),('employee_id','=',employee.id),('att_date','>=',date_of_execution)])
             for attendance in employee_attendance:
                 overtime_request = self.env['hr.overtime.request'].search([('employee_id','=', employee.id),('date','>=',attendance.check_in),('date','<=',attendance.check_out)])
                 ovt_hours = 0
@@ -173,22 +173,24 @@ class HrAttendance(models.Model):
                         overtime_limit = attendance.rounded_hours - employee.shift_id.hours_per_day
                     else:
                         overtime_limit = attendance.rounded_hours - 8
-                    request_date = fields.date.today()
+                    request_date = attendance.att_date
                     if attendance.check_in:
                         request_date = attendance.check_in
-                    ovt_request_date = request_date.strftime('%Y-%m-%d')
+                    ovt_request_date = attendance.att_date.strftime('%Y-%m-%d')
                     # get normal overtime type
                     overtime_type = self.get_normal_overtime_type(employee_company, work_location)
 
                     for gazetted_day in attendance.shift_id.global_leave_ids:
-                        if str(request_date) >= str(gazetted_day.date_from) and str(request_date) <= str(gazetted_day.date_to):
+                        gazetted_date_from = gazetted_day.date_from +relativedelta(hours=+5)
+                        gazetted_date_to = gazetted_day.date_to +relativedelta(hours=+5)
+                        if str(attendance.att_date.strftime('%y-%m-%d')) >= str(gazetted_date_from.strftime('%y-%m-%d')) and str(attendance.att_date.strftime('%y-%m-%d')) <= str(gazetted_date_to.strftime('%y-%m-%d')):
                             # get gazetted overtime type
                             overtime_type = self.get_gazetted_overtime_type(employee_company, work_location)
 
-                    shift_schedule_lines = self.env['hr.shift.schedule.line'].search([('employee_id','=', attendance.employee_id.id),('rest_day','=',True),('date','=',request_date)])
+                    shift_schedule_lines = self.env['hr.shift.schedule.line'].search([('employee_id','=', attendance.employee_id.id),('rest_day','=',True),('date','=',attendance.att_date)])
 
                     for rest_day in shift_schedule_lines:
-                        if str(ovt_request_date) == str(rest_day.date):
+                        if rest_day.rest_day==True:
                             # get Rest Days overtime type
                             overtime_type = self.get_rest_days_overtime_type(employee_company, work_location)
 
