@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="employee_status_wizard_view" model="ir.ui.view">
+        <field name="name">employee.status.report</field>
+        <field name="model">employee.status</field>
+        <field name="arch" type="xml">
+            <form string="Employee Status">
+                <group>
+                    <field name="employee_type_ids"  widget="many2many_tags"/>
+                    <field name="location_ids"  widget="many2many_tags"/>
+                </group>
+                <group>
+                    <field name="department_ids" widget="many2many_tags"/>
+                    <field name="cost_center_ids" widget="many2many_tags"/>
+                    <field name="company_ids"  widget="many2many_tags"/>
+                </group>
+                <group>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                </group>
+
+                <footer>
+                    <button name="action_generate_pdf" type="object" string="Print PDF" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_status_wizard" model="ir.actions.act_window">
+        <field name="name">Status Report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">employee.status</field>
+        <field name="view_id" ref="de_hr_employee_report.employee_status_wizard_view"/>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

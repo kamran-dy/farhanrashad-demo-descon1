@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="paperformat_custom" model="report.paperformat">
+            <field name="name">Employee Status</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">0</field>
+            <field name="margin_bottom">0</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">0</field>
+            <field name="dpi">90</field>
+        </record>
+        <template id="employee_status_pdf">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="text-left">
+                            <div class="row" style="margin-top:0 !important;">
+                                <div class="col-3">
+                                    <img style="text-align:left;" src='/web/binary/company_logo'/>
+                                </div>
+                                <div class="col-6">
+                                    <h1 style="font-size:20px;color:blue;"><strong t-esc="company_name"/></h1>
+                                    <br></br>
+                                    <a style="font-weight:bold;font-size:20px;color:blue;">Employee Status Report</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <b>
+                                       Location:
+                                   </b>
+                                   <span t-esc="location"/>
+                                </div>
+                                <div class="col-2">
+                                    <b>
+                                       Department:
+                                   </b>
+                                   <span t-esc="department"/>
+                                </div>
+                                <div class="col-5">
+                                    <b>
+                                       Start Date:
+                                   </b>
+                                   <span t-esc="start_date"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <b>
+                                       Cost Center:
+                                   </b>
+                                   <span t-esc="cost_center"/>
+                                </div>
+                                <div class="col-2">
+                                    <b>
+                                       Emp Type:
+                                   </b>
+                                   <span t-esc="employee_type"/>
+                                </div>
+                                <div class="col-5">
+                                    <b>
+                                       End Date:
+                                   </b>
+                                   <span t-esc="end_date"/>
+                                </div>
+                            </div>
+                        </div>
+                       <div>
+                           <table class="table table-condensed" style="border: 1px solid black;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Sr #</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Location</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Department</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Emp Code</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Name</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Date of Joining</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Emp Type</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Grade Type</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">NIC Number</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Designation</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Position</b>
+                                        </th>
+                                        <th style="border: 1px solid black">
+                                            <b style="color:black">Resign Date</b>
+                                        </th>
+                                    </tr>
+                                </thead>
+                               <t t-set="count" t-value="1"/>
+                               <t t-foreach="active_contract" t-as="o">
+                                   <tbody class="invoice_tbody">
+                                       <tr style="border: 1px solid black">
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="count"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.work_location_id.name"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.department_id.name"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.emp_number"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.name"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.date"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.emp_type"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.grade_type.name"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.cnic"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.grade_designation.name"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.job_id.name"/>
+                                           </td>
+                                           <td style="border: 1px solid black">
+                                               <span t-esc="o.employee_id.resigned_date"/>
+                                           </td>
+                                           <t t-set="count" t-value="count+1"/>
+                                       </tr>
+                                   </tbody>
+                               </t>
+                           </table>
+                       </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

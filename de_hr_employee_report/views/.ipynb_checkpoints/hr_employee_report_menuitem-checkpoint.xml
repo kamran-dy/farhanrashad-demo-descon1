@@ -41,6 +41,11 @@
                   parent="hr.hr_menu_hr_reports"
                   action="de_hr_employee_report.action_experience_wizard" sequence="10"
         />
+        <menuitem id="menu_status_report"
+                  name="Status Report"
+                  parent="hr.hr_menu_hr_reports"
+                  action="de_hr_employee_report.action_status_wizard" sequence="11"
+        />
     </data>
 </odoo>
 

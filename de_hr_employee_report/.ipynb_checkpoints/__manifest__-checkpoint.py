@@ -23,6 +23,7 @@
         'wizards/employee_information_wizard.xml',
         'wizards/dob_wizard.xml',
         'wizards/employee_experience_wizard.xml',
+        'wizards/employee_status_wizard_view.xml',
         'views/view_employee_type.xml',
         'views/hr_employee_report_menuitem.xml',
         'reports/contract_expiry_report_xlsx.xml',
@@ -38,7 +39,8 @@
         'reports/employee_information_report_pdf.xml',
         'reports/employee_information_report_xlsx.xml',
         'reports/employee_dob_report_pdf.xml',
-        'reports/employee_experience_report_pdf.xml'
+        'reports/employee_experience_report_pdf.xml',
+        'reports/employee_status_report_pdf.xml'
 ],
     "installable": True,
     "application": False,
