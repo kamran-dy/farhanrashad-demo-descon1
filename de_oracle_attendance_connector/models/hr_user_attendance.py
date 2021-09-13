@@ -29,8 +29,8 @@ class HrUserAttendance(models.Model):
 
     def action_attendace_validated(self):
         
-        month_datetime = fields.date.today() - timedelta(2)
-        for month_date in range(2):
+        month_datetime = fields.date.today() - timedelta(11)
+        for month_date in range(3):
             attendance_date1 =  month_datetime + timedelta(month_date)
             total_employee = self.env['hr.employee'].search([])
             for employee in total_employee:
