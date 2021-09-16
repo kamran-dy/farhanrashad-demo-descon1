@@ -152,7 +152,7 @@ class PurchaseAttendanceReport(models.AbstractModel):
                             else:
                                 gazetted_days_count += 1
                 if shift_line.rest_day == True:
-                    exist_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=',shift_line.date)])
+                    exist_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=',shift_line.date)], limit=1)
                     if  exist_attendance.check_in and exist_attendance.check_out:
                         pass
                     else:
@@ -305,7 +305,7 @@ class PurchaseAttendanceReport(models.AbstractModel):
                         if check_out_time :
                             datecheck_out_time = datetime.strptime(str(check_out_time), "%Y-%m-%d %H:%M:%S").strftime('%d/%b/%Y %H:%M:%S')
                     
-                    if tot_hours < (current_shift.hours_per_day -1):
+                    if tot_hours < (current_shift.hours_per_day - 1.30):
                         remarks = 'Half Present'
                     if tot_hours < ((current_shift.hours_per_day)/2):
                         remarks = 'Absent.' 
@@ -335,6 +335,13 @@ class PurchaseAttendanceReport(models.AbstractModel):
                             remarks = 'Attendance Present.'
                         else:    
                             remarks = 'Restday.'
+                    rectify_color = 0
+                    daily_rectify = self.env['hr.attendance.rectification'].sudo().search([('employee_id','=', employee.id),('state','in', ('approved','submitted'))])
+                    for single_rectify in daily_rectify:
+                        if date_after_month.strftime('%Y-%m-%d') >=  single_rectify.check_in.strftime('%Y-%m-%d') and date_after_month.strftime('%Y-%m-%d') <=  single_rectify.check_out.strftime('%Y-%m-%d'):
+                            if  single_rectify:
+                                remarks =  'Rectification' +' ('+str(single_rectify.state) +')' 
+                                    
                     attendances.append({
                             'date': date_after_month.strftime('%d/%b/%Y'),
                             'day':  day1,
@@ -344,6 +351,7 @@ class PurchaseAttendanceReport(models.AbstractModel):
                             'shift': shift,
                             'rest_day': rest_day,
                             'leave': leave_color,
+                            'rectify': rectify_color, 
                             'gazetted': gazetted_color,
                             'remarks': remarks,
                     })
@@ -396,6 +404,15 @@ class PurchaseAttendanceReport(models.AbstractModel):
                                 status = 'Approved'         
                             remarks =  str(daily_leave.holiday_status_id.name) +' ('+str(status) +')'
                             leave_color = '1'
+                    rectify_color = 0
+                    daily_rectify = self.env['hr.attendance.rectification'].sudo().search([('employee_id','=', employee.id),('state','in', ('approved','submitted'))])
+                    for single_rectify in daily_rectify:
+                        if date_after_month.strftime('%Y-%m-%d') >=  single_rectify.check_in.strftime('%Y-%m-%d') and date_after_month.strftime('%Y-%m-%d') <=  single_rectify.check_out.strftime('%Y-%m-%d'):
+                            if  single_rectify:
+                                remarks =  'Rectification' +' ('+str(single_rectify.state) +')' 
+                                rectify_color = 1     
+                       
+                    
                     attendances.append({
                         'date': date_after_month.strftime('%d/%b/%Y'),
                         'day':  day1,
@@ -404,6 +421,7 @@ class PurchaseAttendanceReport(models.AbstractModel):
                         'hours': 0.0,
                         'shift': shift,
                         'leave': leave_color,
+                         'rectify': rectify_color,
                         'gazetted': gazetted_color,
                         'rest_day': rest_day,
                         'remarks': remarks,
@@ -570,7 +588,7 @@ class PurchaseAttendanceReport(models.AbstractModel):
                             else:
                                 gazetted_days_count += 1       
                 if shift_line.rest_day == True:
-                    exist_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=',shift_line.date)])
+                    exist_attendance = self.env['hr.attendance'].search([('employee_id','=',employee.id),('att_date','=',shift_line.date)], limit=1)
                     if  exist_attendance.check_in and exist_attendance.check_out:
                         pass
                     else:
@@ -724,7 +742,7 @@ class PurchaseAttendanceReport(models.AbstractModel):
                             datecheck_out_time = datetime.strptime(str(check_out_time), "%Y-%m-%d %H:%M:%S").strftime('%d/%b/%Y %H:%M:%S')
                             
                             
-                    if tot_hours < (current_shift.hours_per_day -1):
+                    if tot_hours < (current_shift.hours_per_day - 1.30):
                         remarks = 'Half Present'
                     if tot_hours < ((current_shift.hours_per_day)/2):
                         remarks = 'Absent.'
@@ -754,6 +772,9 @@ class PurchaseAttendanceReport(models.AbstractModel):
                             remarks = 'Attendance Present.'
                         else:    
                             remarks = 'Restday.'
+                    daily_rectify = self.env['hr.attendance.rectification'].sudo().search([('employee_id','=', employee.id),('date','=', date_after_month),('state','in', ('approved','submitted'))], limit=1)
+                    if  daily_rectify:
+                        remarks =  'Rectification' +' ('+str(daily_rectify.state) +')' 
                     attendances.append({
                             'date': date_after_month.strftime('%d/%b/%Y'),
                             'day':  day1,
@@ -815,6 +836,9 @@ class PurchaseAttendanceReport(models.AbstractModel):
                                 status = 'Approved'         
                             remarks =  str(daily_leave.holiday_status_id.name) +' ('+str(status) +')' 
                             leave_color = '1'
+                    daily_rectify = self.env['hr.attendance.rectification'].sudo().search([('employee_id','=', employee.id),('date','=', date_after_month),('state','in', ('approved','submitted'))], limit=1)
+                    if  daily_rectify:
+                        remarks =  'Rectification' +' ('+str(daily_rectify.state) +')' 
                     attendances.append({
                         'date': date_after_month.strftime('%d/%b/%Y'),
                         'day':  day1,
