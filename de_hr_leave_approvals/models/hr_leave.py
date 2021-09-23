@@ -247,7 +247,7 @@ class HolidaysRequest(models.Model):
                     holiday_sudo.action_create_approval_request()
                 elif not self._context.get('import_file'):
                     holiday_sudo.activity_update()
-            holiday._get_date_from_to()  
+            #holiday._get_date_from_to()  
             holiday._get_duration_update_approval()  
             holiday.action_validate_leave_period()
             holiday.action_onchange_attachment()  
